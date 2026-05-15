@@ -1,0 +1,207 @@
+<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+  
+  <div class="p-6 flex">
+    <mat-card-title class="mat-mdc-card-title mb-0">
+      {{ plan?.name }}
+    </mat-card-title>
+  </div>
+
+  <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+
+    <div class="grid grid-cols-12 gap-6">
+
+        <div class="col-span-12 lg:col-span-9">
+
+
+            <div *ngIf="finalizado" class="max-w-5xl px-3 mx-auto">
+                <h4 class="text-3xl font-semibold text-center leading-relaxed mb-4">
+                    Tu plan de tesis ha sido completado correctamente.
+                    Ya puedes ver todas tus respuestas y descargar tu documento final.
+                </h4>
+
+
+            </div>
+
+
+            <mat-card *ngIf="!finalizado" class="mat-mdc-card border border-border shadow-none mb-0">
+
+                <div class="p-4">
+                    <mat-card-title>
+                        {{ sectionProgress?.title }}: {{ sectionProgress?.description }}
+                    </mat-card-title>
+                </div>
+
+                <mat-card-content class="border-t border-border">
+
+                    <form [formGroup]="form">
+                        <div class="grid grid-cols-8 gap-x-4 text-sm"
+                            >
+
+                            <div class="col-span-8">
+                                <mat-label class="font-semibold mb-2 block">
+                                        {{ currentQuestion?.text }}
+
+                                        <small class="text-success cursor-pointer"
+                                            title="Ver detalle"
+                                            (click)="verDetalle(currentQuestion)">
+                                            <strong>Ver detalle</strong>
+                                        </small>
+                                </mat-label>
+
+                                <div class="flex items-center gap-2 w-full">
+
+                                    <mat-form-field appearance="outline" class="flex-1">
+                                            <textarea
+                                            matInput
+                                            rows="3"   autofocus formControlName="answer">
+                                        </textarea>
+                                    </mat-form-field>
+
+                                    <!-- input oculto -->
+                                    <!-- <input
+                                        type="file"
+                                        hidden
+                                        #fileInput
+                                        (change)="onFileSelected($event)"
+                                    /> -->
+
+                                    <!-- botón -->
+                                    <button *ngIf="currentQuestion?.image == 1"
+                                        mat-icon-button
+                                        color="primary"
+                                        type="button"
+                                        title="Adjuntar archivo">
+
+                                        <mat-icon>attach_file</mat-icon>
+
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3 flex gap-2">
+                            <button  type="button"
+                                    (click)="validarRespuesta()" 
+                                    mat-flat-button 
+                                    color="primary">
+                                Enviar info
+                            </button>
+
+                            <button mat-stroked-button color="warn">
+                                Limpiar
+                            </button>
+                        </div>
+                    </form>
+
+                </mat-card-content>
+                <mat-card-content class="border-t border-border">
+                    <form>
+                        <div class="grid grid-cols-8 gap-x-4 text-sm">
+
+                            <div class="col-span-8">
+                                <mat-label class="font-semibold mb-2 block">
+                                    Respuesta obtenida
+                                </mat-label>
+
+                                <mat-form-field appearance="outline" class="w-full">
+                                    <textarea
+                                        matInput
+                                        rows="12"
+                                        [(ngModel)]="reply" name="reply">
+                                    </textarea>
+                                </mat-form-field>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3 flex gap-2">
+                            <button mat-flat-button color="accent">
+                                Guardar esta respuesta para esta pregunta
+                            </button>
+                        </div>
+                    </form>
+
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+       <div class="col-span-12 lg:col-span-3">
+
+            <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
+
+                <div class="p-4">
+                <mat-card-title class="mat-mdc-card-title">
+                    Modulos/Capitulos
+                </mat-card-title>
+                </div>
+
+                <mat-card-content class="border-t border-border">
+
+                <mat-chip-listbox aria-label="Color selection">
+
+                    <mat-chip-option
+                    *ngFor="let section of sections; let i = index"
+                    selected
+                    color="primary">
+
+                    {{ section.title }} : {{ section.description }}
+
+                    </mat-chip-option>
+
+                </mat-chip-listbox>
+
+                </mat-card-content>
+
+            </mat-card>
+
+        </div>
+
+
+
+    </div>
+    </mat-card-content>
+</mat-card>
+<!--MODAL ver detalle -->
+<!-- MODAL -->
+<div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+
+    <div class="bg-white w-full max-w-lg rounded-lg shadow-lg">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between p-4 ">
+
+            <h5 class="font-semibold text-lg">
+                Detalle pregunta
+            </h5>
+
+            <button mat-icon-button (click)="cerrarModal()">
+                <mat-icon>close</mat-icon>
+            </button>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="p-4 space-y-2 text-sm">
+
+            <p><strong>Pregunta:</strong> {{ selectedQuestion?.text }}</p>
+
+            <p><strong>Detalle:</strong> {{ selectedQuestion?.detail }}</p>
+
+            <p><strong>Evidencia:</strong> {{ selectedQuestion?.evidence }}</p>
+
+            <p><strong>APA:</strong> {{ selectedQuestion?.apa }}</p>
+
+        </div>
+        <div class="flex justify-end gap-2 p-4 ">
+
+            <button mat-stroked-button color="warn" (click)="cerrarModal()">
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

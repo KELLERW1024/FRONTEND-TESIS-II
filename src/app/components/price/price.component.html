@@ -1,0 +1,97 @@
+<div class="max-w-5xl px-3 mx-auto">
+
+  <h4 class="text-3xl font-semibold text-center leading-relaxed mb-4">
+    Elige el plan que mejor se adapte a tu proyecto!
+  </h4>
+
+
+</div>
+<div class="grid grid-cols-12 gap-6 mt-16">
+
+  <!-- SILVER -->
+  <div class="col-span-12 sm:col-span-6 lg:col-span-4" *ngFor="let plan of plans">
+
+    <mat-card class="cardWithShadow">
+       <span class="absolute right-4 top-4 text-xs bg-green-100 text-yellow-700 px-2 py-1 rounded">
+        Suscriptions
+      </span>
+      <br/>
+
+      <mat-card-content class="py-6 text-center">
+
+        <span class="block uppercase text-xs mb-4">{{ plan.name }}</span>
+
+        <img src="/assets/images/backgrounds/gold.png" width="90" alt="badge" class="mx-auto">
+
+        <h2 class="text-5xl font-bold my-5">{{ plan.price }}</h2>
+
+        <div class="space-y-3 text-left">
+
+          <div class="flex items-center">
+            <mat-icon class="text-primary mr-2">check</mat-icon>
+            <span class="text-sm"> {{ plan.description }} </span>
+          </div>
+
+        </div>
+
+        <button mat-flat-button color="primary" class="w-full mt-6" (click)="openPayment(plan)">
+          Obtener Plan
+        </button>
+
+      </mat-card-content>
+
+    </mat-card>
+
+  </div>
+
+
+</div>
+
+<div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+
+  <div class="bg-white w-full max-w-lg rounded-lg shadow-lg">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between p-4">
+
+      <h5 class="font-semibold text-lg">
+        Confirmar pago
+      </h5>
+
+      <button mat-icon-button (click)="cerrarModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+    </div>
+
+    <!-- BODY -->
+    <div class="p-4 space-y-2 text-sm">
+
+      <p><strong>Plan:</strong> {{ selectedPlan?.name }}</p>
+
+      <p><strong>Código:</strong> {{ selectedPlan?.code }}</p>
+
+      <p><strong>Descripción:</strong> {{ selectedPlan?.description }}</p>
+
+      <p class="text-lg font-bold">
+        Precio: ${{ selectedPlan?.price }}
+      </p>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex justify-end gap-2 p-4">
+
+      <button mat-stroked-button color="warn" (click)="cerrarModal()">
+        Cancelar
+      </button>
+
+      <button mat-flat-button color="primary" (click)="pagarPlan()">
+        Pagar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
