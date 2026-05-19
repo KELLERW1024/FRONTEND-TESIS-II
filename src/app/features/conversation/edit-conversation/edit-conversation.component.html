@@ -33,7 +33,7 @@
 
                 <mat-card-content class="border-t border-border">
 
-                    <form [formGroup]="form">
+                    <form [formGroup]="form" (ngSubmit)="validarRespuesta()">
                         <div class="grid grid-cols-8 gap-x-4 text-sm"
                             >
 
@@ -44,9 +44,63 @@
                                         <small class="text-success cursor-pointer"
                                             title="Ver detalle"
                                             (click)="verDetalle(currentQuestion)">
-                                            <strong>Ver detalle</strong>
+                                            <strong>Ver detalle para responder</strong>
+                                            
                                         </small>
+                                      
                                 </mat-label>
+                                <mat-label class="font-semibold mb-2 block">
+
+                                    <button *ngIf="currentQuestion?.image == 1"
+                                            type="button"
+                                            class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
+                                            title="Adjuntar archivo"
+                                            (click)="fileInput.click()">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="w-12 h-12 text-primary"
+                                            viewBox="0 0 24 24">
+
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path fill="currentColor" fill-rule="evenodd"
+                                                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m.75-13a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25z"
+                                                clip-rule="evenodd" />
+
+                                        </svg>
+
+                                    </button>
+
+                                    <input type="file"
+                                            #fileInput
+                                            multiple
+                                            style="display: none"
+                                            (change)="onFileSelected($event)"    />
+                                    <div *ngIf="selectedFiles.length > 0" class="mt-2">
+                                        <p class="text-sm font-medium">Archivos seleccionados:</p>
+
+                                        <ul>
+                                            <li *ngFor="let file of selectedFiles; let i = index; trackBy: trackByFile">
+                                            {{ file.name }} ({{ file.size / 1024 | number:'1.0-0' }} KB)
+
+                                                <button
+                                                    type="button"
+                                                    (click)="removeFile(i)"
+                                                    class="ml-2 text-red-500 hover:text-red-700"
+                                                    title="Eliminar archivo">
+                                                    ✖
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </mat-label>
+                                <div class="flex gap-2 mt-2">
+
+                                    <div *ngFor="let img of previewFiles">
+                                        <img [src]="img" width="80" class="rounded" />
+                                    </div>
+
+                                </div>
 
                                 <div class="flex items-center gap-2 w-full">
 
@@ -57,24 +111,8 @@
                                         </textarea>
                                     </mat-form-field>
 
-                                    <!-- input oculto -->
-                                    <!-- <input
-                                        type="file"
-                                        hidden
-                                        #fileInput
-                                        (change)="onFileSelected($event)"
-                                    /> -->
-
-                                    <!-- botón -->
-                                    <button *ngIf="currentQuestion?.image == 1"
-                                        mat-icon-button
-                                        color="primary"
-                                        type="button"
-                                        title="Adjuntar archivo">
-
-                                        <mat-icon>attach_file</mat-icon>
-
-                                    </button>
+                                  
+                                  
 
                                 </div>
                             </div>
@@ -82,9 +120,7 @@
                         </div>
 
                         <div class="mt-3 flex gap-2">
-                            <button  type="button"
-                                    (click)="validarRespuesta()" 
-                                    mat-flat-button 
+                            <button mat-flat-button 
                                     color="primary">
                                 Enviar info
                             </button>
@@ -117,7 +153,7 @@
                         </div>
 
                         <div class="mt-3 flex gap-2">
-                            <button mat-flat-button color="accent">
+                            <button mat-flat-button color="accent" (click)="guardarRespuesta()">
                                 Guardar esta respuesta para esta pregunta
                             </button>
                         </div>

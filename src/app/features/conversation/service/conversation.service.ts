@@ -57,14 +57,19 @@ export class ConversationService {
         return this.http.post(URL,data,{headers: headers});
     }
 
-    validateAnswer(data: any): Observable<AnswerValidationResponse> {
-      let headers = new HttpHeaders({
-        'Authorization': 'Bearer ' + this.authService.token
+    validateAnswer(data: FormData): Observable<AnswerValidationResponse> {
+
+      const headers = new HttpHeaders({
+        Authorization: 'Bearer ' + this.authService.token
       });
 
-      let URL = URL_SERVICIOS + "/conversation/validateanswer";
+      const URL = URL_SERVICIOS + "/conversation/validateanswer";
 
-      return this.http.post<AnswerValidationResponse>(URL, data, { headers });
+      return this.http.post<AnswerValidationResponse>(
+        URL,
+        data,
+        { headers }
+      );
     }
 
     guardarRespuestas( data: any ){

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +13,8 @@ import { Plan, Question, Section } from 'src/app/core/models/PlanResponse';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AnswerValidationResponse } from 'src/app/core/models/ValidarRespuestaResponse';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from 'src/app/components/dialog/dialog.component';
 
 @Component({
   selector: 'app-edit-conversation',
@@ -28,6 +30,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './edit-conversation.component.scss',
 })
 export class EditConversationComponent {
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  
+  openFilePicker() {
+    this.fileInput.nativeElement.click();
+  }
 
   idSuscriptionConversation!: number;
   idPlan!: number;
@@ -50,12 +58,15 @@ export class EditConversationComponent {
   selectedQuestion: any = null;
   showModal = false;
 
+  selectedFiles: File[] = [];
+  previewFiles: string[] = [];
+
   form!: FormGroup;
 
   constructor(
     private conversationService: ConversationService,
     private router: Router , 
-    private route: ActivatedRoute, private fb: FormBuilder, private snackBar: MatSnackBar
+    private route: ActivatedRoute, private fb: FormBuilder, private snackBar: MatSnackBar, private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -83,40 +94,28 @@ export class EditConversationComponent {
     this.showModal = false;
   }
 
-  // addConversation(){
-  //   this.conversationService.startConversation( 1 ).subscribe ({
-  //     next: (resp: any) => {
-  //       this.idConversation = resp.conversation_id;
-
-  //       console.log('DATA START => ',  resp );
-  //       console.log(resp);
-
-  //     },
-  //     error: (err: any) => {
-  //       console.error(err);
-  //     },
-  //     complete: () => {
-  //       console.log('Completado');
-  //     }
-  //   }) 
-  // }
   obtenerDataConversation(){
+
     console.log("Suscription => obtenerDataConversation "   )
+
     this.conversationService.getDataConversation( this.idSuscriptionConversation ).subscribe ({
       next: (resp: any) => {
       this.plan = resp.data.plan;
-      console.log('PLAN RESP ',  resp);
+      console.log('PLAN => ',  resp);
 
       this.sections = this.plan.sections ;
       console.log('Sections => ',  this.sections);
 
       this.sectionProgress = this.sections.find(
-          (s: any) => !s.answer_section
-        ) || null;
+          (s: any) =>
+                      s.progress_section === 'in_progress' ||
+                      s.progress_section === null
+              ) ?? null;
 
-      console.log('Section => ',  this.sectionProgress );
+      console.log('SectionCurrent => ',  this.sectionProgress );
 
       this.questions = this.sectionProgress?.questions ?? [];
+
       this.currentQuestion =  this.questions.find(q => q.answer_question === null) ?? null;
 
       console.log(" QUESTION CURRENT => {}" , this.currentQuestion);
@@ -132,45 +131,137 @@ export class EditConversationComponent {
   
     }) 
   }
+  onFileSelected(event: any) {
+
+     const files: FileList = event.target.files;
+
+      // IMPORTANTE: no perder referencia previa si quieres acumular
+      const newFiles: File[] = [];
+
+      for (let i = 0; i < files.length && i < 2; i++) {
+        newFiles.push(files[i]);
+      }
+
+      // si quieres REEMPLAZAR siempre:
+      this.selectedFiles = [...this.selectedFiles, ...newFiles];
+
+      // reset para permitir re-selección del mismo archivo
+      event.target.value = '';
+  }
+  removeFile(index: number): void {
+    this.selectedFiles.splice(index, 1);
+  }
+
+  trackByFile(index: number, file: File): string {
+    return file.name + file.lastModified;
+  }
+  
 
   validarRespuesta(){
-    const payloadRespuesta =  { 
-        pregunta : this.currentQuestion?.text ,
-        detail : this.currentQuestion?.detail ,
-        evidence : this.currentQuestion?.evidence ,
-        respuesta: this.form.value.answer,
-    }
-    console.log("Payload {}", payloadRespuesta)
-    this.conversationService.validateAnswer( payloadRespuesta ).subscribe ({
-      next: (resp:  AnswerValidationResponse ) => {
-        console.log("Validacion de respuesta : {}" ,  resp);
-        this.validationResponse = resp ;
+    const respuesta = this.form.value.answer?.trim();
+    console.count('🔥 validarRespuesta');
 
-        if( this.validationResponse.is_valid && this.validationResponse.score >= 70 ){
-          this.conversationPayloadResponse();
-        }else{
-           this.snackBar.open(
-              this.validationResponse.feedback + ' : Reponder  nuevamente',
-              'Cerrar',
-              {
-                duration: 4000,
-                panelClass: ['error-snackbar']
-              }
-            );
-          
+    if (!respuesta) {
+       return this.showDialog('error', 'La respuesta es obligatoria', 'Error');
+    }
+
+    if (this.selectedFiles.length > 2) {
+      return this.showDialog('error', 'Solo se permiten dos archivos', 'Error');
+    }
+
+    const invalidFile = this.selectedFiles.find(
+      file => !this.isValidFile(file)
+    );
+
+    if (invalidFile) {
+      return this.showDialog('info', 
+        'Solo se permiten documentos (DOCX, DOC, PDF) e imágenes (JPG, PNG) y hojas de cálculo (XLS, XLSX)', 'Info'
+      );
+    }
+
+    const formData = this.buildFormData(respuesta);
+
+    this.conversationService
+      .validateAnswer(formData)
+      .subscribe({
+
+        next: (resp: AnswerValidationResponse) => {
+
+          console.log("Validacion:", resp);
+
+          this.validationResponse = resp;
+
+          if (
+            this.validationResponse.is_valid &&
+            this.validationResponse.score >= 70
+          ) {
+
+            //this.conversationPayloadResponse();
+
+          } else {
+            return this.showDialog('info',  this.validationResponse.feedback , 'Info');
+
+          }
+
+        },
+
+        error: (err: any) => {
+          console.error(err);
+        },
+
+        complete: () => {
+          console.log('Completado');
         }
 
+      });
 
-      },
-      error: (err: any) => {
-        console.error(err);
-      },
-      complete: () => {
-        console.log('Completado');
+
+  }
+  showDialog(
+    type: 'success' | 'error' | 'info',
+    message: string,
+    title = 'Aviso'
+  ) {
+    this.dialog.open(DialogComponent, {
+      width: '400px',
+      data: {
+        type,
+        title,
+        message,
+        confirmText: 'Aceptar'
       }
-   
-    }) 
+    });
+  }
+ 
+  private buildFormData(respuesta: string): FormData {
 
+    const formData = new FormData();
+
+    formData.append(
+      'pregunta',
+      this.currentQuestion?.text || ''
+    );
+
+    formData.append(
+      'detail',
+      this.currentQuestion?.detail || ''
+    );
+
+    formData.append(
+      'evidence',
+      this.currentQuestion?.evidence || ''
+    );
+
+    formData.append(
+      'respuesta',
+      respuesta
+    );
+
+    this.selectedFiles.forEach(file => {
+      formData.append('files[]', file, file.name);
+    });
+
+    return formData;
   }
 
   //  obtenerSectionsPlanSuscription(){
@@ -259,18 +350,20 @@ export class EditConversationComponent {
     //FORMATO 
     console.log("guardarRespuesta" + this.idPlan)
     const payload =  { 
-        idPlan : this.idPlan ,
-        idConversation: this.idConversation ,
+        idPlan : this.plan.id ,
+        idConversation: this.idSuscriptionConversation,
         idSection: this.sectionProgress?.id , 
+        idQuestion : this.currentQuestion?.id,
         reply: this.reply
     }
 
     this.conversationService.guardarRespuestas( payload ).subscribe ({
       next: (resp: any) => {
-        console.log(resp);
+        console.log("Estado Guaradar Respuesta {} ", resp);
         this.obtenerDataConversation();
         this.reply = '' ;
         this.answers = [];
+        this.form.reset();
       }
    
     })  
@@ -306,6 +399,82 @@ export class EditConversationComponent {
       
     });
 
+  }
+
+  isValidFile(file: File): boolean {
+
+    const allowedTypes = [
+
+      // imágenes
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+
+      // PDF
+      'application/pdf',
+
+      // Word
+      'application/msword', // .doc
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+
+      // Excel
+      'application/vnd.ms-excel', // .xls
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+    ];
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    const isValidType = allowedTypes.includes(file.type);
+    const isValidSize = file.size <= maxSize;
+
+    return isValidType && isValidSize;
+  }
+
+  validateFiles() {
+
+    if (this.selectedFiles.length > 2) {
+      this.selectedFiles = [];
+
+      this.snackBar.open(
+        'Solo se permiten máximo 2 archivos',
+        'Cerrar',
+        { duration: 4000 }
+      );
+
+      return;
+    }
+
+    let images = 0;
+    let docs = 0;
+
+    this.selectedFiles.forEach(file => {
+
+      if (file.type.startsWith('image/')) {
+        images++;
+      } else {
+        docs++;
+      }
+    });
+
+    if (images > 1) {
+      this.selectedFiles = [];
+
+      this.snackBar.open(
+        'Solo se permite 1 imagen',
+        'Cerrar',
+        { duration: 4000 }
+      );
+    }
+
+    if (docs > 1) {
+      this.selectedFiles = [];
+
+      this.snackBar.open(
+        'Solo se permite 1 documento',
+        'Cerrar',
+        { duration: 4000 }
+      );
+    }
   }
 
 

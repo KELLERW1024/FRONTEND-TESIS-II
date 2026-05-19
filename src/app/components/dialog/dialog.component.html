@@ -1,0 +1,23 @@
+<div class="p-6 text-center">
+
+  <!-- ICON -->
+  <div class="text-5xl mb-3" [class]="colorClass">
+    {{ icon }}
+  </div>
+
+  <!-- TITLE -->
+  <h2 class="text-xl font-bold mb-2">
+    {{ data.title }}
+  </h2>
+
+  <!-- MESSAGE -->
+  <p class="text-gray-600 mb-6">
+    {{ data.message }}
+  </p>
+
+  <!-- ACTION -->
+  <button mat-flat-button color="primary" (click)="close()">
+    {{ data.confirmText || 'Aceptar' }}
+  </button>
+
+</div>
