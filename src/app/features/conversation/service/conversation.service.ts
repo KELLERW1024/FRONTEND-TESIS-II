@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { ApiResponse } from '../conversation/conversation.component';
 import { AnswerValidationResponse } from 'src/app/core/models/ValidarRespuestaResponse';
 import { Observable } from 'rxjs';
+import { IaResponse } from 'src/app/core/models/IAResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -53,8 +54,8 @@ export class ConversationService {
     }
     enviarContextoRespuestas( data: any ){
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
-        let URL = URL_SERVICIOS+"/conversation";
-        return this.http.post(URL,data,{headers: headers});
+        let URL = URL_SERVICIOS+"/conversation/validateAnswerResponse";
+        return this.http.post<IaResponse>(URL,data,{headers: headers});
     }
 
     validateAnswer(data: FormData): Observable<AnswerValidationResponse> {

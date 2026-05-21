@@ -15,6 +15,8 @@ import { AnswerValidationResponse } from 'src/app/core/models/ValidarRespuestaRe
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/components/dialog/dialog.component';
+import { IaResponse } from 'src/app/core/models/IAResponse';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-edit-conversation',
@@ -63,7 +65,22 @@ export class EditConversationComponent {
 
   form!: FormGroup;
 
-  constructor(
+  images: string[] = [];
+  imagesSafe: any[] = [];
+  selectedImage: string | null = null;
+
+  openImage(img: string) {
+    this.selectedImage = img;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeImage() {
+    this.selectedImage = null;
+    document.body.style.overflow = 'auto';
+  }
+
+
+  constructor( private sanitizer: DomSanitizer, 
     private conversationService: ConversationService,
     private router: Router , 
     private route: ActivatedRoute, private fb: FormBuilder, private snackBar: MatSnackBar, private dialog: MatDialog
@@ -71,8 +88,9 @@ export class EditConversationComponent {
 
   ngOnInit() {
     this.form = this.fb.group({
-    answer: ['']
-  });
+      answer: [''], 
+      showImages: [false]
+    });
     
     this.finalizado = false;
     this.route.params.subscribe(params => {
@@ -158,15 +176,35 @@ export class EditConversationComponent {
   
 
   validarRespuesta(){
-    const respuesta = this.form.value.answer?.trim();
+    const respuesta = this.form.value.answer?.trim() || '';
     console.count('🔥 validarRespuesta');
 
-    if (!respuesta) {
+    if ( !respuesta && this.selectedFiles.length == 0 ) {
        return this.showDialog('error', 'La respuesta es obligatoria', 'Error');
     }
 
     if (this.selectedFiles.length > 2) {
       return this.showDialog('error', 'Solo se permiten dos archivos', 'Error');
+    }
+
+    const allowedDocTypes = [
+                            'application/pdf',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                          ];
+    const images = this.selectedFiles.filter(f => f.type.startsWith('image/'));
+    const docs = this.selectedFiles.filter(f =>
+                                              allowedDocTypes.includes(f.type)
+                                            );
+
+    if (images.length > 1 || docs.length > 1) {
+      return this.showDialog(
+        'info',
+        'Solo puedes subir como máximo 1 imagen y 1 documento por envío.',
+        'Info'
+      );
     }
 
     const invalidFile = this.selectedFiles.find(
@@ -195,8 +233,8 @@ export class EditConversationComponent {
             this.validationResponse.is_valid &&
             this.validationResponse.score >= 70
           ) {
-
-            //this.conversationPayloadResponse();
+            //return this.showDialog('success',  this.validationResponse.feedback , 'Success');
+            this.conversationPayloadResponse();
 
           } else {
             return this.showDialog('info',  this.validationResponse.feedback , 'Info');
@@ -248,8 +286,13 @@ export class EditConversationComponent {
     );
 
     formData.append(
-      'evidence',
-      this.currentQuestion?.evidence || ''
+      'validation',
+      this.currentQuestion?.validation || ''
+    );
+
+    formData.append(
+      'apa',
+      this.currentQuestion?.apa || ''
     );
 
     formData.append(
@@ -263,6 +306,46 @@ export class EditConversationComponent {
 
     return formData;
   }
+
+  private buildFormDataOK(): FormData {
+
+    const formData = new FormData();
+
+    formData.append('idPlan', String(this.plan.id));
+    formData.append('idSection', String(this.sectionProgress?.id));
+    formData.append('idConversation', String(this.idSuscriptionConversation));
+    formData.append('idQuestion', String(this.currentQuestion?.id));
+
+    formData.append('plan', this.plan.name);
+    formData.append('title', this.sectionProgress?.title ?? '');
+     formData.append(
+      'detail',
+      this.currentQuestion?.detail || ''
+    );
+
+   formData.append(
+      'validation',
+      this.currentQuestion?.validation || ''
+    );
+
+    formData.append(
+      'apa',
+      this.currentQuestion?.apa || ''
+    );
+    formData.append('description', this.sectionProgress?.description ?? '');
+    formData.append('question', this.currentQuestion?.text ?? '');
+
+    formData.append('response', this.form.value.answer ?? '');
+    formData.append('apa', this.form.value.showImages ? '1' : '0');
+    formData.append('is_visual', this.form.value.showImages ? '1' : '0');
+
+    this.selectedFiles.forEach(file => {
+      formData.append('files[]', file, file.name);
+    });
+
+    return formData;
+  }
+
 
   //  obtenerSectionsPlanSuscription(){
   //   console.log("obtenerSectionPlan1 => " + this.idSuscriptionConversation)
@@ -314,36 +397,41 @@ export class EditConversationComponent {
   conversationPayloadResponse() {
     console.log('Respuestas enviadas:', this.answers);
 
-    // if( !this.validarRespuestasDeInputs() ){ return }
+    
+    const formDataPayload = this.buildFormDataOK();
 
-    // aquí puedes armar el payload
-    const payload =  { 
-        idPlan : this.plan.id ,
-        idSection : this.sectionProgress?.id ,
-        idConversation : this.idSuscriptionConversation ,
-        idQuestion:  this.currentQuestion?.id,
-        plan: this.plan.name,
-        title: this.sectionProgress?.title,
-        description: this.sectionProgress?.description,
-        question: this.currentQuestion?.text ,  
-        response: this.form.value.answer
-    };
+    console.log('Payload:', formDataPayload);
 
-    console.log('Payload:', payload);
+     this.conversationService.enviarContextoRespuestas(formDataPayload).subscribe({
+        next: (resp: IaResponse) => {
 
-     this.conversationService.enviarContextoRespuestas( payload ).subscribe ({
-      next: (resp: any) => {
-        console.log("Respuesta Pregunta : {}" ,  resp);
-        this.reply = resp.reply ;
-      },
-      error: (err: any) => {
-        console.error(err);
-      },
-      complete: () => {
-        console.log('Completado');
-      }
-   
-    })  
+          console.log("Respuesta Pregunta : {}", resp);
+           if ( !resp.is_valid  ) {
+            return this.showDialog('info',  resp.feedback ?? '' , 'Info');
+
+          } 
+          this.reply = resp.response ?? '';
+          // this.images = resp.images ?? [];
+
+          // if (this.images.length > 0) {
+
+          //   this.imagesSafe = this.images.map((img: string) =>
+          //     this.sanitizer.bypassSecurityTrustUrl(img)
+          //   );
+
+          // } else {
+          //   this.imagesSafe = [];
+          // }
+        },
+
+        error: (err: any) => {
+          console.error(err);
+        },
+
+        complete: () => {
+          console.log('Completado');
+        }
+      });
   }
 
   guardarRespuesta(){
@@ -363,6 +451,7 @@ export class EditConversationComponent {
         this.obtenerDataConversation();
         this.reply = '' ;
         this.answers = [];
+        this.selectedFiles = [];
         this.form.reset();
       }
    
@@ -429,53 +518,54 @@ export class EditConversationComponent {
 
     return isValidType && isValidSize;
   }
+  
 
-  validateFiles() {
+  // validateFiles() {
 
-    if (this.selectedFiles.length > 2) {
-      this.selectedFiles = [];
+  //   if (this.selectedFiles.length > 2) {
+  //     this.selectedFiles = [];
 
-      this.snackBar.open(
-        'Solo se permiten máximo 2 archivos',
-        'Cerrar',
-        { duration: 4000 }
-      );
+  //     this.snackBar.open(
+  //       'Solo se permiten máximo 2 archivos',
+  //       'Cerrar',
+  //       { duration: 4000 }
+  //     );
 
-      return;
-    }
+  //     return;
+  //   }
 
-    let images = 0;
-    let docs = 0;
+  //   let images = 0;
+  //   let docs = 0;
 
-    this.selectedFiles.forEach(file => {
+  //   this.selectedFiles.forEach(file => {
 
-      if (file.type.startsWith('image/')) {
-        images++;
-      } else {
-        docs++;
-      }
-    });
+  //     if (file.type.startsWith('image/')) {
+  //       images++;
+  //     } else {
+  //       docs++;
+  //     }
+  //   });
 
-    if (images > 1) {
-      this.selectedFiles = [];
+  //   if (images > 1) {
+  //     this.selectedFiles = [];
 
-      this.snackBar.open(
-        'Solo se permite 1 imagen',
-        'Cerrar',
-        { duration: 4000 }
-      );
-    }
+  //     this.snackBar.open(
+  //       'Solo se permite 1 imagen',
+  //       'Cerrar',
+  //       { duration: 4000 }
+  //     );
+  //   }
 
-    if (docs > 1) {
-      this.selectedFiles = [];
+  //   if (docs > 1) {
+  //     this.selectedFiles = [];
 
-      this.snackBar.open(
-        'Solo se permite 1 documento',
-        'Cerrar',
-        { duration: 4000 }
-      );
-    }
-  }
+  //     this.snackBar.open(
+  //       'Solo se permite 1 documento',
+  //       'Cerrar',
+  //       { duration: 4000 }
+  //     );
+  //   }
+  // }
 
 
 
