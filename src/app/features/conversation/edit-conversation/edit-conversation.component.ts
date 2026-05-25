@@ -50,10 +50,8 @@ export class EditConversationComponent {
   currentQuestion!: Question | null;
   answers: string[] = [];
 
-  // answerText: string = '';
-
   reply : string = "";
-  validationResponse : AnswerValidationResponse | null;
+  iaResponse : IaResponse | null;
 
   finalizado : boolean = false;
 
@@ -61,24 +59,28 @@ export class EditConversationComponent {
   showModal = false;
 
   selectedFiles: File[] = [];
+
+  selectedFilesAdd: any[] = [];
+  selectedFilesAddDoc: any[] = [];
   previewFiles: string[] = [];
+
+  imagesAdd : any[] = [];
 
   form!: FormGroup;
 
   images: string[] = [];
   imagesSafe: any[] = [];
-  selectedImage: string | null = null;
+  selectedImage: string | null = null; // mostrar imagen generada por la IA
 
   openImage(img: string) {
     this.selectedImage = img;
-    document.body.style.overflow = 'hidden';
-  }
+      document.body.style.overflow = 'hidden';
+    }
 
   closeImage() {
     this.selectedImage = null;
     document.body.style.overflow = 'auto';
   }
-
 
   constructor( private sanitizer: DomSanitizer, 
     private conversationService: ConversationService,
@@ -89,7 +91,11 @@ export class EditConversationComponent {
   ngOnInit() {
     this.form = this.fb.group({
       answer: [''], 
-      showImages: [false]
+      showImages: [true], 
+      citaApa: [true], 
+
+      image: [null],
+      imageDescription: ['']
     });
     
     this.finalizado = false;
@@ -166,6 +172,98 @@ export class EditConversationComponent {
       // reset para permitir re-selección del mismo archivo
       event.target.value = '';
   }
+
+  // onFileSelectedAdd(event: any) : void {
+
+  //     const files: FileList = event.target.files;
+
+  //     const readers = Array.from(files).map(file => {
+
+  //         return new Promise<any>((resolve) => {
+
+  //           const reader = new FileReader();
+  //           reader.onload = () => {
+
+  //             resolve({
+  //               file: file,
+  //               preview: reader.result,
+  //               description: '', 
+  //               fuente:  ''
+  //             });
+
+  //           };
+
+  //           reader.readAsDataURL(file);
+  //         });
+
+  //     });
+
+  //     Promise.all(readers).then(results => {
+
+  //       this.selectedFilesAdd = [
+  //         ...this.selectedFilesAdd,
+  //         ...results
+  //       ];
+
+  //     });
+
+  //     event.target.value = '';
+  // }
+  onFileSelectedAddDoc(event: any) : void {
+
+        const files: FileList = event.target.files;
+
+        if (!files || files.length === 0) return;
+
+        Array.from(files).forEach(file => {
+
+          const isImage = file.type.startsWith('image/');
+
+          const item: any = {
+
+            file: file,
+
+            category: isImage ? 'image' : 'document',
+            description: '',
+            fuente: '',
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            preview: null
+          };
+
+          // 🖼 preview solo imágenes
+          if (isImage) {
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+
+              item.preview = reader.result;
+
+              this.selectedFilesAddDoc = [
+                  ...this.selectedFilesAddDoc,
+                  item
+                ];
+
+            };
+
+            reader.readAsDataURL(file);
+
+          }
+          else {
+
+            this.selectedFilesAddDoc.push(item);
+
+          }
+
+        });
+
+        console.log(this.selectedFilesAddDoc);
+
+        event.target.value = '';
+  }
+
   removeFile(index: number): void {
     this.selectedFiles.splice(index, 1);
   }
@@ -174,87 +272,6 @@ export class EditConversationComponent {
     return file.name + file.lastModified;
   }
   
-
-  validarRespuesta(){
-    const respuesta = this.form.value.answer?.trim() || '';
-    console.count('🔥 validarRespuesta');
-
-    if ( !respuesta && this.selectedFiles.length == 0 ) {
-       return this.showDialog('error', 'La respuesta es obligatoria', 'Error');
-    }
-
-    if (this.selectedFiles.length > 2) {
-      return this.showDialog('error', 'Solo se permiten dos archivos', 'Error');
-    }
-
-    const allowedDocTypes = [
-                            'application/pdf',
-                            'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'application/vnd.ms-excel',
-                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                          ];
-    const images = this.selectedFiles.filter(f => f.type.startsWith('image/'));
-    const docs = this.selectedFiles.filter(f =>
-                                              allowedDocTypes.includes(f.type)
-                                            );
-
-    if (images.length > 1 || docs.length > 1) {
-      return this.showDialog(
-        'info',
-        'Solo puedes subir como máximo 1 imagen y 1 documento por envío.',
-        'Info'
-      );
-    }
-
-    const invalidFile = this.selectedFiles.find(
-      file => !this.isValidFile(file)
-    );
-
-    if (invalidFile) {
-      return this.showDialog('info', 
-        'Solo se permiten documentos (DOCX, DOC, PDF) e imágenes (JPG, PNG) y hojas de cálculo (XLS, XLSX)', 'Info'
-      );
-    }
-
-    const formData = this.buildFormData(respuesta);
-
-    this.conversationService
-      .validateAnswer(formData)
-      .subscribe({
-
-        next: (resp: AnswerValidationResponse) => {
-
-          console.log("Validacion:", resp);
-
-          this.validationResponse = resp;
-
-          if (
-            this.validationResponse.is_valid &&
-            this.validationResponse.score >= 70
-          ) {
-            //return this.showDialog('success',  this.validationResponse.feedback , 'Success');
-            this.conversationPayloadResponse();
-
-          } else {
-            return this.showDialog('info',  this.validationResponse.feedback , 'Info');
-
-          }
-
-        },
-
-        error: (err: any) => {
-          console.error(err);
-        },
-
-        complete: () => {
-          console.log('Completado');
-        }
-
-      });
-
-
-  }
   showDialog(
     type: 'success' | 'error' | 'info',
     message: string,
@@ -270,78 +287,70 @@ export class EditConversationComponent {
       }
     });
   }
- 
-  private buildFormData(respuesta: string): FormData {
+
+  private buildFormData( tipo : string ): FormData {
 
     const formData = new FormData();
 
-    formData.append(
-      'pregunta',
-      this.currentQuestion?.text || ''
-    );
-
-    formData.append(
-      'detail',
-      this.currentQuestion?.detail || ''
-    );
-
-    formData.append(
-      'validation',
-      this.currentQuestion?.validation || ''
-    );
-
-    formData.append(
-      'apa',
-      this.currentQuestion?.apa || ''
-    );
-
-    formData.append(
-      'respuesta',
-      respuesta
-    );
-
-    this.selectedFiles.forEach(file => {
-      formData.append('files[]', file, file.name);
-    });
-
-    return formData;
-  }
-
-  private buildFormDataOK(): FormData {
-
-    const formData = new FormData();
-
+    // 🔥 DATA BASE (siempre)
     formData.append('idPlan', String(this.plan.id));
-    formData.append('idSection', String(this.sectionProgress?.id));
-    formData.append('idConversation', String(this.idSuscriptionConversation));
-    formData.append('idQuestion', String(this.currentQuestion?.id));
+    // formData.append('plan', this.plan.name);
+    formData.append('idSection', String(this.sectionProgress?.id ?? ''));
+    formData.append('idConversation', String(this.idSuscriptionConversation ?? ''));
+    formData.append('idQuestion', String(this.currentQuestion?.id ?? ''));
 
-    formData.append('plan', this.plan.name);
-    formData.append('title', this.sectionProgress?.title ?? '');
-     formData.append(
-      'detail',
-      this.currentQuestion?.detail || ''
-    );
+    switch( tipo ){
 
-   formData.append(
-      'validation',
-      this.currentQuestion?.validation || ''
-    );
+      case "validate":
 
-    formData.append(
-      'apa',
-      this.currentQuestion?.apa || ''
-    );
-    formData.append('description', this.sectionProgress?.description ?? '');
-    formData.append('question', this.currentQuestion?.text ?? '');
+          formData.append('plan', this.plan.name);
+          formData.append('title', this.sectionProgress?.title ?? '');
+         
+          formData.append( 'detail', this.currentQuestion?.detail || '' );
+          formData.append( 'validation', this.currentQuestion?.validation || '' );
 
-    formData.append('response', this.form.value.answer ?? '');
-    formData.append('apa', this.form.value.showImages ? '1' : '0');
-    formData.append('is_visual', this.form.value.showImages ? '1' : '0');
+          formData.append('description', this.sectionProgress?.description ?? '');
+          formData.append('question', this.currentQuestion?.text ?? '');
 
-    this.selectedFiles.forEach(file => {
-      formData.append('files[]', file, file.name);
-    });
+          formData.append('response', this.form.value.answer ?? '');
+          formData.append('apa', this.form.value.showImages ? '1' : '0');
+          formData.append('is_visual', this.form.value.showImages ? '1' : '0');
+
+          this.selectedFiles.forEach(file => {
+            formData.append('files[]', file, file.name);
+          });
+
+        break;
+      case "save" :
+
+            formData.append('reply', this.reply);
+
+            formData.append(
+              'metadata',
+              JSON.stringify(
+                this.selectedFilesAdd.map(item => ({
+                  description: item.description,
+                  fuente: item.fuente
+                }))
+              )
+            );
+
+            this.selectedFilesAdd.forEach(item => {
+              formData.append('files[]', item.file, item.file.name);
+            });
+
+            formData.append( 'references', JSON.stringify(this.iaResponse?.references ?? []) );
+
+        break;
+
+    }
+    for (let pair of formData.entries()) {
+      if (pair[1] instanceof File) {
+        console.log(pair[0], 'FILE =>', pair[1].name, pair[1].size);
+      } else {
+        console.log(pair[0], pair[1]);
+      }
+    }
 
     return formData;
   }
@@ -396,9 +405,48 @@ export class EditConversationComponent {
 
   conversationPayloadResponse() {
     console.log('Respuestas enviadas:', this.answers);
+        const respuesta = this.form.value.answer?.trim() || '';
+    console.count('🔥 validarRespuesta');
 
+    if ( !respuesta && this.selectedFiles.length == 0 ) {
+       return this.showDialog('error', 'La respuesta es obligatoria', 'Error');
+    }
+
+    if (this.selectedFiles.length > 2) {
+      return this.showDialog('error', 'Solo se permiten dos archivos', 'Error');
+    }
+
+    const allowedDocTypes = [
+                            'application/pdf',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                          ];
+    const images = this.selectedFiles.filter(f => f.type.startsWith('image/'));
+    const docs = this.selectedFiles.filter(f =>
+                                              allowedDocTypes.includes(f.type)
+                                            );
+
+    if (images.length > 1 || docs.length > 1) {
+      return this.showDialog(
+        'info',
+        'Solo puedes subir como máximo 1 imagen y 1 documento por envío.',
+        'Info'
+      );
+    }
+
+    const invalidFile = this.selectedFiles.find(
+      file => !this.isValidFile(file)
+    );
+
+    if (invalidFile) {
+      return this.showDialog('info', 
+        'Solo se permiten documentos (DOCX, DOC, PDF) e imágenes (JPG, PNG) y hojas de cálculo (XLS, XLSX)', 'Info'
+      );
+    }
     
-    const formDataPayload = this.buildFormDataOK();
+    const formDataPayload = this.buildFormData("validate");
 
     console.log('Payload:', formDataPayload);
 
@@ -406,6 +454,9 @@ export class EditConversationComponent {
         next: (resp: IaResponse) => {
 
           console.log("Respuesta Pregunta : {}", resp);
+          console.log("Respuesta  VALID : ", resp.is_valid);
+          console.log("Respuesta feedback : {}", resp.feedback);
+          this.iaResponse = resp;
            if ( !resp.is_valid  ) {
             return this.showDialog('info',  resp.feedback ?? '' , 'Info');
 
@@ -436,16 +487,17 @@ export class EditConversationComponent {
 
   guardarRespuesta(){
     //FORMATO 
-    console.log("guardarRespuesta" + this.idPlan)
-    const payload =  { 
-        idPlan : this.plan.id ,
-        idConversation: this.idSuscriptionConversation,
-        idSection: this.sectionProgress?.id , 
-        idQuestion : this.currentQuestion?.id,
-        reply: this.reply
-    }
+    // console.log("guardarRespuesta" + this.idPlan)
+    // const payload =  { 
+    //     idPlan : this.plan.id ,
+    //     idConversation: this.idSuscriptionConversation,
+    //     idSection: this.sectionProgress?.id , 
+    //     idQuestion : this.currentQuestion?.id,
+    //     reply: this.reply
+    // }
+    const formDataPayload = this.buildFormData("save");
 
-    this.conversationService.guardarRespuestas( payload ).subscribe ({
+    this.conversationService.guardarRespuestas( formDataPayload ).subscribe ({
       next: (resp: any) => {
         console.log("Estado Guaradar Respuesta {} ", resp);
         this.obtenerDataConversation();
@@ -519,53 +571,6 @@ export class EditConversationComponent {
     return isValidType && isValidSize;
   }
   
-
-  // validateFiles() {
-
-  //   if (this.selectedFiles.length > 2) {
-  //     this.selectedFiles = [];
-
-  //     this.snackBar.open(
-  //       'Solo se permiten máximo 2 archivos',
-  //       'Cerrar',
-  //       { duration: 4000 }
-  //     );
-
-  //     return;
-  //   }
-
-  //   let images = 0;
-  //   let docs = 0;
-
-  //   this.selectedFiles.forEach(file => {
-
-  //     if (file.type.startsWith('image/')) {
-  //       images++;
-  //     } else {
-  //       docs++;
-  //     }
-  //   });
-
-  //   if (images > 1) {
-  //     this.selectedFiles = [];
-
-  //     this.snackBar.open(
-  //       'Solo se permite 1 imagen',
-  //       'Cerrar',
-  //       { duration: 4000 }
-  //     );
-  //   }
-
-  //   if (docs > 1) {
-  //     this.selectedFiles = [];
-
-  //     this.snackBar.open(
-  //       'Solo se permite 1 documento',
-  //       'Cerrar',
-  //       { duration: 4000 }
-  //     );
-  //   }
-  // }
 
 
 

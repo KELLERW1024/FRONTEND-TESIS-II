@@ -4,4 +4,14 @@ export interface IaResponse {
   feedback?: string | '';
   response?: string;
   images?: string[];
+  references: Reference[] | null;
+}
+
+export interface Reference {
+  authors: string[];
+  title: string;
+  year: string;
+  source_type: string;
+  url: string;
+  apa_citation: string;
 }

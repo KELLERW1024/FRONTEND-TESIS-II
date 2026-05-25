@@ -56,20 +56,17 @@
                                             class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
                                             title="Adjuntar archivo"
                                             (click)="fileInput.click()">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-12 h-12 text-primary"
-                                            viewBox="0 0 24 24">
-
-                                        <path d="M0 0h24v24H0z" fill="none" />
-                                        <path fill="currentColor" fill-rule="evenodd"
-                                                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m.75-13a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25z"
-                                                clip-rule="evenodd" />
-
+                                            
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24">
+                                            <path d="M0 0h24v24H0z" fill="none" />
+                                            <path fill="currentColor" d="M22 13.75v-2.202c0-2.632 0-3.949-.77-4.804a3 3 0 0 0-.224-.225c-.855-.769-2.172-.769-4.804-.769h-.374c-1.153 0-1.73 0-2.268-.153a4 4 0 0 1-.848-.352c-.488-.271-.896-.68-1.712-1.495l-.55-.55c-.274-.274-.41-.41-.554-.53a4 4 0 0 0-2.18-.903c-.186-.017-.38-.017-.766-.017c-.883 0-1.324 0-1.692.07A4 4 0 0 0 2.07 5.007C2 5.376 2 5.818 2 6.7v7.05c0 3.771 0 5.657 1.172 6.828S6.229 21.75 10 21.75h4c3.771 0 5.657 0 6.828-1.172S22 17.521 22 13.75" opacity=".5" />
+                                            <path fill="currentColor" d="M12 11a.75.75 0 0 1 .75.75V13H14a.75.75 0 0 1 0 1.5h-1.25v1.25a.75.75 0 0 1-1.5 0V14.5H10a.75.75 0 0 1 0-1.5h1.25v-1.25A.75.75 0 0 1 12 11" />
                                         </svg>
 
+                                       
+                                       
                                     </button>
-
+                                    
                                     <input type="file"
                                             #fileInput
                                             multiple
@@ -114,8 +111,12 @@
                                     
                                 </div>
                                 <p>
-                                    <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
+                                    <mat-checkbox formControlName="showImages"  color="primary">Generame imagenes a partir de la respuesta.</mat-checkbox>
+                                    <mat-checkbox formControlName="citaApa"  color="primary">Obtener como cita APA.</mat-checkbox>
                                 </p>
+                                <!-- <p>
+                                    <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
+                                </p> -->
                             </div>
 
                         </div>
@@ -149,47 +150,185 @@
                                         [(ngModel)]="reply" name="reply">
                                     </textarea>
                                 </mat-form-field>
-                            </div>
+                                <!-- <p>Adjuntar imagenes a la respuesta</p>
+                                <input
+                                    #fileInput2
+                                    type="file"
+                                    accept="image/*"
+                                    hidden
+                                    (change)="onFileSelectedAdd($event)">
+                                <button 
+                                            type="button"
+                                            class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
+                                            title="Adjuntar archivo"
+                                            (click)="fileInput2.click()">
+                                  
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24">
+                                        <path fill="currentColor" fill-rule="evenodd" d="M18.132 7.408c-.849-.12-1.942-.12-3.305-.12H9.173c-1.363 0-2.456 0-3.305.12c-.877.125-1.608.393-2.152 1.02c-.543.628-.71 1.397-.716 2.293c-.006.866.139 1.962.319 3.329l.365 2.771c.141 1.069.255 1.933.432 2.61c.185.704.457 1.289.968 1.741s1.12.648 1.834.74C7.605 22 8.468 22 9.533 22h4.934c1.065 0 1.928 0 2.615-.088c.715-.092 1.323-.288 1.834-.74s.783-1.037.968-1.741c.177-.677.291-1.542.432-2.61l.365-2.771c.18-1.367.325-2.463.319-3.33c-.007-.895-.172-1.664-.716-2.291c-.544-.628-1.275-.896-2.152-1.021M6.052 8.732c-.726.104-1.094.292-1.34.578c-.248.285-.384.678-.39 1.42c-.005.762.126 1.765.315 3.195l.05.38l.371-.273c.96-.702 2.376-.668 3.288.095l3.384 2.833c.32.268.871.318 1.269.084l.235-.138c1.125-.662 2.634-.592 3.672.19l1.832 1.38c.09-.496.171-1.105.273-1.876l.352-2.675c.189-1.43.32-2.433.314-3.195c-.005-.742-.141-1.135-.388-1.42c-.247-.286-.615-.474-1.342-.578c-.745-.106-1.745-.107-3.172-.107h-5.55c-1.427 0-2.427.001-3.172.107" clip-rule="evenodd" />
+                                        <path fill="currentColor" d="M8.859 2h6.282c.21 0 .37 0 .51.015a2.62 2.62 0 0 1 2.159 1.672H6.19a2.62 2.62 0 0 1 2.159-1.672c.14-.015.3-.015.51-.015M6.88 4.5c-1.252 0-2.278.84-2.62 1.954l-.021.07c.358-.12.73-.2 1.108-.253c.973-.139 2.202-.139 3.629-.139h6.203c1.427 0 2.656 0 3.628.139c.378.053.75.132 1.11.253l-.021-.07C19.553 5.34 18.527 4.5 17.276 4.5z" />
+                                    </svg>
 
-                        </div>
-                        <!--  -->
-<div class="grid grid-cols-12 gap-4">
+                                </button> -->
 
-  <div
+
+                                <p>Adjuntar imagen o tabla a la respuesta</p>
+                                <input
+                                    #fileInputAddDoc
+                                    type="file"
+                                    accept="image/*, 
+                                            .pdf,
+                                            .doc,
+                                            .docx,
+                                            .xls,
+                                            .xlsx"
+                                    hidden
+                                    (change)="onFileSelectedAddDoc($event)">
+                                <!-- *ngIf="currentQuestion?.image == 1" -->
+
+                                <button type="button"
+                                            class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
+                                            title="Adjuntar archivo"
+                                            (click)="fileInputAddDoc.click()">
+                                  
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24">
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path fill="currentColor" fill-rule="evenodd" d="M3.25 6c0-1.542 1.23-2.736 2.758-3.5C7.58 1.716 9.7 1.25 12 1.25s4.42.465 5.992 1.25c1.528.764 2.758 1.958 2.758 3.5v12c0 1.542-1.23 2.735-2.758 3.5c-1.572.785-3.692 1.25-5.992 1.25s-4.42-.465-5.992-1.25C4.48 20.734 3.25 19.541 3.25 18zm1.5 0c0-.667.56-1.474 1.929-2.158C8.002 3.181 9.882 2.75 12 2.75s3.998.43 5.321 1.092C18.69 4.526 19.25 5.332 19.25 6s-.56 1.474-1.929 2.158C15.998 8.819 14.118 9.25 12 9.25s-3.998-.43-5.321-1.092C5.31 7.474 4.75 6.668 4.75 6m0 12c0 .667.56 1.474 1.929 2.158c1.323.661 3.203 1.092 5.321 1.092s3.998-.43 5.321-1.092c1.368-.684 1.929-1.49 1.929-2.158v-3.293c-.377.3-.804.565-1.258.792C16.42 16.285 14.3 16.75 12 16.75s-4.42-.465-5.992-1.25a7 7 0 0 1-1.258-.793zm14.5-9.293V12c0 .667-.56 1.474-1.929 2.158c-1.323.661-3.203 1.092-5.321 1.092s-3.998-.43-5.321-1.092C5.31 13.474 4.75 12.668 4.75 12V8.707c.377.3.804.565 1.258.792C7.58 10.285 9.7 10.75 12 10.75s4.42-.465 5.992-1.25a7 7 0 0 0 1.258-.793" clip-rule="evenodd" />
+                                    </svg>
+
+                                </button>
+                                <!-- PREVIEW -->
+                            <div class="grid grid-cols-12 gap-6 mt-4">
+                             
+
+                                <div
     class="col-span-12 sm:col-span-6 lg:col-span-4"
-    *ngFor="let img of imagesSafe"
-  >
+    *ngFor="let item of selectedFilesAddDoc; let i = index">
 
-    <mat-card class="cardWithShadow overflow-hidden rounded-xl">
+    <mat-card class="relative overflow-hidden p-0">
 
-      <!-- IMAGEN -->
-      <img
-        [src]="img"
-        class="w-full h-56 object-cover hover:scale-105 transition duration-300"
-      />
+        <!-- ❌ eliminar -->
+        <button
+            type="button"
+            class="absolute top-2 right-2 bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center z-10 shadow"
+            (click)="selectedFilesAddDoc.splice(i, 1)">
 
-      <!-- FOOTER SIMPLE -->
-      <mat-card-content class="p-3">
+            ✕
+        </button>
 
-        <div class="flex justify-between items-center">
+        <mat-card-content class="p-0">
 
-          <span class="text-sm font-medium">
-            Imagen generada
-          </span>
+            <!-- 🖼 IMAGEN -->
+            <div
+                *ngIf="item.category === 'image'"
+                class="w-full flex justify-center bg-gray-100">
 
-          <button mat-icon-button  (click)="openImage(img)">
-            <mat-icon>zoom_in</mat-icon>
-          </button>
+                <img
+                    [src]="item.preview"
+                    class="w-[90%] h-56 object-cover rounded-md mt-3">
 
-        </div>
+            </div>
 
-      </mat-card-content>
+            <!-- 📄 DOCUMENTO -->
+            <div
+                *ngIf="item.category === 'document'"
+                class="w-full bg-gray-100 px-4 py-10 text-center">
+
+                <p class="text-5xl">
+                    📄
+                </p>
+
+                <p class="text-sm text-gray-600 mt-2">
+                    {{ item.name }}
+                </p>
+
+            </div>
+
+            <!-- 📝 DESCRIPCIÓN -->
+            <div class="p-3">
+
+                <input
+                    type="text"
+                    [(ngModel)]="item.description"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Descripción"
+                    class="border rounded w-full p-2 text-sm">
+
+            </div>
+
+            <!-- 📌 FUENTE -->
+            <div class="p-3">
+
+                <input
+                    type="text"
+                    [(ngModel)]="item.fuente"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Fuente"
+                    class="border rounded w-full p-2 text-sm">
+
+            </div>
+
+        </mat-card-content>
 
     </mat-card>
 
-  </div>
-
 </div>
+
+                            </div>
+                        </div>
+                           
+
+                        </div>
+                        <!--  -->
+                        <div class="col-span-12 lg:col-span-3">
+
+                                 <mat-chip-listbox aria-label="Color selection">
+
+                                    <mat-chip-option
+                                    *ngFor="let ref of (iaResponse?.references ?? [])"
+                                    selected
+                                    color="primary">
+
+                                    {{ ref.apa_citation }}
+
+                                    </mat-chip-option>
+
+                                </mat-chip-listbox>
+                        </div>
+                        
+                        <div class="grid grid-cols-12 gap-4">
+
+                            <div  class="col-span-12 sm:col-span-6 lg:col-span-4"  *ngFor="let img of imagesSafe" >
+
+                                <mat-card class="cardWithShadow overflow-hidden rounded-xl">
+
+                                <!-- IMAGEN -->
+                                <img
+                                    [src]="img"
+                                    class="w-full h-56 object-cover hover:scale-105 transition duration-300"
+                                />
+
+                                <!-- FOOTER SIMPLE -->
+                                <mat-card-content class="p-3">
+
+                                    <div class="flex justify-between items-center">
+
+                                    <span class="text-sm font-medium">
+                                        Imagen generada
+                                    </span>
+
+                                    <button mat-icon-button  (click)="openImage(img)">
+                                        <mat-icon>zoom_in</mat-icon>
+                                    </button>
+
+                                    </div>
+
+                                </mat-card-content>
+
+                                </mat-card>
+
+                            </div>
+
+                        </div>
                         <!--  -->
 
                         <div class="mt-3 flex gap-2">
