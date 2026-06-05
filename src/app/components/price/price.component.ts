@@ -69,8 +69,9 @@ export class PriceComponent {
   }
 
   openPayment(plan: any) {
-    this.selectedPlan = plan;
-    this.showModal = true;
+    // this.selectedPlan = plan;
+    // this.showModal = true;
+     this.router.navigate(['/payment', plan.id]);
   }
 
   cerrarModal() {

@@ -1,0 +1,111 @@
+<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+     <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+
+        <div class="grid grid-cols-12 gap-6">
+
+            <div class="col-span-12 lg:col-span-12">
+                <!-- INI -->
+                         <div class="flex items-center mb-4">
+            <button mat-flat-button color="primary" (click)="accordion.openAll()">
+            Expandir todo
+            </button>
+            <button mat-stroked-button color="primary" (click)="accordion.closeAll()" class="ms-2">
+            Contraer todo
+            </button>
+        </div>
+        <mat-accordion multi>
+        <!-- step 1 -->
+      
+            <mat-expansion-panel class="cardWithShadow" *ngFor="let section of sections" [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="font-semibold"> {{ section.title }}: {{ section.description }}
+                        	
+
+                    </mat-panel-title>
+                    <mat-panel-description class="text-sm">
+                        <mat-icon class="ml-auto me-2">
+                        </mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                    <div *ngFor="let question of section.questions" class="mb-4">
+
+                        <h4 class="font-semibold">
+                            {{ question.text }}
+                             <button  *ngIf="question.answer_question"  mat-flat-button class="bg-secondary text-white!"  (click)="selectedQuestion = question; showModal = true" > Editar respuesta </button>
+                        </h4>
+
+                        <p class="text-sm text-gray-500">
+                            {{ question.detail }}
+                        </p>
+
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Respuesta</mat-label>
+                            <textarea
+                                matInput
+                                rows="5"
+                                [(ngModel)]="question.answer_question">
+                            </textarea>
+                        </mat-form-field>
+
+                    </div>
+            </mat-expansion-panel>
+       
+      
+        </mat-accordion>
+                <!-- FIN   -->
+                 <h2 class="example-h2 font-semibold mb-4">Slide toggle configuration</h2>
+
+                <section class="example-section">
+                    <mat-checkbox class="example-margin" [(ngModel)]="checked">
+                        Checked
+                    </mat-checkbox>
+                </section>
+
+                <section class="example-section">
+                    <mat-checkbox class="example-margin" [(ngModel)]="disabled">
+                        Disabled
+                    </mat-checkbox>
+                </section>
+
+                <div class="p-6 rounded-sm bg-light-primary mt-4">
+                    <h2 class="text-base font-semibold mb-4 example-h2">Result</h2>
+
+                    <section class="example-section">
+                        <mat-slide-toggle
+                            class="example-margin"
+                            [checked]="checked"
+                            [disabled]="disabled">
+                            Slide me!
+                        </mat-slide-toggle>
+                    </section>
+                </div>
+
+            </div>
+        </div>
+    </mat-card-content>
+   
+
+</mat-card>
+
+    <div *ngIf="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded w-96">
+
+            <h2 class="text-lg font-semibold mb-4">Confirmar edicion</h2>
+
+            <p> Teniendo en cuenta que las respuestas estan relacionadas a respuestas de preguntas anteriores y posteriores, al editar asegurate que el contenido no sea muy variable 
+                dado que todo el contenido debe tener una relacion estricta entre las partes, ¿Editar esta respuesta?</p>
+
+            <div class="flex justify-end gap-2 mt-6">
+
+                <button mat-button (click)="showModal = false">
+                    Cancelar
+                </button>
+
+                <button mat-flat-button color="warn"
+                        (click)="deleteAnswer()">
+                    Eliminar
+                </button>
+
+            </div>
+        </div>
+    </div>

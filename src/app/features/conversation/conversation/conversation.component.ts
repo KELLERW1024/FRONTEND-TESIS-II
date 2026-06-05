@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +8,10 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Router, RouterLink } from '@angular/router';
 import { MaterialModule } from 'src/app/material.module';
 import { ConversationService } from '../service/conversation.service';
+import { MatDialog } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 export type ConversationStatus = 'active' | 'completed' | 'archived';
 
@@ -71,6 +75,9 @@ export interface Conversation {
 @Component({
   selector: 'app-conversation',
   imports: [
+      FormsModule,
+  MatFormFieldModule,
+  MatInputModule,
     MatTableModule,
     CommonModule,
     MatCardModule,
@@ -87,6 +94,8 @@ export class ConversationComponent {
 //dataSource1 = PRODUCT_DATA;
 //displayedColumns1: string[] = ['assigned', 'name', 'priority', 'budget'];
 
+@ViewChild('editDialog') editDialog!: TemplateRef<any>;
+
   displayedColumns1: string[] = ['plan', 'title', 'status', 'actions'];
 
   dataSource1 = new MatTableDataSource<Conversation>([]);
@@ -95,7 +104,10 @@ export class ConversationComponent {
 
   loading = false;
 
-  constructor(private router: Router, private conversationService : ConversationService ) {}
+  newTitle = '';
+selectedConversation: any;
+
+  constructor(private router: Router, private conversationService : ConversationService,  public dialog: MatDialog ) {}
 
   ngOnInit(): void {
      this.getConversations();
@@ -127,6 +139,27 @@ export class ConversationComponent {
         }
 
       });
+
+  }
+  openEditNameConversation(conversation: any) {
+
+    this.selectedConversation = conversation;
+    this.newTitle = conversation.title;
+
+    this.dialog.open(this.editDialog, {
+      width: '500px'
+    });
+
+  }
+
+  saveNameConversation() {
+
+    this.selectedConversation.title = this.newTitle;
+
+    // Aquí llamas a tu API
+    // this.conversationService.update(...)
+
+    this.dialog.closeAll();
 
   }
   

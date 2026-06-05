@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
 import { LoginComponent } from './features/authentication/login/login.component';
+import { authGuard } from './guard/auth.guard';
+
 
 export const routes: Routes = [
    {
@@ -18,12 +20,18 @@ export const routes: Routes = [
   {
     path: '',
     component: FullComponent,
+    canActivate: [authGuard],
     children: [
       
       {
         path: 'dashboard',
         loadChildren: () =>
           import('./pages/pages.routes').then((m) => m.PagesRoutes),
+      },
+       {
+        path: 'payment/:planId',
+        loadComponent: () =>
+          import('./features/payment/payment.component').then((m) => m.PaymentComponent),
       },
       {
         path: 'conversations',
@@ -46,7 +54,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: 'dashboard'
   }, 
 
 

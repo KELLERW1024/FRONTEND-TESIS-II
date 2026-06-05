@@ -1,1 +1,129 @@
-<p>view-conversation works!</p>
+<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+  
+  <div class="p-6 flex justify-center items-center" >
+    <mat-card-title class="mat-mdc-card-title mb-0">
+      {{ plan?.name }}
+    </mat-card-title>
+  </div>
+
+    <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+
+    <div class="grid grid-cols-12 gap-6">
+
+        <div class="col-span-12 lg:col-span-12">
+
+
+          
+
+           <mat-card *ngFor="let section of sections" class="mb-4">
+
+                <div class="p-4 flex justify-center items-center">
+                    <mat-card-title class="text-center">
+                    {{ section.title }}: {{ section.description }}
+                    </mat-card-title>
+                </div>
+
+                <!-- SUBCAPÍTULOS (QUESTIONS) -->
+                <div class="px-4 pb-4">
+                    <div *ngFor="let question of section.questions">
+                    
+                    <mat-card-subtitle class="text-center">
+                        <strong>{{ question.text }}:</strong> {{ question.answer_question }}
+                    </mat-card-subtitle>
+
+                    <!-- IMGEN -->
+               <mat-card-content *ngIf="question.files?.length" class="mt-6 mb-10">
+
+                    <div  class="grid grid-cols-12 gap-3">
+
+                        <div class="col-span-3" *ngFor="let file of question.files">
+
+                        <div *ngIf="file.file_type === 'image'">
+
+                            <img
+                            [src]="file.file_url"
+                            class="w-70 h-50 aspect-square object-cover rounded-sm"
+                            />
+
+                            <p class="text-sm mt-2 text-gray-700">
+                            {{ file.description || 'Sin descripción' }}
+                            </p>
+
+                            <p class="text-xs text-gray-500">
+                            Fuente: {{ file.fuente || 'No especificada' }}
+                            </p>
+
+                        </div>
+
+                        <!-- DOCUMENTO -->
+                        <a
+                            *ngIf="file.file_type === 'document'"
+                            [href]="file.file_url"
+                            target="_blank"
+                            class="text-blue-500 underline block mt-2"
+                        >
+                            Ver documento
+                        </a>
+
+                        </div>
+
+                    </div>
+
+                </mat-card-content>
+                  
+
+
+                    </div>
+                </div>
+
+            </mat-card>
+            
+            <!--  -->
+        <div class="flex items-center mb-4">
+            <button mat-flat-button color="primary" (click)="accordion.openAll()">
+            Expand All
+            </button>
+            <button mat-stroked-button color="primary" (click)="accordion.closeAll()" class="ms-2">
+            Collapse All
+            </button>
+        </div>
+        <mat-accordion multi>
+        <!-- step 1 -->
+      
+            <mat-expansion-panel class="cardWithShadow" *ngFor="let section of sections">
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="font-semibold"> {{ section.title }}: {{ section.description }}</mat-panel-title>
+                    <mat-panel-description class="text-sm">
+                        Type your name and age
+                        <mat-icon class="ml-auto me-2">
+                            <i-tabler name="user-circle" class="size-5!"></i-tabler>
+                        </mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="grid grid-cols-12 gap-6">
+                    <div class="col-span-12 sm:col-span-6">
+                    <mat-form-field appearance="outline" color="primary" class="w-full hide-hint">
+                    <mat-label>First name</mat-label>
+                    <input matInput />
+                    </mat-form-field>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                    <mat-form-field appearance="outline" color="primary" class="w-full hide-hint">
+                    <mat-label>Age</mat-label>
+                    <input matInput type="number" min="1" />
+                    </mat-form-field>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+       
+      
+        </mat-accordion>
+        	<!--  -->
+        </div>
+        
+      
+    </div>
+    </mat-card-content>
+</mat-card>
+<!--MODAL ver detalle -->
+

@@ -91,8 +91,8 @@ export class EditConversationComponent {
   ngOnInit() {
     this.form = this.fb.group({
       answer: [''], 
-      showImages: [true], 
-      citaApa: [true], 
+      showImages: [false], 
+      citaApa: [false], 
 
       image: [null],
       imageDescription: ['']
@@ -109,7 +109,17 @@ export class EditConversationComponent {
     this.obtenerDataConversation();
     // this.addConversation();
   }
-    verDetalle(question: any) {
+  irAvance() {
+    this.router.navigate(['/conversations/view', this.idSuscriptionConversation]);
+  }
+  irEditCapitulo() {
+    this.router.navigate(['/conversations/edit-capitulo-conversation', this.idSuscriptionConversation]);
+  }
+  irDeleteCapitulo() {
+    this.router.navigate(['/conversations/delete-capitulo-conversation', this.idSuscriptionConversation]);
+  }
+
+  verDetalle(question: any) {
     this.selectedQuestion = question;
     this.showModal = true;
   }
@@ -313,7 +323,7 @@ export class EditConversationComponent {
           formData.append('question', this.currentQuestion?.text ?? '');
 
           formData.append('response', this.form.value.answer ?? '');
-          formData.append('apa', this.form.value.showImages ? '1' : '0');
+          formData.append('apa', this.form.value.citaApa ? '1' : '0');
           formData.append('is_visual', this.form.value.showImages ? '1' : '0');
 
           this.selectedFiles.forEach(file => {
@@ -449,6 +459,7 @@ export class EditConversationComponent {
     const formDataPayload = this.buildFormData("validate");
 
     console.log('Payload:', formDataPayload);
+    this.iaResponse = null;
 
      this.conversationService.enviarContextoRespuestas(formDataPayload).subscribe({
         next: (resp: IaResponse) => {
@@ -456,13 +467,17 @@ export class EditConversationComponent {
           console.log("Respuesta Pregunta : {}", resp);
           console.log("Respuesta  VALID : ", resp.is_valid);
           console.log("Respuesta feedback : {}", resp.feedback);
+
           this.iaResponse = resp;
-           if ( !resp.is_valid  ) {
+
+          if ( !resp.is_valid  ) {
+
             return this.showDialog('info',  resp.feedback ?? '' , 'Info');
 
           } 
           this.reply = resp.response ?? '';
-          // this.images = resp.images ?? [];
+          this.images = resp.images ?? [];
+          
 
           // if (this.images.length > 0) {
 
@@ -505,6 +520,14 @@ export class EditConversationComponent {
         this.answers = [];
         this.selectedFiles = [];
         this.form.reset();
+        this.iaResponse = null;
+          // this.form.reset({
+          //   answer: '',
+          //   showImages: true,
+          //   citaApa: true,
+          //   image: null,
+          //   imageDescription: ''
+          // });
       }
    
     })  

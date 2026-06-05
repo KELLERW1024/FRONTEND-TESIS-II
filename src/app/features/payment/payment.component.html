@@ -1,0 +1,62 @@
+
+<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+  
+  <div class="p-6 flex">
+    <mat-card-title class="mat-mdc-card-title mb-0">
+      Realizar pago
+    </mat-card-title>
+  </div>
+
+  <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+
+    <div class="grid grid-cols-12 gap-6">
+
+        <div class="col-span-12 lg:col-span-8">
+            <mat-card class="border border-border shadow-none">
+
+  <mat-card-content>
+
+    <!-- TÍTULO -->
+    <h5 class="text-xl font-semibold mb-4">
+      {{ plan?.name }}
+    </h5>
+
+    <!-- DESCRIPCIÓN -->
+    <p class="text-sm mb-4">
+       {{ plan?.description }}
+    </p>
+
+    <!-- INFO ITEMS -->
+    <div class="flex items-center gap-4 mb-3">
+      <i-tabler name="currency-dollar" class="size-5"></i-tabler>
+
+      <h6 class="text-base font-semibold">
+        {{ plan?.price}}
+      </h6>
+    </div>
+
+    <!-- <div class="flex items-center gap-4 mb-3">
+      <i-tabler name="cash" class="size-5"></i-tabler>
+
+      <h6 class="text-base font-semibold">
+        xyzjonathan@gmail.com
+      </h6>
+    </div> -->
+
+    
+
+  </mat-card-content>
+
+</mat-card>
+        </div>
+         <div class="col-span-12 lg:col-span-4">
+              <!-- <mat-card-content> -->
+                    <div id="paymentBrick_container">
+
+                    </div>
+              <!-- </mat-card-content> -->
+            
+        </div>
+    </div>
+</mat-card-content>
+</mat-card>

@@ -135,5 +135,30 @@ export class AuthService {
         })
       );
   }
+  isTokenExpired(): boolean {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      return true;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      const now = Math.floor(Date.now() / 1000);
+
+      return payload.exp < now;
+    } catch (error) {
+      return true;
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('authenticated');
+
+    this.loggedIn.next(false);
+  }
 
 }
