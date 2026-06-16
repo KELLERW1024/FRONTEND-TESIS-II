@@ -152,16 +152,38 @@ selectedConversation: any;
 
   }
 
-  saveNameConversation() {
+  updateNameConversation() {
+    
+    const data = {
+      id: this.selectedConversation.id,
+      title: this.newTitle
+    };
 
-    this.selectedConversation.title = this.newTitle;
+    this.conversationService.updateTitleConversation(data)
+      .subscribe({
+        next: (resp: any) => {
 
-    // Aquí llamas a tu API
-    // this.conversationService.update(...)
+          // actualizar UI local
+          this.selectedConversation.title = this.newTitle;
 
-    this.dialog.closeAll();
+          this.dialog.closeAll();
+        },
 
-  }
+        error: (err) => {
+          console.error(err);
+
+            if (err.status === 422) {
+              console.log('Errores de validación', err.error.errors);
+            }
+
+            if (err.status === 500) {
+              console.log('Error del servidor', err.error.message);
+            }
+
+            this.loading = false;
+        }
+      });
+}
   
 
 }

@@ -55,14 +55,14 @@
 
                         </div>
 
-                        <!-- DOCUMENTO -->
+                        <!-- IMAGEN -->
                         <a
-                            *ngIf="file.file_type === 'document'"
+                            *ngIf="file.file_type === 'image'"
                             [href]="file.file_url"
                             target="_blank"
                             class="text-blue-500 underline block mt-2"
                         >
-                            Ver documento
+                            Ver imagen
                         </a>
 
                         </div>
@@ -70,6 +70,50 @@
                     </div>
 
                 </mat-card-content>
+
+
+                <!-- Tabla -->
+<mat-card-content *ngIf="question.tables?.length" class="mt-6 mb-10">
+
+  <div *ngFor="let table of question.tables" class="mb-6">
+
+    <!-- TITLE -->
+    <h3 class="text-lg font-semibold mb-3">
+      {{ table.title }}
+    </h3>
+
+    <!-- TABLE -->
+    <table class="w-full border border-gray-300 text-sm">
+
+      <!-- HEADER -->
+      <thead>
+        <tr >
+          <th
+            class="border px-2 py-1 bg-gray-100 text-left"
+            *ngFor="let col of table.data.columns"
+          >
+            {{ col || '' }}
+          </th>
+        </tr>
+      </thead>
+
+      <!-- BODY -->
+      <tbody>
+        <tr *ngFor="let row of table.data.rows">
+          <td
+            class="border px-2 py-1"
+            *ngFor="let cell of row"
+          >
+            {{ cell }}
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+</mat-card-content>
                   
 
 

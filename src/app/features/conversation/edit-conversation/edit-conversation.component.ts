@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +15,7 @@ import { AnswerValidationResponse } from 'src/app/core/models/ValidarRespuestaRe
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/components/dialog/dialog.component';
-import { IaResponse } from 'src/app/core/models/IAResponse';
+import { ChatResponse, ChatTable, IaResponse } from 'src/app/core/models/IAResponse';
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
@@ -34,6 +34,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class EditConversationComponent {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  @ViewChild('tableModal') tableModal!: TemplateRef<any>;
   
   openFilePicker() {
     this.fileInput.nativeElement.click();
@@ -66,6 +68,8 @@ export class EditConversationComponent {
 
   imagesAdd : any[] = [];
 
+  tablaGenerada : ChatTable | null;
+
   form!: FormGroup;
 
   images: string[] = [];
@@ -92,7 +96,7 @@ export class EditConversationComponent {
     this.form = this.fb.group({
       answer: [''], 
       showImages: [false], 
-      citaApa: [false], 
+      crearCuadro: [false], 
 
       image: [null],
       imageDescription: ['']
@@ -323,7 +327,8 @@ export class EditConversationComponent {
           formData.append('question', this.currentQuestion?.text ?? '');
 
           formData.append('response', this.form.value.answer ?? '');
-          formData.append('apa', this.form.value.citaApa ? '1' : '0');
+          
+          formData.append('generate_table', this.form.value.crearCuadro ? '1' : '0');
           formData.append('is_visual', this.form.value.showImages ? '1' : '0');
 
           this.selectedFiles.forEach(file => {
@@ -338,18 +343,27 @@ export class EditConversationComponent {
             formData.append(
               'metadata',
               JSON.stringify(
-                this.selectedFilesAdd.map(item => ({
+                this.selectedFilesAddDoc.map(item => ({
                   description: item.description,
                   fuente: item.fuente
                 }))
               )
             );
 
-            this.selectedFilesAdd.forEach(item => {
+            this.selectedFilesAddDoc.forEach(item => {
+              //  console.log('INDEX:', index);
+              console.log('NAME:', item.file.name);
+              console.log('TYPE:', item.file.type);
+              console.log('SIZE:', item.file.size);
               formData.append('files[]', item.file, item.file.name);
             });
-
+            console.log(this.iaResponse?.references);
             formData.append( 'references', JSON.stringify(this.iaResponse?.references ?? []) );
+
+             formData.append(
+              'table',
+              JSON.stringify(this.tablaGenerada)
+            );
 
         break;
 
@@ -462,21 +476,22 @@ export class EditConversationComponent {
     this.iaResponse = null;
 
      this.conversationService.enviarContextoRespuestas(formDataPayload).subscribe({
-        next: (resp: IaResponse) => {
+        next: (resp: ChatResponse) => {
 
-          console.log("Respuesta Pregunta : {}", resp);
-          console.log("Respuesta  VALID : ", resp.is_valid);
-          console.log("Respuesta feedback : {}", resp.feedback);
-
-          this.iaResponse = resp;
+          this.iaResponse = resp.response;
+          console.log("RESPUESTA => {} ", resp );
+          console.log("Respuesta Completa : {}", resp );
+          console.log("Respuesta  VALID : ", this.iaResponse );
+          console.log("Respuesta feedback : {}", this.iaResponse.is_valid );
 
           if ( !resp.is_valid  ) {
 
             return this.showDialog('info',  resp.feedback ?? '' , 'Info');
 
           } 
-          this.reply = resp.response ?? '';
-          this.images = resp.images ?? [];
+          this.reply = this.iaResponse.response ?? '';
+          this.images = this.iaResponse.images ?? [];
+          this.tablaGenerada = resp.table ?? null;
           
 
           // if (this.images.length > 0) {
@@ -594,6 +609,12 @@ export class EditConversationComponent {
     return isValidType && isValidSize;
   }
   
+  openModalTable(): void {
+    this.dialog.open(this.tableModal, {
+      width: '900px',
+      maxHeight: '80vh'
+    });
+  }
 
 
 

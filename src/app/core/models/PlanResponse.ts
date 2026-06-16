@@ -18,6 +18,7 @@ export interface Question {
   type: string;
   image: number;
   answer_question : string;
+  tables?: Table[];
 }
 
 export interface Plan {
@@ -28,4 +29,9 @@ export interface Plan {
   billing_cycle: string;
   sections: Section[];
   description: string;
+}
+
+export interface Table {
+  title: string;
+  data: any;
 }

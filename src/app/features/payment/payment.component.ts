@@ -80,9 +80,9 @@ export class PaymentComponent implements OnInit {
 
         console.log('startConversationSuscription  =>', resp );
         this.router.navigate([
-                    '/conversations',
-                    'edit',
-                    resp.conversation_id
+                      '/conversations',
+                      'edit',
+                      resp.conversation_id
                   ]);
 
       },
