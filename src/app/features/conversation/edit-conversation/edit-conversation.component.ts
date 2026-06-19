@@ -331,6 +331,8 @@ export class EditConversationComponent {
           formData.append('generate_table', this.form.value.crearCuadro ? '1' : '0');
           formData.append('is_visual', this.form.value.showImages ? '1' : '0');
 
+          formData.append('apa', this.currentQuestion?.apa || '' );
+
           this.selectedFiles.forEach(file => {
             formData.append('files[]', file, file.name);
           });
@@ -561,7 +563,7 @@ export class EditConversationComponent {
   }
   generarArchivo() {
      
-    this.conversationService.getDocument(this.idConversation)
+    this.conversationService.getDocument(this.idSuscriptionConversation)
       .subscribe( (resp: Blob) => {
         const blob = new Blob([resp], {
           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
