@@ -1,0 +1,278 @@
+<!-- HEADER -->
+<!-- <mat-card class="bg-light-secondary px-6 py-4">
+
+  <div class="flex justify-between items-center">
+    <div>
+      <mat-card-title>Coupons</mat-card-title>
+    </div>
+    <div class="hidden lg:block">
+      <img
+        src="/assets/images/backgrounds/customer-support-img.png"
+        alt="Coupons"
+        class="img-fluid mb-[-12px]" />
+    </div>
+
+  </div>
+</mat-card> -->
+<!-- CONTENT -->
+<mat-card class="cardWithShadow theme-card">
+  <!-- ACTION BAR -->
+  <div class="p-6 flex justify-between items-center">
+    <mat-card-title class="mb-0">
+      Cupones
+    </mat-card-title>
+    <button mat-stroked-button
+       class="border border-secondary! text-secondary"
+      
+      (click)="openCouponModal()">
+      Crear cupón
+    </button>
+  </div>
+
+  <mat-card-content class="border-t border-border">
+    <!-- TABLE / CONTENT AREA -->
+
+  </mat-card-content>
+  <div class="container">
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Buscar cupón</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ej: SAVE10">
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+    <!-- Code -->
+<ng-container matColumnDef="code">
+  <th mat-header-cell *matHeaderCellDef> Código </th>
+  <td mat-cell *matCellDef="let coupon">{{ coupon.code }}</td>
+</ng-container>
+
+<ng-container matColumnDef="plans">
+  <th mat-header-cell *matHeaderCellDef> Planes </th>
+  <td mat-cell *matCellDef="let coupon">
+    {{ getPlanNames(coupon) }}
+  </td>
+</ng-container>
+
+    <!-- Discount -->
+<ng-container matColumnDef="discount_type">
+  <th mat-header-cell *matHeaderCellDef> Descuento </th>
+  <td mat-cell *matCellDef="let coupon">
+    {{ coupon.discount_value }}
+  </td>
+</ng-container>
+
+    <!-- Expiration -->
+<ng-container matColumnDef="valid_until">
+  <th mat-header-cell *matHeaderCellDef> Expira </th>
+  <td mat-cell *matCellDef="let coupon">
+    {{ coupon.valid_until }}
+  </td>
+</ng-container>
+
+    <!-- Status -->
+<ng-container matColumnDef="is_active">
+  <th mat-header-cell *matHeaderCellDef> Estado </th>
+  <td mat-cell *matCellDef="let coupon">
+    {{ coupon.is_active === 1 ? 'ACTIVE' : 'INACTIVE' }}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef> Acciones </th>
+
+  <td mat-cell *matCellDef="let coupon" class="flex gap-2 items-center">
+
+    <!-- EDITAR -->
+    <button
+      type="button"
+      class="p-2 rounded-full hover:bg-blue-100 transition cursor-pointer"
+      title="Editar cupón"
+      (click)="editCoupon(coupon)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
+        <path fill="currentColor"
+          d="M3 17.25V21h3.75l11.06-11.06l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83z"/>
+      </svg>
+    </button>
+
+    <!-- ELIMINAR -->
+    <button
+      type="button"
+      class="p-2 rounded-full hover:bg-red-100 transition cursor-pointer"
+      title="Eliminar cupón"
+      (click)="deleteCoupon(coupon.id)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
+        <path fill="currentColor"
+          d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1z"/>
+      </svg>
+    </button>
+
+  </td>
+</ng-container>
+
+    <!-- Header & Rows -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons>
+  </mat-paginator>
+
+</div>
+
+</mat-card>
+
+<!-- MODAL  -->
+<!-- DIALOG EN EL MISMO COMPONENTE -->
+<ng-template #couponDialog>
+    <h2 mat-dialog-title>Crear cupón</h2>
+
+    <mat-dialog-content class="coupon-dialog-content">
+        <div class="grid grid-cols-1 gap-4 pt-2">
+
+            <form  [formGroup]="form" >
+
+                <div class="grid grid-cols-12 gap-6">
+
+                    <!-- CODE -->
+                    <div class="col-span-12 md:col-span-6">
+                        <mat-label class="text-sm font-semibold block mb-2">
+                            Código
+                        </mat-label>
+
+                        <mat-form-field appearance="outline" class="w-full">
+                            <input matInput formControlName="code" placeholder="WELCOME10" />
+                        </mat-form-field>
+                    </div>
+
+                    <!-- DISCOUNT TYPE -->
+                    <div class="col-span-12 md:col-span-6">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Tipo de descuento
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-select formControlName="discountType">
+                        <!-- <mat-option value="percentage">Porcentaje</mat-option> -->
+                        <mat-option  value="fixed">Monto fijo</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    </div>
+
+                    <!-- DISCOUNT VALUE -->
+                    <div class="col-span-12 md:col-span-6">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Valor del descuento
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input matInput formControlName="discountValue" type="number" placeholder="10" />
+                    </mat-form-field>
+                    </div>
+
+                    <!-- MAX USES -->
+                    <div class="col-span-12 md:col-span-6">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Uso máximo
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input matInput formControlName="maxUses" type="number" placeholder="100 (opcional)" />
+                    </mat-form-field>
+                    </div>
+
+                    <!-- MAX USES PER USER -->
+                    <div class="col-span-12 md:col-span-6">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Uso por usuario
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input matInput formControlName="maxUsesPerUser" type="number" />
+                    </mat-form-field>
+                    </div>
+
+                    <!-- VALID FROM -->
+                    <div class="col-span-12 md:col-span-6">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Válido desde
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input matInput formControlName="validFrom" type="date" />
+                    </mat-form-field>
+                    </div>
+
+                    <!-- VALID UNTIL -->
+                    <div class="col-span-12 md:col-span-6">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Válido hasta
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input matInput formControlName="validUntil" type="date" />
+                    </mat-form-field>
+                    </div>
+
+                    <!-- FIRST PURCHASE ONLY -->
+                    <div class="col-span-12 md:col-span-6 flex items-center gap-2">
+                    <mat-checkbox formControlName="firstPurchaseOnly" >
+                        Solo primera compra
+                    </mat-checkbox>
+                    </div>
+
+                    <!-- ACTIVE -->
+                    <div class="col-span-12 md:col-span-6 flex items-center gap-2">
+                    <mat-checkbox formControlName="active">
+                        Activo
+                    </mat-checkbox>
+                    </div>
+
+                    <!-- PLAN IDS -->
+                    <div class="col-span-12">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Planes aplicables
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-select multiple formControlName="plans"  >
+                            <mat-option *ngFor="let plan of plans" [value]="plan.id" >{{ plan.name }}</mat-option>
+                       
+                        </mat-select>
+                    </mat-form-field>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="col-span-12">
+                    <mat-label class="text-sm font-semibold block mb-2">
+                        Descripción
+                    </mat-label>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                        <textarea matInput formControlName="description" rows="3"></textarea>
+                    </mat-form-field>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>
+        Cancelar
+        </button>
+
+        <button mat-raised-button color="primary" (click)="saveCoupon()">
+        Guardar cupón
+        </button>
+    </mat-dialog-actions>
+</ng-template>

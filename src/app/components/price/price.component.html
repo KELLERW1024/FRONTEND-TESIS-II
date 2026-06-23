@@ -23,7 +23,7 @@
 
         <img src="/assets/images/backgrounds/gold.png" width="90" alt="badge" class="mx-auto">
 
-        <h2 class="text-5xl font-bold my-5">{{ plan.price }}</h2>
+        <!-- <h2 class="text-5xl font-bold my-5">{{ plan.price }}</h2> -->
 
         <div class="space-y-3 text-left">
 
@@ -34,6 +34,7 @@
 
         </div>
 
+        <!-- <button mat-flat-button color="primary" class="w-full mt-6" (click)="openPayment(plan)"> -->
         <button mat-flat-button color="primary" class="w-full mt-6" (click)="openPayment(plan)">
           Obtener Plan
         </button>
@@ -46,52 +47,177 @@
 
 
 </div>
+<!-- MODAL PRICES -->
+ <ng-template #pricesModal>
+    <h2 mat-dialog-title>Crear cupón</h2>
 
-<div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+    <mat-dialog-content class="!max-w-none">
+        <div class="grid grid-cols-1 gap-4 pt-2">
 
-  <div class="bg-white w-full max-w-lg rounded-lg shadow-lg">
 
-    <!-- HEADER -->
-    <div class="flex items-center justify-between p-4">
+                <div class="grid grid-cols-12 gap-6">
 
-      <h5 class="font-semibold text-lg">
-        Confirmar pago
-      </h5>
+                    <!-- <div class="grid grid-cols-12 gap-6 mt-16"> -->
 
-      <button mat-icon-button (click)="cerrarModal()">
-        <mat-icon>close</mat-icon>
-      </button>
+  <!-- SILVER -->
+  <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+    <mat-card class="cardWithShadow">
+      <mat-card-content class="py-6">
 
-    </div>
+        <span class="block uppercase text-xs mb-4">Silver</span>
 
-    <!-- BODY -->
-    <div class="p-4 space-y-2 text-sm">
+        <img src="/assets/images/backgrounds/silver.png" width="90" alt="badge">
 
-      <p><strong>Plan:</strong> {{ selectedPlan?.name }}</p>
+        <h2 class="text-5xl font-bold my-5">Free</h2>
 
-      <p><strong>Código:</strong> {{ selectedPlan?.code }}</p>
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">3 Members</span>
+        </div>
 
-      <p><strong>Descripción:</strong> {{ selectedPlan?.description }}</p>
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">Single Device</span>
+        </div>
 
-      <p class="text-lg font-bold">
-        Precio: ${{ selectedPlan?.price }}
-      </p>
+        <div class="flex items-center py-3 opacity-50">
+          <mat-icon class="mr-2">close</mat-icon>
+          <span class="text-sm font-medium">50GB Storage</span>
+        </div>
 
-    </div>
+        <div class="flex items-center py-3 opacity-50">
+          <mat-icon class="mr-2">close</mat-icon>
+          <span class="text-sm font-medium">Monthly Backups</span>
+        </div>
 
-    <!-- FOOTER -->
-    <div class="flex justify-end gap-2 p-4">
+        <div class="flex items-center py-3 opacity-50">
+          <mat-icon class="mr-2">close</mat-icon>
+          <span class="text-sm font-medium">Permissions & workflows</span>
+        </div>
 
-      <button mat-stroked-button color="warn" (click)="cerrarModal()">
-        Cancelar
-      </button>
+        <button mat-flat-button color="primary" class="w-full mt-6">
+          Choose Silver
+        </button>
 
-      <button mat-flat-button color="primary" (click)="pagarPlan()">
-        Pagar
-      </button>
-
-    </div>
-
+      </mat-card-content>
+    </mat-card>
   </div>
 
-</div>
+  <!-- BRONZE -->
+  <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+    <mat-card class="cardWithShadow">
+      <mat-card-content class="py-6">
+
+        <span class="absolute right-4 uppercase bg-yellow-100 text-yellow-700 px-2 py-1 text-xs rounded">
+          Popular
+        </span>
+
+        <span class="block uppercase text-xs mb-4">Bronze</span>
+
+        <img src="/assets/images/backgrounds/bronze.png" width="90" alt="badge">
+
+        <div class="flex items-center my-5">
+          <span class="text-xl font-bold">$</span>
+          <h2 class="text-5xl font-bold mx-2">10.99</h2>
+          <span class="text-sm">/mo</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">5 Members</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">Multiple Device</span>
+        </div>
+
+        <div class="flex items-center py-3 opacity-50">
+          <mat-icon class="mr-2">close</mat-icon>
+          <span class="text-sm font-medium">80GB Storage</span>
+        </div>
+
+        <div class="flex items-center py-3 opacity-50">
+          <mat-icon class="mr-2">close</mat-icon>
+          <span class="text-sm font-medium">Monthly Backups</span>
+        </div>
+
+        <div class="flex items-center py-3 opacity-50">
+          <mat-icon class="mr-2">close</mat-icon>
+          <span class="text-sm font-medium">Permissions & workflows</span>
+        </div>
+
+        <button mat-flat-button color="primary" class="w-full mt-6">
+          Choose Bronze
+        </button>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- GOLD -->
+  <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+    <mat-card class="cardWithShadow">
+      <mat-card-content class="py-6">
+
+        <span class="block uppercase text-xs mb-4">Gold</span>
+
+        <img src="/assets/images/backgrounds/gold.png" width="90" alt="badge">
+
+        <div class="flex items-center my-5">
+          <span class="text-xl font-bold">$</span>
+          <h2 class="text-5xl font-bold mx-2">22.99</h2>
+          <span class="text-sm">/mo</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">Unlimited Members</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">Multiple Device</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">150GB Storage</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">Monthly Backups</span>
+        </div>
+
+        <div class="flex items-center py-3">
+          <mat-icon class="text-primary mr-2">check</mat-icon>
+          <span class="text-sm font-medium">Permissions & workflows</span>
+        </div>
+
+        <button mat-flat-button color="primary" class="w-full mt-6">
+          Choose Gold
+        </button>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+<!-- </div> -->
+
+                </div>
+
+
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>
+        Cancelar
+        </button>
+
+        <button mat-raised-button color="primary" >
+        Guardar cupón
+        </button>
+    </mat-dialog-actions>
+</ng-template>

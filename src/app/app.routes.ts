@@ -39,6 +39,11 @@ export const routes: Routes = [
           import('./features/conversation/conversation.routes').then( (m) => m.ConversationRoutes ),
       },
       {
+        path: 'coupons',
+        loadChildren: () =>
+          import('./features/coupons/coupons.routes').then( (m) => m.CouponsRoutes ),
+      },
+      {
         path: 'ui-components',
         loadChildren: () =>
           import('./pages/ui-components/ui-components.routes').then(

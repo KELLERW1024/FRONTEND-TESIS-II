@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,10 +29,12 @@ import { ConversationService } from 'src/app/features/conversation/service/conve
   styleUrl: './price.component.scss',
 })
 export class PriceComponent {
+
+  @ViewChild('pricesModal')
+  pricesModal!: TemplateRef<any>;
   
   plans: Plan[] = [];
 
-  showModal = false;
   idConversation! : number;
 
   selectedPlan: any = null;
@@ -69,15 +71,16 @@ export class PriceComponent {
   }
 
   openPayment(plan: any) {
-    // this.selectedPlan = plan;
-    // this.showModal = true;
-     this.router.navigate(['/payment', plan.id]);
+    this.dialog.open(this.pricesModal, {
+      width: '1200px',
+      maxWidth: '95vw'
+    });
+
+
+    //  this.router.navigate(['/payment', plan.id]);
   }
 
-  cerrarModal() {
-    this.showModal = false;
-    this.selectedPlan = null;
-  }
+
 
   pagarPlan() {
 
@@ -102,7 +105,6 @@ export class PriceComponent {
           }
         }) 
 
-    this.cerrarModal();
   }
 
 }

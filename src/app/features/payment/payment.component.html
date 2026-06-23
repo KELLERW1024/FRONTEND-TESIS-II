@@ -14,49 +14,198 @@
         <div class="col-span-12 lg:col-span-8">
             <mat-card class="border border-border shadow-none">
 
-  <mat-card-content>
+              <mat-card-content>
 
-    <!-- TÍTULO -->
-    <h5 class="text-xl font-semibold mb-4">
-      {{ plan?.name }}
-    </h5>
+                <!-- TÍTULO -->
+                <h5 class="text-xl font-semibold mb-4">
+                  {{ plan?.name }}
+                </h5>
 
-    <!-- DESCRIPCIÓN -->
-    <p class="text-sm mb-4">
-       {{ plan?.description }}
-    </p>
+                <!-- DESCRIPCIÓN -->
+                <p class="text-sm mb-4">
+                  {{ plan?.description }}
+                </p>
 
-    <!-- INFO ITEMS -->
-    <div class="flex items-center gap-4 mb-3">
-      <i-tabler name="currency-dollar" class="size-5"></i-tabler>
+                <!-- INFO ITEMS -->
+                <div class="flex items-center gap-4 mb-3">
 
-      <h6 class="text-base font-semibold">
-        {{ plan?.price}}
-      </h6>
-    </div>
+                  <h6 class="text-base font-semibold">
+                    S/. {{ plan?.price}}
+                  </h6>
+                </div>
 
-    <!-- <div class="flex items-center gap-4 mb-3">
-      <i-tabler name="cash" class="size-5"></i-tabler>
+              </mat-card-content>
+              
+              <mat-card-content>
 
-      <h6 class="text-base font-semibold">
-        xyzjonathan@gmail.com
-      </h6>
-    </div> -->
+               
+                <!-- DESCRIPCIÓN -->
+                <p class="text-sm mb-4">
+                  Cuentas con cupon de descuento
+                </p>
 
-    
+                <!-- INFO ITEMS -->
+                <div class="flex items-center gap-4 mb-3">
+                  <button
+                      mat-stroked-button
+                      class="border border-secondary! text-secondary"
+                     (click)="openCouponModal()">
+                      Usar cupón de descuento
+                    </button>
 
-  </mat-card-content>
+                </div>
 
-</mat-card>
+              </mat-card-content>
+            </mat-card>
         </div>
-         <div class="col-span-12 lg:col-span-4">
-              <!-- <mat-card-content> -->
-                    <div id="paymentBrick_container">
+        <div class="col-span-12 lg:col-span-4">
+            <div id="paymentBrick_container">
 
-                    </div>
-              <!-- </mat-card-content> -->
+            </div>
+
+            <mat-card class="border border-border shadow-none">
+
+            
+              <mat-card-content>
+
+                <div class="w-full">
+                    <button
+                        mat-flat-button
+                        class="w-full"
+                         style="background-color: #742384; color: white; height: 48px;"
+                      (click)="openYapeModal()">
+                        Pagar con YAPE!
+                      </button>
+
+                </div>
+
+              </mat-card-content>
+            </mat-card>
             
         </div>
     </div>
 </mat-card-content>
 </mat-card>
+
+<!-- MODAL CUPON-->
+<div *ngIf="showCouponModal" class="modal-backdrop">
+  <div class="modal-box">
+    
+    <h2 class="text-lg font-semibold mb-3">Agregar cupón</h2>
+
+    <input
+      type="text"
+      [(ngModel)]="couponCode"
+      placeholder="Ej: DESCUENTO10"
+      class="w-full border p-2 rounded mb-3"
+    />
+
+    <p *ngIf="errorMessage" class="text-red-500 text-sm">
+      {{ errorMessage }}
+    </p>
+
+    <p *ngIf="successMessage" class="text-green-600 text-sm">
+      {{ successMessage }}
+    </p>
+
+    <div class="flex justify-end gap-2 mt-4">
+      <button (click)="closeCouponModal()" class="px-3 py-1 border rounded">
+        Cancelar
+      </button>
+
+      <button (click)="applyCoupon()" class="px-3 py-1 bg-green-600 text-white rounded">
+        Aplicar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PAGO YAPE -->
+
+<ng-template #yapeDialog>
+    <h2 mat-dialog-title style="text-align: center;">Realizar Pago </h2>
+
+    <mat-dialog-content class="coupon-dialog-content">
+        <div class="grid grid-cols-1 gap-4 pt-2">
+
+            <form  [formGroup]="form" >
+
+                <div class="grid grid-cols-12 gap-6">
+
+                   <!-- QR YAPE -->
+                    <div class="col-span-12 flex justify-center">
+                      <img
+                        src="assets/images/qr/yape.webp"
+                        alt="QR Yape"
+                        class="w-44 h-44 object-contain rounded-lg border">
+                    </div>
+                    <!-- INFO -->
+                    <div class="col-span-12">
+                      <div class="bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded text-sm text-center">
+                        ℹ️ La activación de tu cuenta se realizará como máximo dentro de 12 horas después de confirmar el pago.
+                      </div>
+                    </div>
+
+                    <!-- CODE -->
+                    <div class="col-span-12 md:col-span-6">
+                        <mat-label class="text-sm font-semibold block mb-2">
+                            Código de seguridad
+                        </mat-label>
+
+                        <mat-form-field appearance="outline" class="w-full">
+                            <input matInput formControlName="code" placeholder="00000" />
+                        </mat-form-field>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <mat-label class="text-sm font-semibold block mb-2">
+                            Numero de operacion
+                        </mat-label>
+
+                        <mat-form-field appearance="outline" class="w-full">
+                            <input matInput formControlName="code" placeholder="0000" />
+                        </mat-form-field>
+                    </div>
+
+                     
+
+                    <!-- MAX USES PER USER -->
+                    <div class="col-span-12 md:col-span-12">
+                      <!-- <mat-label class="text-sm font-semibold block mb-2">
+                          Captura de pago (<small>Opcional</small>) 
+                      </mat-label> -->
+
+                      <div class="col-span-12 md:col-span-12">
+                          <button mat-stroked-button type="button" (click)="fileInput.click()">
+                            <mat-icon>upload_file</mat-icon>
+                            Subir captura de pago
+                          </button>
+                          <span class="ml-3 text-sm text-gray-600">
+                            {{ selectedFileName || 'Ningún archivo seleccionado' }}
+                          </span>
+
+                        <input #fileInput
+                                type="file"
+                                accept="image/*"
+                                hidden  (change)="onFileSelected($event)">
+                      </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>
+          Cancelar
+        </button>
+
+        <button  mat-flat-button 
+                         style="background-color: #742384; color: white; height: 48px;" >
+          Realizar registro de pago
+        </button>
+    </mat-dialog-actions>
+</ng-template>

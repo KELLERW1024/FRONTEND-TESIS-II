@@ -1,23 +1,31 @@
 import {
   Component,
   AfterViewInit,
-  OnInit
+  OnInit,
+  ViewChild,
+  TemplateRef
 } from '@angular/core';
 
 import { MatCard, MatCardModule } from '@angular/material/card';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TablerIconsModule } from 'angular-tabler-icons';
+import { provideTablerIcons, TablerIconsModule } from 'angular-tabler-icons';
 
 import { environment } from 'src/environments/environment.development';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogModule } from '@angular/material/dialog';
 
 import { Plan } from 'src/app/core/models/PlanResponse';
 import { PlanService } from '../plans/services/plans.service';
 import { PaymentResponse } from 'src/app/core/models/PaymentResponse';
 import { ConversationService } from '../conversation/service/conversation.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 
 declare var MercadoPago: any;
@@ -25,16 +33,32 @@ declare var MercadoPago: any;
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports: [MatCard, MatCardModule, TablerIconsModule],
+  imports: [MatCard, MatCardModule, TablerIconsModule, CommonModule, FormsModule, MatButtonModule
+    , MatIconModule, MatDialogContent, ReactiveFormsModule, MatFormFieldModule, MatDialogModule, MatInputModule
+  ],
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
 })
 export class PaymentComponent implements OnInit {
 
+  @ViewChild('yapeDialog')
+  yapeDialog!: TemplateRef<any>;
+
+  selectedFileName: string = '';
+
+
+  form: FormGroup;
+
   idPlan!: number;
   plan!: Plan;
 
   private brickInitialized = false;
+
+  //
+  showCouponModal = false;
+  couponCode = '';
+  errorMessage = '';
+  successMessage = '';
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -45,7 +69,14 @@ export class PaymentComponent implements OnInit {
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
-  ) {}
+  ) {
+
+    this.form = this.fb.group({
+                    code: [''],
+                    numeroOperacion: [null],
+                    captura: [''] 
+    });
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -113,7 +144,6 @@ export class PaymentComponent implements OnInit {
 
       customization: {
         paymentMethods: {
-          creditCard: 'all',
           debitCard: 'all',
           ticket: 'all',
           bankTransfer: 'all',
@@ -164,5 +194,52 @@ export class PaymentComponent implements OnInit {
         }
       }
     });
+  }
+
+  openYapeModal(){
+    this.dialog.open(this.yapeDialog, {
+      width: '500px',
+    });
+  }
+
+  openCouponModal() {
+    this.showCouponModal = true;
+  }
+
+  closeCouponModal() {
+    this.showCouponModal = false;
+    this.resetMessages();
+  }
+
+  applyCoupon() {
+    if (!this.couponCode) {
+      this.errorMessage = 'Ingresa un cupón válido';
+      return;
+    }
+
+    if (this.couponCode === 'DESCUENTO10') {
+      this.successMessage = 'Cupón aplicado correctamente';
+      this.errorMessage = '';
+    } else {
+      this.errorMessage = 'Cupón inválido';
+      this.successMessage = '';
+    }
+  }
+
+  resetMessages() {
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    if (input.files && input.files.length > 0) {
+
+      const file = input.files[0];
+
+     this.selectedFileName = file.name;
+      console.log(input.files[0]);
+    }
   }
 }
