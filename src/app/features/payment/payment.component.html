@@ -29,8 +29,12 @@
                 <!-- INFO ITEMS -->
                 <div class="flex items-center gap-4 mb-3">
 
-                  <h6 class="text-base font-semibold">
-                    S/. {{ plan?.price}}
+                  <h6 *ngIf="!isCouponApplied" class="text-base font-semibold">
+                    S/. {{ originalPrice }}
+                  </h6>
+
+                  <h6 *ngIf="isCouponApplied" class="text-base font-semibold">
+                    S/. {{ finalAmount }}
                   </h6>
                 </div>
 
@@ -88,38 +92,44 @@
 </mat-card>
 
 <!-- MODAL CUPON-->
-<div *ngIf="showCouponModal" class="modal-backdrop">
-  <div class="modal-box">
-    
-    <h2 class="text-lg font-semibold mb-3">Agregar cupón</h2>
+ <ng-template #couponDialog>
+    <h2 mat-dialog-title style="text-align: center;">Agregar cupon </h2>
 
-    <input
-      type="text"
-      [(ngModel)]="couponCode"
-      placeholder="Ej: DESCUENTO10"
-      class="w-full border p-2 rounded mb-3"
-    />
+    <mat-dialog-content class="coupon-dialog-content">
+        <div class="grid grid-cols-1 gap-4 pt-2">
 
-    <p *ngIf="errorMessage" class="text-red-500 text-sm">
-      {{ errorMessage }}
-    </p>
+            <form  [formGroup]="formCoupon" >
 
-    <p *ngIf="successMessage" class="text-green-600 text-sm">
-      {{ successMessage }}
-    </p>
+                <div class="grid grid-cols-12 gap-12">
 
-    <div class="flex justify-end gap-2 mt-4">
-      <button (click)="closeCouponModal()" class="px-3 py-1 border rounded">
-        Cancelar
-      </button>
+                    <!-- CODE -->
+                    <div class="col-span-12 md:col-span-6">
 
-      <button (click)="applyCoupon()" class="px-3 py-1 bg-green-600 text-white rounded">
-        Aplicar
-      </button>
-    </div>
+                        <mat-form-field appearance="outline" class="w-full">
+                            <input matInput formControlName="code" placeholder="EJEMPLO10" />
+                        </mat-form-field>
+                    </div>
+                    
+                </div>
 
-  </div>
-</div>
+            </form>
+
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>
+          Cancelar
+        </button>
+
+        <button  mat-flat-button 
+                         style="background-color: #3cbff3; color: white; height: 48px;" 
+                         (click)="aplicarCupon()" >
+          Aplicar
+        </button>
+    </mat-dialog-actions>
+</ng-template>
+
 
 <!-- MODAL PAGO YAPE -->
 
@@ -204,7 +214,8 @@
         </button>
 
         <button  mat-flat-button 
-                         style="background-color: #742384; color: white; height: 48px;" >
+                        style="background-color: #742384; color: white; height: 48px;"
+                        (click)="realizarPagoYape()" >
           Realizar registro de pago
         </button>
     </mat-dialog-actions>

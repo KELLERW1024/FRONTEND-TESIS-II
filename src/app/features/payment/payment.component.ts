@@ -26,6 +26,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { CouponService } from '../coupons/service/coupon.service';
+import { PaymentService } from './service/payment.service';
+import { DialogComponent } from 'src/app/components/dialog/dialog.component';
 
 
 declare var MercadoPago: any;
@@ -44,10 +47,13 @@ export class PaymentComponent implements OnInit {
   @ViewChild('yapeDialog')
   yapeDialog!: TemplateRef<any>;
 
-  selectedFileName: string = '';
+  @ViewChild('couponDialog') couponDialog !: TemplateRef<any>;
 
+  selectedFileName: string = '';
+  selectedFile: File | null = null;
 
   form: FormGroup;
+  formCoupon: FormGroup;
 
   idPlan!: number;
   plan!: Plan;
@@ -55,10 +61,15 @@ export class PaymentComponent implements OnInit {
   private brickInitialized = false;
 
   //
-  showCouponModal = false;
-  couponCode = '';
-  errorMessage = '';
-  successMessage = '';
+  // showCouponModal = false;
+  // couponCode = '';
+  // errorMessage = '';
+  // successMessage = '';
+  couponApplied: any = null;
+  discountAmount: number = 0;
+  finalAmount: number = 0;
+  originalPrice: number = 0;
+  isCouponApplied: boolean = false;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -68,13 +79,19 @@ export class PaymentComponent implements OnInit {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private paymentService: PaymentService
   ) {
 
     this.form = this.fb.group({
                     code: [''],
                     numeroOperacion: [null],
                     captura: [''] 
+    });
+
+        this.formCoupon = this.fb.group({
+                    code: [''],
+                   
     });
   }
 
@@ -94,6 +111,7 @@ export class PaymentComponent implements OnInit {
         this.plan = resp;
 
         console.log('PLAN =>', this.plan);
+        this.originalPrice = this.plan.price;
 
         // ⚠️ IMPORTANTE: inicializar SOLO cuando exista el plan
         this.initBrick();
@@ -102,6 +120,40 @@ export class PaymentComponent implements OnInit {
         console.error('Error obteniendo plan', err);
       }
     });
+  }
+
+  aplicarCupon(){
+    const code = this.formCoupon.get('code')?.value?.trim();
+
+    if (!code) {
+      alert('Ingrese un código de cupón');
+      return;
+    }
+
+      this.paymentService.validateCoupon(code, this.idPlan)
+      .subscribe({
+          next: (response) => {
+            console.log("RESPONSE : ", response)
+
+                this.couponApplied = response.coupon;
+                this.discountAmount = response.discount_amount;
+                this.finalAmount = Math.round(response.final_amount * 100) / 100;
+                this.originalPrice = response.price;
+
+                this.isCouponApplied = true;
+                this.dialog.closeAll();
+                return this.showDialog('success', 'Cupon descuento realizado', 'Success');
+              },
+              error: (error) => {
+                this.couponApplied = null;
+                this.discountAmount = 0;
+                this.finalAmount = this.plan?.price;
+                this.isCouponApplied = false;
+
+                // alert(error.error?.message || 'No se pudo validar el cupón');
+                return this.showDialog('error', error.error?.message || 'No se pudo validar el cupón' , 'Error');
+              }
+      });
   }
 
   startConversationSuscription(id : number) {
@@ -122,7 +174,6 @@ export class PaymentComponent implements OnInit {
       }
     });
   }
-
   // =========================
   // INIT MERCADOPAGO BRICK
   // =========================
@@ -196,6 +247,74 @@ export class PaymentComponent implements OnInit {
     });
   }
 
+  realizarPagoYape() {
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('plan_id', this.idPlan.toString());
+
+    formData.append(
+      'security_code',
+      this.form.get('security_code')?.value
+    );
+
+    formData.append(
+      'operation_number',
+      this.form.get('operation_number')?.value
+    );
+
+    if (this.couponApplied) {
+      formData.append('coupon_code', this.couponApplied.code);
+    }
+    if (this.couponApplied) {
+      formData.append('discount_amount', this.discountAmount.toString() );
+    }
+    if (this.couponApplied) {
+      formData.append('original_price', this.originalPrice.toString() );
+    }
+
+    if (this.couponApplied) {
+      formData.append('final_amount', this.finalAmount.toString() );
+    }
+
+    if (this.selectedFile) {
+      formData.append('voucher', this.selectedFile);
+    }
+
+    // if ( this.isCouponApplied ){
+    //   formData.append('id_coupon', this.couponApplied.id );
+    // }
+
+    this.paymentService.registerYapePayment(formData)
+      .subscribe({
+        next: (resp: any) => {
+
+          this.dialog.closeAll();
+
+          this.showDialog(
+            'success',
+            'Tu pago fue registrado correctamente. Será validado dentro de las próximas horas.',
+            'Pago registrado'
+          );
+
+        },
+        error: (err) => {
+
+          this.showDialog(
+            'error',
+            err.error?.message || 'No se pudo registrar el pago',
+            'Error'
+          );
+
+        }
+      });
+  }
+
   openYapeModal(){
     this.dialog.open(this.yapeDialog, {
       width: '500px',
@@ -203,33 +322,35 @@ export class PaymentComponent implements OnInit {
   }
 
   openCouponModal() {
-    this.showCouponModal = true;
+    this.dialog.open(this.couponDialog, {
+      width: '300px',
+    });
   }
 
-  closeCouponModal() {
-    this.showCouponModal = false;
-    this.resetMessages();
-  }
+  // closeCouponModal() {
+  //   this.showCouponModal = false;
+  //   this.resetMessages();
+  // }
 
-  applyCoupon() {
-    if (!this.couponCode) {
-      this.errorMessage = 'Ingresa un cupón válido';
-      return;
-    }
+  // applyCoupon() {
+  //   if (!this.couponCode) {
+  //     this.errorMessage = 'Ingresa un cupón válido';
+  //     return;
+  //   }
 
-    if (this.couponCode === 'DESCUENTO10') {
-      this.successMessage = 'Cupón aplicado correctamente';
-      this.errorMessage = '';
-    } else {
-      this.errorMessage = 'Cupón inválido';
-      this.successMessage = '';
-    }
-  }
+  //   if (this.couponCode === 'DESCUENTO10') {
+  //     this.successMessage = 'Cupón aplicado correctamente';
+  //     this.errorMessage = '';
+  //   } else {
+  //     this.errorMessage = 'Cupón inválido';
+  //     this.successMessage = '';
+  //   }
+  // }
 
-  resetMessages() {
-    this.errorMessage = '';
-    this.successMessage = '';
-  }
+  // resetMessages() {
+  //   this.errorMessage = '';
+  //   this.successMessage = '';
+  // }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -238,8 +359,26 @@ export class PaymentComponent implements OnInit {
 
       const file = input.files[0];
 
-     this.selectedFileName = file.name;
+      this.selectedFile = input.files[0];
+
+      this.selectedFileName = file.name;
       console.log(input.files[0]);
     }
+  }
+
+  showDialog(
+      type: 'success' | 'error' | 'info',
+      message: string,
+      title = 'Aviso'
+    ) {
+      this.dialog.open(DialogComponent, {
+        width: '400px',
+        data: {
+          type,
+          title,
+          message,
+          confirmText: 'Aceptar'
+        }
+      });
   }
 }

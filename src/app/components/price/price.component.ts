@@ -71,13 +71,13 @@ export class PriceComponent {
   }
 
   openPayment(plan: any) {
-    this.dialog.open(this.pricesModal, {
-      width: '1200px',
-      maxWidth: '95vw'
-    });
+    // this.dialog.open(this.pricesModal, {
+    //   width: '1200px',
+    //   maxWidth: '95vw'
+    // });
 
 
-    //  this.router.navigate(['/payment', plan.id]);
+     this.router.navigate(['/payment', plan.id]);
   }
 
 

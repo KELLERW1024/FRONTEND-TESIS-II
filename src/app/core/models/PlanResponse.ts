@@ -25,7 +25,7 @@ export interface Plan {
   id: number;
   name: string;
   code: string;
-  price: string;
+  price: number;
   billing_cycle: string;
   sections: Section[];
   description: string;
