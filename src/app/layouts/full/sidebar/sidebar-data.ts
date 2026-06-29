@@ -25,7 +25,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Pagos',
     iconName: 'solar:danger-circle-line-duotone',
-    route: '/paymemts',
+    route: '/payments',
   },
   {
     displayName: 'Contenido',

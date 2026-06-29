@@ -156,24 +156,24 @@ export class PaymentComponent implements OnInit {
       });
   }
 
-  startConversationSuscription(id : number) {
-    this.conversationService.startConversation( id ).subscribe({
-      next: (resp: any) => {
-        // this.plan = resp;
+  // startConversationSuscription(id : number) {
+  //   this.conversationService.startConversation( id ).subscribe({
+  //     next: (resp: any) => {
+  //       // this.plan = resp;
 
-        console.log('startConversationSuscription  =>', resp );
-        this.router.navigate([
-                      '/conversations',
-                      'edit',
-                      resp.conversation_id
-                  ]);
+  //       console.log('startConversationSuscription  =>', resp );
+  //       this.router.navigate([
+  //                     '/conversations',
+  //                     'edit',
+  //                     resp.conversation_id
+  //                 ]);
 
-      },
-      error: (err) => {
-        console.error('Error en startConversationSuscription : ', err);
-      }
-    });
-  }
+  //     },
+  //     error: (err) => {
+  //       console.error('Error en startConversationSuscription : ', err);
+  //     }
+  //   });
+  // }
   // =========================
   // INIT MERCADOPAGO BRICK
   // =========================
@@ -209,24 +209,35 @@ export class PaymentComponent implements OnInit {
         },
 
         onSubmit: (formData: any) => {
-          console.log('PAYLOAD MP =>', formData);
+
+          const payload : any ={
+            ...formData,
+            coupon_code: this.couponApplied ? this.couponApplied.code : null ,
+            discount_amount: this.couponApplied ?  this.discountAmount.toString(): null ,
+            original_price: this.couponApplied ? this.originalPrice.toString(): null ,
+            final_amount : this.couponApplied ? this.finalAmount.toString() : null ,
+            plan_id :  this.idPlan.toString() ,
+
+          };
+         
+          console.log('PAYLOAD MP =>', payload);
 
           // const payload = formData.formData;
 
           return new Promise((resolve, reject) => {
-            this.planService.createPayment( formData ).subscribe({
+            this.planService.createPayment( payload ).subscribe({
               next: (resp: PaymentResponse ) => {
                 console.log('Pago creado:', resp);
                     console.log('STATUS:', resp.status);
 
                   if (resp.status === 'approved') {
                     console.log('Pago aprobado 🎉');
-                    this.startConversationSuscription(this.idPlan);
+                    // this.startConversationSuscription(this.idPlan);
                   }
 
                   if (resp.status === 'rejected') {
                     console.log('Pago rechazado ❌');
-                    this.startConversationSuscription(this.idPlan);
+                    // this.startConversationSuscription(this.idPlan);
 
                   }
 
