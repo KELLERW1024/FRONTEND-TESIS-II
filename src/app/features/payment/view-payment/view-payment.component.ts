@@ -53,7 +53,10 @@ export class ViewPaymentComponent {
 
   displayedColumns: string[] = [
     'user',
-    'plan'
+    'plan',
+    'status',
+    'status_payment',
+    'acciones'
   ];
 
   constructor(  private dialog: MatDialog,  private service: DashboardService,  private fb: FormBuilder ,

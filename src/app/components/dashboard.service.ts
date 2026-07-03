@@ -3,6 +3,9 @@ import { Injectable } from '@angular/core';
 import { URL_SERVICIOS } from 'src/app/config/config';
 import { AuthService } from 'src/app/core/services/auth.service';
 
+import { PackageResponse } from '../core/models/PackageResponse';
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -25,7 +28,7 @@ export class DashboardService {
     }
 
 
-    getPlans(){
+  getPlans(){
 
       let URL = URL_SERVICIOS + "/plans";
       console.log("TOKEN get progres: " + this.authService.token )
@@ -34,7 +37,18 @@ export class DashboardService {
         {   headers
         });
 
-    }
+  }
+
+  getPackages(){
+
+      let URL = URL_SERVICIOS + "/packages";
+      console.log("TOKEN get progres: " + this.authService.token )
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+      return this.http.get<PackageResponse>( URL  ,
+        {   headers
+        });
+
+  }
 
    
 

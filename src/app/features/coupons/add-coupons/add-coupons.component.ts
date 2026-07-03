@@ -19,6 +19,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
+import { Package } from 'src/app/core/models/PackageResponse';
 
 export interface Coupon {
   id: number;
@@ -67,6 +68,8 @@ export class AddCouponsComponent {
   couponDialog!: TemplateRef<any>;
 
   plans: Plan[] = [];
+  
+  packages : Package [] = [];
   // selectedPlans: number[] = [];
 
   form: FormGroup;
@@ -100,7 +103,7 @@ export class AddCouponsComponent {
                     validUntil: [null],
                     firstPurchaseOnly: [false],
                     active: [true],
-                    plans: [[]],
+                    packages: [[]],
                     description: ['']
                   });
   }
@@ -116,10 +119,28 @@ export class AddCouponsComponent {
 
   ngOnInit() {
     
-    this.getPlans();
+    this.getPackages();
     this.getCoupons();
     // this.dataSource = new MatTableDataSource(this.tableData);
     this.dataSource = new MatTableDataSource<Coupon>([]);
+
+  }
+
+  getPackages(){
+      this.service.getPackages( ).subscribe ({
+      next: (resp: any) => {
+      this.packages = resp.data;
+      console.log("PAckages => {} ",  this.packages )
+     
+      },
+      error: (err: any) => {
+        console.error(err);
+      },
+      complete: () => {
+        console.log('Completado');
+      }
+  
+    }) 
 
   }
 
@@ -183,7 +204,7 @@ export class AddCouponsComponent {
         first_purchase_only: form.firstPurchaseOnly,
         is_active: form.active,
 
-        plan_ids: form.plans
+        package_ids: form.packages
       };
 
     const errors = this.validateCoupon(form);
@@ -315,7 +336,7 @@ deleteCoupon(id: number) {
       }
 
       // PLAN IDS
-      if (!Array.isArray(data.plans) || data.plans.length === 0) {
+      if (!Array.isArray(data.packages) || data.packages.length === 0) {
         errors.push('Debe seleccionar al menos un plan');
       }
 

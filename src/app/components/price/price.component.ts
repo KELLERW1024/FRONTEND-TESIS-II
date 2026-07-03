@@ -12,6 +12,7 @@ import { DashboardService } from '../dashboard.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConversationService } from 'src/app/features/conversation/service/conversation.service';
+import { Package, PackageResponse } from 'src/app/core/models/PackageResponse';
 
 @Component({
   selector: 'app-price',
@@ -34,6 +35,8 @@ export class PriceComponent {
   pricesModal!: TemplateRef<any>;
   
   plans: Plan[] = [];
+  
+  packages : Package [] = [];
 
   idConversation! : number;
 
@@ -48,16 +51,34 @@ export class PriceComponent {
   
   ngOnInit() {
     
-    this.getPlans();
+    // this.getPlans();
+    this.getPackages();
   }
 
 
 
-    getPlans(){
+  getPlans(){
     this.service.getPlans( ).subscribe ({
       next: (resp: any) => {
       this.plans = resp.data;
       console.log("PLANS => {} ", resp.data)
+     
+      },
+      error: (err: any) => {
+        console.error(err);
+      },
+      complete: () => {
+        console.log('Completado');
+      }
+  
+    }) 
+  }
+
+  getPackages(){
+    this.service.getPackages( ).subscribe ({
+      next: (resp: any) => {
+      this.packages = resp.data;
+      console.log("PAckages => {} ",  this.packages )
      
       },
       error: (err: any) => {

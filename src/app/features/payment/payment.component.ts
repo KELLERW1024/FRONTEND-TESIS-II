@@ -29,6 +29,10 @@ import { MatInputModule } from '@angular/material/input';
 import { CouponService } from '../coupons/service/coupon.service';
 import { PaymentService } from './service/payment.service';
 import { DialogComponent } from 'src/app/components/dialog/dialog.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatOption } from '@angular/material/autocomplete';
+import { MatSelect } from '@angular/material/select';
+import { Package, PackageResponse } from 'src/app/core/models/PackageResponse';
 
 
 declare var MercadoPago: any;
@@ -36,7 +40,7 @@ declare var MercadoPago: any;
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports: [MatCard, MatCardModule, TablerIconsModule, CommonModule, FormsModule, MatButtonModule
+  imports: [MatCard, MatOption, MatSelect,  MatCheckbox,  MatCardModule, TablerIconsModule, CommonModule, FormsModule, MatButtonModule
     , MatIconModule, MatDialogContent, ReactiveFormsModule, MatFormFieldModule, MatDialogModule, MatInputModule
   ],
   templateUrl: './payment.component.html',
@@ -55,8 +59,14 @@ export class PaymentComponent implements OnInit {
   form: FormGroup;
   formCoupon: FormGroup;
 
-  idPlan!: number;
+  idPackage!: number;
+  numPlanPackage : number = 0 ;
+  plans: Plan [] =[] ;
   plan!: Plan;
+
+  package : Package | null = null;
+
+  selectedPlans: number[] = [];
 
   private brickInitialized = false;
 
@@ -89,29 +99,42 @@ export class PaymentComponent implements OnInit {
                     captura: [''] 
     });
 
-        this.formCoupon = this.fb.group({
-                    code: [''],
-                   
+    this.formCoupon = this.fb.group({
+                    code: [''],           
     });
+
   }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.idPlan = Number(params['planId']);
-      this.getPlanId();
+      this.idPackage = Number(params['packageId']);
+      this.getPackagePlans();
     });
+  }
+  trackByIndex(index: number): number {
+    return index;
   }
 
   // =========================
   // GET PLAN
   // =========================
-  getPlanId() {
-    this.planService.getPlanId(this.idPlan).subscribe({
+  getPackagePlans() {
+    console.log('ID PACKAGE  =>', this.idPackage);
+    this.planService.getPackagePlans(this.idPackage).subscribe({
       next: (resp: any) => {
-        this.plan = resp;
+        console.log('PPP =>', resp);
+        this.package = resp.data;
+        console.log('PACAKAGE =>', this.package );
 
-        console.log('PLAN =>', this.plan);
-        this.originalPrice = this.plan.price;
+
+        this.numPlanPackage = resp.data.num_plans;
+
+        this.plans = resp.data.plans;
+
+        console.log('PLANS =>', this.plans);
+        // this.originalPrice = this.plan.price;
+        // crear array con N selects
+        this.selectedPlans = Array(this.numPlanPackage).fill(null);
 
         // ⚠️ IMPORTANTE: inicializar SOLO cuando exista el plan
         this.initBrick();
@@ -121,6 +144,22 @@ export class PaymentComponent implements OnInit {
       }
     });
   }
+  // getPlanId() {
+  //   this.planService.getPlanId(this.idPlan).subscribe({
+  //     next: (resp: any) => {
+  //       this.plan = resp;
+
+  //       console.log('PLAN =>', this.plan);
+  //       this.originalPrice = this.plan.price;
+
+  //       // ⚠️ IMPORTANTE: inicializar SOLO cuando exista el plan
+  //       this.initBrick();
+  //     },
+  //     error: (err) => {
+  //       console.error('Error obteniendo plan', err);
+  //     }
+  //   });
+  // }
 
   aplicarCupon(){
     const code = this.formCoupon.get('code')?.value?.trim();
@@ -130,7 +169,7 @@ export class PaymentComponent implements OnInit {
       return;
     }
 
-      this.paymentService.validateCoupon(code, this.idPlan)
+      this.paymentService.validateCoupon(code, this.idPackage)
       .subscribe({
           next: (response) => {
             console.log("RESPONSE : ", response)
@@ -190,7 +229,7 @@ export class PaymentComponent implements OnInit {
 
     bricksBuilder.create('payment', 'paymentBrick_container', {
       initialization: {
-        amount: Number(this.plan.price) // ✅ FIX CRÍTICO
+        amount: Number( 100 ) // ✅ FIX CRÍTICO
       },
 
       customization: {
@@ -216,7 +255,7 @@ export class PaymentComponent implements OnInit {
             discount_amount: this.couponApplied ?  this.discountAmount.toString(): null ,
             original_price: this.couponApplied ? this.originalPrice.toString(): null ,
             final_amount : this.couponApplied ? this.finalAmount.toString() : null ,
-            plan_id :  this.idPlan.toString() ,
+            package_id :  this.idPackage.toString() ,
 
           };
          
@@ -267,7 +306,7 @@ export class PaymentComponent implements OnInit {
 
     const formData = new FormData();
 
-    formData.append('plan_id', this.idPlan.toString());
+    formData.append('plan_id', this.idPackage.toString());
 
     formData.append(
       'security_code',
@@ -333,6 +372,8 @@ export class PaymentComponent implements OnInit {
   }
 
   openCouponModal() {
+    console.log("ID PLANS SLECTS {} " , this.selectedPlans);
+
     this.dialog.open(this.couponDialog, {
       width: '300px',
     });

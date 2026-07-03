@@ -12,7 +12,35 @@
     <div class="grid grid-cols-12 gap-6">
 
         <div class="col-span-12 lg:col-span-8">
-            <mat-card class="border border-border shadow-none">
+          <mat-card class="border border-border shadow-none">
+              <mat-card-header>
+                  <mat-card-title>Seleccionar plan </mat-card-title>
+              </mat-card-header>
+            <mat-card-content>
+
+              <div  class="col-span-12 sm:col-span-8" 
+                    *ngFor="let item of selectedPlans; let i = index; trackBy: trackByIndex">
+
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select [(ngModel)]="selectedPlans[i]" [name]="'plan' + i"  placeholder="Seleccionar plan">
+                    <mat-option *ngFor="let pack of plans" [value]="pack.id">{{ pack.name }}</mat-option>
+                  
+                  </mat-select>
+                </mat-form-field>
+
+              </div>
+              <!-- <div class="col-span-12 sm:col-span-8">
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select >
+                  <mat-option *ngFor="let pack of plans" [value]="pack.id">{{ pack.name }}</mat-option>
+                  
+                  </mat-select>
+                </mat-form-field>
+              </div> -->
+
+              </mat-card-content>
+          </mat-card>
+          <mat-card class="border border-border shadow-none">
 
               <mat-card-content>
 
@@ -30,7 +58,7 @@
                 <div class="flex items-center gap-4 mb-3">
 
                   <h6 *ngIf="!isCouponApplied" class="text-base font-semibold">
-                    S/. {{ originalPrice }}
+                    S/. {{ package?.local_price }}
                   </h6>
 
                   <h6 *ngIf="isCouponApplied" class="text-base font-semibold">
@@ -88,7 +116,7 @@
             
         </div>
     </div>
-</mat-card-content>
+  </mat-card-content>
 </mat-card>
 
 <!-- MODAL CUPON-->

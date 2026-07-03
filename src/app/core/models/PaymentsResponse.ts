@@ -9,7 +9,7 @@ export interface ConversationItem {
   status: ConversationStatus;
   title: string;
   plan_name: string;
-  payment_status: PaymentStatus | null;
+  payments: Payments[] ;
 }
 
 export interface User {
@@ -19,8 +19,6 @@ export interface User {
 
 export type ConversationStatus = 'active' | 'completed' | 'archived';
 
-export type PaymentStatus =
-  | 'pending'
-  | 'completed'
-  | 'failed'
-  | 'refunded';
+export interface Payments{
+  status: string;
+}

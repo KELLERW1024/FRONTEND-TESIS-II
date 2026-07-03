@@ -34,7 +34,7 @@ export const routes: Routes = [
           import('./pages/pages.routes').then((m) => m.PagesRoutes),
       },
        {
-        path: 'payment/:planId',
+        path: 'payment/:packageId',
         loadComponent: () =>
           import('./features/payment/payment.component').then((m) => m.PaymentComponent),
       },

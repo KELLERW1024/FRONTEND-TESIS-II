@@ -27,6 +27,17 @@ export class PlanService {
 
     }
 
+    getPackagePlans( idPackage: number ){
+  
+        console.log("TOKEN get progres: " + this.authService.token )
+        let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+        return this.http.get( URL_SERVICIOS + "/getpackageplans"     ,
+            {   headers,
+                params: { idPackage: idPackage } 
+            });
+
+    }
+
     createPayment(paymentData: any): Observable<PaymentResponse> {
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
         return this.http.post<PaymentResponse>(

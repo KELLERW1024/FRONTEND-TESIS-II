@@ -237,12 +237,12 @@
                     <!-- PLAN IDS -->
                     <div class="col-span-12">
                     <mat-label class="text-sm font-semibold block mb-2">
-                        Planes aplicables
+                        Paquetes aplicables
                     </mat-label>
 
                     <mat-form-field appearance="outline" class="w-full">
-                        <mat-select multiple formControlName="plans"  >
-                            <mat-option *ngFor="let plan of plans" [value]="plan.id" >{{ plan.name }}</mat-option>
+                        <mat-select multiple formControlName="packages"  >
+                            <mat-option *ngFor="let pack of packages" [value]="pack.id" >{{ pack.name }}</mat-option>
                        
                         </mat-select>
                     </mat-form-field>
