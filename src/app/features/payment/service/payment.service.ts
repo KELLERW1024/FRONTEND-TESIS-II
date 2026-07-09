@@ -15,13 +15,13 @@ export class PaymentService {
 
   constructor( private http: HttpClient, public authService: AuthService) { }
 
-  validateCoupon(code: string, planId: number) {
+  validateCoupon(code: string, packageId: number) {
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
         return this.http.post<CouponValidationResponse>(
             this.url + `/validate`,
              {
               code,
-              plan_id: planId
+              package_id: packageId
             },
             {headers}
         );
@@ -34,6 +34,17 @@ export class PaymentService {
 
     return this.http.post(
       this.url + '/yape',
+      data,
+      { headers }
+    );
+  }
+  registerFree( data: any ) {
+    const headers = new HttpHeaders({
+      Authorization: 'Bearer ' + this.authService.token
+    });
+
+    return this.http.post(
+      this.url + '/free',
       data,
       { headers }
     );

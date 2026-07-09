@@ -94,8 +94,8 @@ export class PaymentComponent implements OnInit {
   ) {
 
     this.form = this.fb.group({
-                    code: [''],
-                    numeroOperacion: [null],
+                    codeSecurity: [''],
+                    numberOperation: [null],
                     captura: [''] 
     });
 
@@ -297,6 +297,50 @@ export class PaymentComponent implements OnInit {
     });
   }
 
+  obtenerFree() {
+
+    console.log("planes sep;ccionados" + this.selectedPlans.length );
+
+    if (this.selectedPlans.some(planId => !planId)) {
+      this.showDialog(
+          'info',
+          'Debe seleccionar al menos un plan.',
+          'OK'
+        );
+      return;
+    }
+
+    const data = {
+      package_id: this.idPackage,
+      plans :  this.selectedPlans
+    };
+
+    console.log(" PACKAGE : " + this.idPackage );
+    this.paymentService.registerFree( data )
+      .subscribe({
+        next: (resp: any) => {
+
+          this.dialog.closeAll();
+
+          this.showDialog(
+            'success',
+            'Su suscripcion free a sido exitosa',
+            'OK'
+          );
+
+        },
+        error: (err) => {
+
+          this.showDialog(
+            'error',
+            err.error?.message || 'No se pudo completar la suscripcion',
+            'Error'
+          );
+
+        }
+      });
+  }
+
   realizarPagoYape() {
 
     if (this.form.invalid) {
@@ -304,18 +348,32 @@ export class PaymentComponent implements OnInit {
       return;
     }
 
+    // Validar 
+    if (this.selectedPlans.some(planId => !planId)) {
+      this.showDialog(
+        'info',
+        'Debe seleccionar un plan en todos los campos.',
+        'OK'
+      );
+      return;
+    }
+
     const formData = new FormData();
 
-    formData.append('plan_id', this.idPackage.toString());
+    formData.append('package_id', this.idPackage.toString());
+
+    this.selectedPlans.forEach(planId => {
+        formData.append('plans[]', planId.toString());
+      });
 
     formData.append(
       'security_code',
-      this.form.get('security_code')?.value
+      this.form.get('codeSecurity')?.value
     );
 
     formData.append(
       'operation_number',
-      this.form.get('operation_number')?.value
+      this.form.get('numberOperation')?.value
     );
 
     if (this.couponApplied) {

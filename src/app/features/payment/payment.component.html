@@ -67,9 +67,22 @@
                 </div>
 
               </mat-card-content>
-              
-              <mat-card-content>
+              <mat-card-content  *ngIf=" idPackage == 1 ">
+               
+                <!-- INFO ITEMS -->
+                <div class="flex items-center gap-4 mb-3">
+                  <button
+                      mat-stroked-button
+                      class="border border-secondary! text-secondary"
+                     (click)="obtenerFree()">
+                      Obtener paquete free
+                    </button>
 
+                </div>
+
+              </mat-card-content>
+              
+              <mat-card-content  *ngIf=" idPackage != 1 ">
                
                 <!-- DESCRIPCIÓN -->
                 <p class="text-sm mb-4">
@@ -90,7 +103,7 @@
               </mat-card-content>
             </mat-card>
         </div>
-        <div class="col-span-12 lg:col-span-4">
+        <div class="col-span-12 lg:col-span-4" >
             <div id="paymentBrick_container">
 
             </div>
@@ -192,7 +205,7 @@
                         </mat-label>
 
                         <mat-form-field appearance="outline" class="w-full">
-                            <input matInput formControlName="code" placeholder="00000" />
+                            <input matInput formControlName="codeSecurity" placeholder="00000" />
                         </mat-form-field>
                     </div>
 
@@ -202,7 +215,7 @@
                         </mat-label>
 
                         <mat-form-field appearance="outline" class="w-full">
-                            <input matInput formControlName="code" placeholder="0000" />
+                            <input matInput formControlName="numberOperation" placeholder="0000" />
                         </mat-form-field>
                     </div>
 

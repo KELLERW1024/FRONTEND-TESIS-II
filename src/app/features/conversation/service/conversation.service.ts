@@ -119,7 +119,7 @@ export class ConversationService {
       // this.url 
       console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
-      return this.http.get( this.url + "/suscriptionconversation" ,
+      return this.http.get( this.url + "/conversationPlan" ,
         {   headers,
             params: { idConversation: idConversation } 
         });

@@ -30,47 +30,8 @@ export interface Conversation {
   status: ConversationStatus;
   title: string;
   plan_name: string;
+  package_name: string;
 }
-
-// table 1
-// export interface productsData {
-//   id: number;
-//   imagePath: string;
-//   uname: string;
-//   budget: number;
-//   priority: string;
-// }
-
-// const PRODUCT_DATA: productsData[] = [
-//   {
-//     id: 1,
-//     imagePath: 'assets/images/products/product-1.jpg',
-//     uname: 'Gaming Console',
-//     budget: 180,
-//     priority: 'confirmed',
-//   },
-//   {
-//     id: 2,
-//     imagePath: 'assets/images/products/product-2.jpg',
-//     uname: 'Leather Purse',
-//     budget: 90,
-//     priority: 'cancelled',
-//   },
-//   {
-//     id: 3,
-//     imagePath: 'assets/images/products/product-3.jpg',
-//     uname: 'Red Velvate Dress',
-//     budget: 120,
-//     priority: 'rejected',
-//   },
-//   {
-//     id: 4,
-//     imagePath: 'assets/images/products/product-4.jpg',
-//     uname: 'Headphone Boat',
-//     budget: 160,
-//     priority: 'confirmed',
-//   },
-// ];
 
 @Component({
   selector: 'app-conversation',
@@ -96,7 +57,7 @@ export class ConversationComponent {
 
 @ViewChild('editDialog') editDialog!: TemplateRef<any>;
 
-  displayedColumns1: string[] = ['plan', 'title', 'status', 'actions'];
+  displayedColumns1: string[] = ['paquete', 'plan', 'title', 'status', 'actions'];
 
   dataSource1 = new MatTableDataSource<Conversation>([]);
 
