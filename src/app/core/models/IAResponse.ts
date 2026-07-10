@@ -2,7 +2,10 @@ export interface ChatResponse {
   is_valid: boolean;
   response: IaResponse;
   table: ChatTable | null;
-   feedback?: string | '';
+  feedback?: string | '';
+  image ?: IaImageResponse;
+  message?: string | '';
+
 }
 
 export interface IaResponse {
@@ -13,6 +16,9 @@ export interface IaResponse {
   images?: string[];
   references: Reference[] | null;
 }
+export interface IaImageResponse {
+  output: string[];
+} 
 
 export interface Reference {
   authors: string[];

@@ -15,8 +15,9 @@ import { AnswerValidationResponse } from 'src/app/core/models/ValidarRespuestaRe
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/components/dialog/dialog.component';
-import { ChatResponse, ChatTable, IaResponse } from 'src/app/core/models/IAResponse';
+import { ChatResponse, ChatTable, IaImageResponse, IaResponse } from 'src/app/core/models/IAResponse';
 import { DomSanitizer } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-edit-conversation',
@@ -55,6 +56,8 @@ export class EditConversationComponent {
   reply : string = "";
   iaResponse : IaResponse | null;
 
+  iaImageResponse : IaImageResponse  | null = null ;
+
   finalizado : boolean = false;
 
   selectedQuestion: any = null;
@@ -89,7 +92,8 @@ export class EditConversationComponent {
   constructor( private sanitizer: DomSanitizer, 
     private conversationService: ConversationService,
     private router: Router , 
-    private route: ActivatedRoute, private fb: FormBuilder, private snackBar: MatSnackBar, private dialog: MatDialog
+    private route: ActivatedRoute, private fb: FormBuilder, private snackBar: MatSnackBar, private dialog: MatDialog, 
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -481,10 +485,11 @@ export class EditConversationComponent {
         next: (resp: ChatResponse) => {
 
           this.iaResponse = resp.response;
-          console.log("RESPUESTA => {} ", resp );
           console.log("Respuesta Completa : {}", resp );
           console.log("Respuesta  VALID : ", this.iaResponse );
           console.log("Respuesta feedback : {}", this.iaResponse.is_valid );
+          console.log("IMAGEN IA=> {} ", resp.image ?? null );
+
 
           if ( !resp.is_valid  ) {
 
@@ -492,7 +497,7 @@ export class EditConversationComponent {
 
           } 
           this.reply = this.iaResponse.response ?? '';
-          this.images = this.iaResponse.images ?? [];
+          this.iaImageResponse = resp.image ?? null;
           this.tablaGenerada = resp.table ?? null;
           
 
@@ -509,6 +514,7 @@ export class EditConversationComponent {
 
         error: (err: any) => {
           console.error(err);
+          return this.showDialog('info', 'Ocurrió un error, estamos trabajando para solucionarlo', 'Info');
         },
 
         complete: () => {
@@ -617,6 +623,31 @@ export class EditConversationComponent {
       maxHeight: '80vh'
     });
   }
+
+  verImagenGrande( template: TemplateRef<any> ) {
+    this.dialog.open(template, {
+      width: '90vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      autoFocus: false,
+      panelClass: 'image-dialog'
+    });
+  }
+
+descargarImagen(url: string) {
+  this.http.get(url, { responseType: 'blob' }).subscribe(blob => {
+
+    const objectUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = 'imagen-generada.png';
+    link.click();
+
+    window.URL.revokeObjectURL(objectUrl);
+
+  });
+}
 
 
 

@@ -1,157 +1,155 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
-  
-  <div class="p-6 flex">
-    <mat-card-title class="mat-mdc-card-title mb-0">
-      {{ plan?.name }}
-    </mat-card-title>
-  </div>
 
-  <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+    <div class="p-6 flex">
+        <mat-card-title class="mat-mdc-card-title mb-0">
+            {{ plan?.name }}
+        </mat-card-title>
+    </div>
 
-    <div class="grid grid-cols-12 gap-6">
+    <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
 
-        <div class="col-span-12 lg:col-span-9">
+        <div class="grid grid-cols-12 gap-6">
 
-
-            <div *ngIf="finalizado" class="max-w-5xl px-3 mx-auto">
-                <h4 class="text-3xl font-semibold text-center leading-relaxed mb-4">
-                    Tu plan de tesis ha sido completado correctamente.
-                    Ya puedes ver todas tus respuestas y descargar tu documento final.
-                </h4>
+            <div class="col-span-12 lg:col-span-9">
 
 
-            </div>
+                <div *ngIf="finalizado" class="max-w-5xl px-3 mx-auto">
+                    <h4 class="text-3xl font-semibold text-center leading-relaxed mb-4">
+                        Tu plan de tesis ha sido completado correctamente.
+                        Ya puedes ver todas tus respuestas y descargar tu documento final.
+                    </h4>
 
 
-            <mat-card *ngIf="!finalizado" class="mat-mdc-card border border-border shadow-none mb-0">
-
-                <div class="p-4">
-                    <mat-card-title>
-                        {{ sectionProgress?.title }}: {{ sectionProgress?.description }}
-                    </mat-card-title>
                 </div>
 
-                <mat-card-content class="border-t border-border">
 
-                    <form [formGroup]="form" (ngSubmit)="conversationPayloadResponse()">
-                        <div class="grid grid-cols-8 gap-x-4 text-sm"
-                            >
+                <mat-card *ngIf="!finalizado" class="mat-mdc-card border border-border shadow-none mb-0">
 
-                            <div class="col-span-8">
-                                <mat-label class="font-semibold mb-2 block">
+                    <div class="p-4">
+                        <mat-card-title>
+                            {{ sectionProgress?.title }}: {{ sectionProgress?.description }}
+                        </mat-card-title>
+                    </div>
+
+                    <mat-card-content class="border-t border-border">
+
+                        <form [formGroup]="form" (ngSubmit)="conversationPayloadResponse()">
+                            <div class="grid grid-cols-8 gap-x-4 text-sm">
+
+                                <div class="col-span-8">
+                                    <mat-label class="font-semibold mb-2 block">
                                         {{ currentQuestion?.text }}
 
-                                        <small class="text-info cursor-pointer"
-                                            title="Ver detalle"
+                                        <small class="text-info cursor-pointer" title="Ver detalle"
                                             (click)="verDetalle(currentQuestion)">
                                             <strong>Ver detalle para responder</strong>
-                                            
+
                                         </small>
-                                      
-                                </mat-label>
-                                <mat-label class="font-semibold mb-2 block">
 
-                                    <button *ngIf="currentQuestion?.image == 1"
-                                            type="button"
+                                    </mat-label>
+                                    <mat-label class="font-semibold mb-2 block">
+
+                                        <button *ngIf="currentQuestion?.image == 1" type="button"
                                             class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
-                                            title="Adjuntar archivo"
-                                            (click)="fileInput.click()">
-                                            
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24">
-                                            <path d="M0 0h24v24H0z" fill="none" />
-                                            <path fill="currentColor" d="M22 13.75v-2.202c0-2.632 0-3.949-.77-4.804a3 3 0 0 0-.224-.225c-.855-.769-2.172-.769-4.804-.769h-.374c-1.153 0-1.73 0-2.268-.153a4 4 0 0 1-.848-.352c-.488-.271-.896-.68-1.712-1.495l-.55-.55c-.274-.274-.41-.41-.554-.53a4 4 0 0 0-2.18-.903c-.186-.017-.38-.017-.766-.017c-.883 0-1.324 0-1.692.07A4 4 0 0 0 2.07 5.007C2 5.376 2 5.818 2 6.7v7.05c0 3.771 0 5.657 1.172 6.828S6.229 21.75 10 21.75h4c3.771 0 5.657 0 6.828-1.172S22 17.521 22 13.75" opacity=".5" />
-                                            <path fill="currentColor" d="M12 11a.75.75 0 0 1 .75.75V13H14a.75.75 0 0 1 0 1.5h-1.25v1.25a.75.75 0 0 1-1.5 0V14.5H10a.75.75 0 0 1 0-1.5h1.25v-1.25A.75.75 0 0 1 12 11" />
-                                        </svg>
-                                        <span class="mdc-button__label"> Img / Doc </span>
+                                            title="Adjuntar archivo" (click)="fileInput.click()">
 
-                                       
-                                       
-                                    </button>
-                                    
-                                    <input type="file"
-                                            #fileInput
-                                            multiple
-                                            style="display: none"
-                                            (change)="onFileSelected($event)"    />
-                                    <div *ngIf="selectedFiles.length > 0" class="mt-2">
-                                        <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se permite max. una imagen y un documento)</small> </p>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em"
+                                                viewBox="0 0 24 24">
+                                                <path d="M0 0h24v24H0z" fill="none" />
+                                                <path fill="currentColor"
+                                                    d="M22 13.75v-2.202c0-2.632 0-3.949-.77-4.804a3 3 0 0 0-.224-.225c-.855-.769-2.172-.769-4.804-.769h-.374c-1.153 0-1.73 0-2.268-.153a4 4 0 0 1-.848-.352c-.488-.271-.896-.68-1.712-1.495l-.55-.55c-.274-.274-.41-.41-.554-.53a4 4 0 0 0-2.18-.903c-.186-.017-.38-.017-.766-.017c-.883 0-1.324 0-1.692.07A4 4 0 0 0 2.07 5.007C2 5.376 2 5.818 2 6.7v7.05c0 3.771 0 5.657 1.172 6.828S6.229 21.75 10 21.75h4c3.771 0 5.657 0 6.828-1.172S22 17.521 22 13.75"
+                                                    opacity=".5" />
+                                                <path fill="currentColor"
+                                                    d="M12 11a.75.75 0 0 1 .75.75V13H14a.75.75 0 0 1 0 1.5h-1.25v1.25a.75.75 0 0 1-1.5 0V14.5H10a.75.75 0 0 1 0-1.5h1.25v-1.25A.75.75 0 0 1 12 11" />
+                                            </svg>
+                                            <span class="mdc-button__label"> Img / Doc </span>
 
-                                        <ul>
-                                            <li *ngFor="let file of selectedFiles; let i = index; trackBy: trackByFile">
-                                            {{ file.name }} ({{ file.size / 1024 | number:'1.0-0' }} KB)
 
-                                                <button
-                                                    type="button"
-                                                    (click)="removeFile(i)"
-                                                    class="ml-2 text-red-500 hover:text-red-700"
-                                                    title="Eliminar archivo">
-                                                    ✖
-                                                </button>
-                                            </li>
-                                        </ul>
+
+                                        </button>
+
+                                        <input type="file" #fileInput multiple style="display: none"
+                                            (change)="onFileSelected($event)" />
+                                        <div *ngIf="selectedFiles.length > 0" class="mt-2">
+                                            <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se
+                                                    permite max. una imagen y un documento)</small> </p>
+
+                                            <ul>
+                                                <li
+                                                    *ngFor="let file of selectedFiles; let i = index; trackBy: trackByFile">
+                                                    {{ file.name }} ({{ file.size / 1024 | number:'1.0-0' }} KB)
+
+                                                    <button type="button" (click)="removeFile(i)"
+                                                        class="ml-2 text-red-500 hover:text-red-700"
+                                                        title="Eliminar archivo">
+                                                        ✖
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                    </mat-label>
+                                    <div class="flex gap-2 mt-2">
+
+                                        <div *ngFor="let img of previewFiles">
+                                            <img [src]="img" width="80" class="rounded" />
+                                        </div>
+
                                     </div>
 
-                                </mat-label>
-                                <div class="flex gap-2 mt-2">
+                                    <div class="flex items-center gap-2 w-full">
 
-                                    <div *ngFor="let img of previewFiles">
-                                        <img [src]="img" width="80" class="rounded" />
-                                    </div>
-
-                                </div>
-
-                                <div class="flex items-center gap-2 w-full">
-
-                                    <mat-form-field appearance="outline" class="flex-1">
-                                            <textarea
-                                            matInput
-                                            rows="3"   autofocus formControlName="answer">
+                                        <mat-form-field appearance="outline" class="flex-1">
+                                            <textarea matInput rows="3" autofocus formControlName="answer">
                                         </textarea>
-                                       
-                                    </mat-form-field>
-                                    
-                                </div>
-                                <p>
-                                    <mat-checkbox formControlName="showImages"  color="primary">Generame imagenes a partir de la respuesta.</mat-checkbox>
-                                    <mat-checkbox formControlName="crearCuadro"  color="primary">Crear cuadro a partir de la respuesta.</mat-checkbox>
-                                </p>
-                                <!-- <p>
+
+                                        </mat-form-field>
+
+                                    </div>
+                                    <p>
+                                        <mat-checkbox formControlName="showImages" color="primary">Generar imagen.</mat-checkbox>
+                                        <mat-checkbox formControlName="crearCuadro" color="primary">Crear cuadro a
+                                            partir de la respuesta.</mat-checkbox>
+                                    </p>
+                                    <!-- <p>
                                     <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
                                 </p> -->
+                                </div>
+
                             </div>
 
-                        </div>
+                            <div class="mt-3 flex gap-2">
+                                <button mat-flat-button color="primary">
+                                    Enviar informacion
+                                </button>
 
-                        <div class="mt-3 flex gap-2">
-                            <button mat-flat-button 
-                                    color="primary">
-                                Enviar informacion
-                            </button>
+                                <button mat-stroked-button color="warn">
+                                    Limpiar
+                                </button>
+                            </div>
+                        </form>
 
-                            <button mat-stroked-button color="warn">
-                                Limpiar
-                            </button>
-                        </div>
-                    </form>
+                    </mat-card-content>
+                    <!-- 
+                        RESPUESTA OBTENIDA EN EL TEXT AREA
+                        BOTON ADJUNTAR IMAGEN 
+                        LISTA DE BIBLIOGRAFIA UTILIZADA 
+                        BOTON GUARDAR ESTA RESPUESTA 
+                    -->
+                    <mat-card-content class="border-t border-border">
+                        <form>
+                            <div class="grid grid-cols-8 gap-x-4 text-sm">
 
-                </mat-card-content>
-                <mat-card-content class="border-t border-border">
-                    <form>
-                        <div class="grid grid-cols-8 gap-x-4 text-sm">
+                                <div class="col-span-8">
+                                    <mat-label class="font-semibold mb-2 block">
+                                        Respuesta obtenida
+                                    </mat-label>
 
-                            <div class="col-span-8">
-                                <mat-label class="font-semibold mb-2 block">
-                                    Respuesta obtenida
-                                </mat-label>
-
-                                <mat-form-field appearance="outline" class="w-full">
-                                    <textarea
-                                        matInput
-                                        rows="12"
-                                        [(ngModel)]="reply" name="reply">
+                                    <mat-form-field appearance="outline" class="w-full">
+                                        <textarea matInput rows="12" [(ngModel)]="reply" name="reply">
                                     </textarea>
-                                </mat-form-field>
-                                <!-- <p>Adjuntar imagenes a la respuesta</p>
+                                    </mat-form-field>
+                                    <!-- <p>Adjuntar imagenes a la respuesta</p>
                                 <input
                                     #fileInput2
                                     type="file"
@@ -170,252 +168,263 @@
                                     </svg>
 
                                 </button> -->
-                                <div *ngIf="tablaGenerada != null ">
-                                
-                                    <p>Ver tabla generada</p>
+                                    <div *ngIf="tablaGenerada != null ">
+
+                                        <p>Ver tabla generada</p>
+                                        <button type="button"
+                                            class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
+                                            title="Ver tabla generada" (click)="openModalTable()">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em"
+                                                viewBox="0 0 24 24">
+                                                <path d="M0 0h24v24H0z" fill="none" />
+                                                <path fill="currentColor"
+                                                    d="M11 16H3v3q0 .825.588 1.413T5 21h6zm2 0v5h6q.825 0 1.413-.587T21 19v-3zm-2-2V9H3v5zm2 0h8V9h-8zM3 7h18V5q0-.825-.587-1.412T19 3H5q-.825 0-1.412.588T3 5z" />
+                                            </svg>
+
+                                        </button>
+                                    </div>
+
+                                    <p>Adjuntar imagen o tabla en archivo excel a la respuesta</p>
+                                    <input #fileInputAddDoc type="file" accept="image/*, 
+                                            .xls,
+                                            .xlsx" hidden (change)="onFileSelectedAddDoc($event)">
+                                    <!-- *ngIf="currentQuestion?.image == 1" -->
+
                                     <button type="button"
-                                                class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
-                                                title="Ver tabla generada"
-                                                (click)="openModalTable()">
-                                    
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24">
+                                        class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
+                                        title="Adjuntar archivo" (click)="fileInputAddDoc.click()">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em"
+                                            viewBox="0 0 16 16">
                                             <path d="M0 0h24v24H0z" fill="none" />
-                                            <path fill="currentColor" d="M11 16H3v3q0 .825.588 1.413T5 21h6zm2 0v5h6q.825 0 1.413-.587T21 19v-3zm-2-2V9H3v5zm2 0h8V9h-8zM3 7h18V5q0-.825-.587-1.412T19 3H5q-.825 0-1.412.588T3 5z" />
+                                            <path fill="currentColor" fill-rule="evenodd"
+                                                d="M3 2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v3h.5a.5.5 0 0 1 .5.5v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5H3zM3 5v2.5h10v-1H7.5a.5.5 0 0 1-.354-.146L5.793 5zm9 .5V3H4v1h2a.5.5 0 0 1 .354.146L7.707 5.5z"
+                                                clip-rule="evenodd" />
                                         </svg>
 
                                     </button>
+                                    
+                                    <!-- PREVIEW DE LA IMAGEN O ARCHIVO  SELECCIONADO -->
+                                    <div class="grid grid-cols-12 gap-6 mt-4">
+
+                                        <div class="col-span-12 sm:col-span-6 lg:col-span-4"
+                                            *ngFor="let item of selectedFilesAddDoc; let i = index">
+
+                                            <mat-card class="relative overflow-hidden p-0">
+
+                                                <!-- ❌ eliminar -->
+                                                <button type="button"
+                                                    class="absolute top-2 right-2 bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center z-10 shadow"
+                                                    (click)="selectedFilesAddDoc.splice(i, 1)">
+
+                                                    ✕
+                                                </button>
+                                                
+
+                                                <mat-card-content class="p-0">
+
+                                                    <!-- 🖼 IMAGEN -->
+                                                    <div *ngIf="item.category === 'image'"
+                                                        class="w-full flex justify-center bg-gray-100">
+
+                                                        <img [src]="item.preview"
+                                                            class="w-[90%] h-56 object-cover rounded-md mt-3">
+
+                                                    </div>
+
+                                                    <!-- 📄 DOCUMENTO -->
+                                                    <div *ngIf="item.category === 'document'"
+                                                        class="w-full bg-gray-100 px-4 py-10 text-center">
+
+                                                        <p class="text-5xl">
+                                                            📄
+                                                        </p>
+
+                                                        <p class="text-sm text-gray-600 mt-2">
+                                                            {{ item.name }}
+                                                        </p>
+
+                                                    </div>
+
+                                                    <!-- 📝 DESCRIPCIÓN -->
+                                                    <div class="p-3">
+
+                                                        <input type="text" [(ngModel)]="item.description"
+                                                            [ngModelOptions]="{standalone: true}"
+                                                            placeholder="Descripción"
+                                                            class="border rounded w-full p-2 text-sm">
+
+                                                    </div>
+
+                                                    <!-- 📌 FUENTE -->
+                                                    <div class="p-3">
+
+                                                        <input type="text" [(ngModel)]="item.fuente"
+                                                            [ngModelOptions]="{standalone: true}" placeholder="Fuente"
+                                                            class="border rounded w-full p-2 text-sm">
+
+                                                    </div>
+
+                                                </mat-card-content>
+
+                                            </mat-card>
+
+                                        </div>
+
+                                    </div>
                                 </div>
 
-                                <p>Adjuntar imagen o tabla a la respuesta</p>
-                                <input
-                                    #fileInputAddDoc
-                                    type="file"
-                                    accept="image/*, 
-                                            .xls,
-                                            .xlsx"
-                                    hidden
-                                    (change)="onFileSelectedAddDoc($event)">
-                                <!-- *ngIf="currentQuestion?.image == 1" -->
-
-                                <button type="button"
-                                            class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
-                                            title="Adjuntar archivo"
-                                            (click)="fileInputAddDoc.click()">
-                                  
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 16 16">
-                                        <path d="M0 0h24v24H0z" fill="none" />
-                                        <path fill="currentColor" fill-rule="evenodd" d="M3 2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v3h.5a.5.5 0 0 1 .5.5v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5H3zM3 5v2.5h10v-1H7.5a.5.5 0 0 1-.354-.146L5.793 5zm9 .5V3H4v1h2a.5.5 0 0 1 .354.146L7.707 5.5z" clip-rule="evenodd" />
-                                    </svg>
-
-                                </button>
-                                <!-- PREVIEW -->
-                            <div class="grid grid-cols-12 gap-6 mt-4">
-                             
-
-                                <div
-    class="col-span-12 sm:col-span-6 lg:col-span-4"
-    *ngFor="let item of selectedFilesAddDoc; let i = index">
-
-    <mat-card class="relative overflow-hidden p-0">
-
-        <!-- ❌ eliminar -->
-        <button
-            type="button"
-            class="absolute top-2 right-2 bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center z-10 shadow"
-            (click)="selectedFilesAddDoc.splice(i, 1)">
-
-            ✕
-        </button>
-
-        <mat-card-content class="p-0">
-
-            <!-- 🖼 IMAGEN -->
-            <div
-                *ngIf="item.category === 'image'"
-                class="w-full flex justify-center bg-gray-100">
-
-                <img
-                    [src]="item.preview"
-                    class="w-[90%] h-56 object-cover rounded-md mt-3">
-
-            </div>
-
-            <!-- 📄 DOCUMENTO -->
-            <div
-                *ngIf="item.category === 'document'"
-                class="w-full bg-gray-100 px-4 py-10 text-center">
-
-                <p class="text-5xl">
-                    📄
-                </p>
-
-                <p class="text-sm text-gray-600 mt-2">
-                    {{ item.name }}
-                </p>
-
-            </div>
-
-            <!-- 📝 DESCRIPCIÓN -->
-            <div class="p-3">
-
-                <input
-                    type="text"
-                    [(ngModel)]="item.description"
-                    [ngModelOptions]="{standalone: true}"
-                    placeholder="Descripción"
-                    class="border rounded w-full p-2 text-sm">
-
-            </div>
-
-            <!-- 📌 FUENTE -->
-            <div class="p-3">
-
-                <input
-                    type="text"
-                    [(ngModel)]="item.fuente"
-                    [ngModelOptions]="{standalone: true}"
-                    placeholder="Fuente"
-                    class="border rounded w-full p-2 text-sm">
-
-            </div>
-
-        </mat-card-content>
-
-    </mat-card>
-
-</div>
 
                             </div>
-                        </div>
-                           
+                            <!-- VER DE LA IMAGEN GENERADA POR LA IA -->
+                            <div class="grid grid-cols-12 gap-4" *ngIf="iaImageResponse "> 
 
-                        </div>
-                        <!--  -->
-                        <div class="col-span-12 lg:col-span-3">
+                                <div class="col-span-12 sm:col-span-6 lg:col-span-4" >
 
-                                 <mat-chip-listbox aria-label="Color selection">
+                                    <mat-card class="cardWithShadow overflow-hidden rounded-xl">
 
-                                    <mat-chip-option
-                                    *ngFor="let ref of (iaResponse?.references ?? [])"
-                                    selected
-                                    color="primary">
+                                        <img   *ngIf="iaImageResponse"
+                                                [src]="iaImageResponse.output[0]"
+                                                class="w-full h-56 object-cover hover:scale-105 transition duration-300"
+                                                (click)="verImagenGrande(dialogTemplate)" />
 
-                                    {{ ref.apa_citation }}
+                                        <mat-card-content class="p-3">
+
+                                            <div class="flex justify-between items-center">
+
+                                                <button mat-icon-button  color="primary"
+                                                                        (click)="verImagenGrande(dialogTemplate)">
+                                                    <mat-icon>zoom_in</mat-icon>
+                                                </button>
+                                                <button
+                                                    mat-icon-button
+                                                    color="accent"
+                                                    (click)="descargarImagen(iaImageResponse!.output![0])">
+
+                                                    <mat-icon>download</mat-icon>
+
+                                                </button>
+
+                                            </div>
+                                           <div>
+
+                                                <div class="mb-3">
+                                                    <span class="text-sm font-medium">
+                                                       Fuente: Autoría propia
+                                                    </span>
+                                                </div>
+
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Descripcion de la imagen"
+                                                        class="border rounded w-full p-2 text-sm">
+                                                </div>
+
+                                            </div>
+
+                                        </mat-card-content>
+
+                                    </mat-card>
+
+                                </div>
+
+                            </div>
+                            <!-- LISTA DE BIBLIOGFIA UTILIZADA EN LA CONSTRUCCION DEL PARRAFO -->
+                            <div class="col-span-12 lg:col-span-3">
+
+                                <mat-chip-listbox aria-label="Color selection">
+
+                                    <mat-chip-option *ngFor="let ref of (iaResponse?.references ?? [])" selected
+                                        color="primary">
+
+                                        {{ ref.apa_citation }}
 
                                     </mat-chip-option>
 
                                 </mat-chip-listbox>
-                        </div>
-                        
-                        <div class="grid grid-cols-12 gap-4">
-
-                            <div  class="col-span-12 sm:col-span-6 lg:col-span-4"  *ngFor="let img of imagesSafe" >
-
-                                <mat-card class="cardWithShadow overflow-hidden rounded-xl">
-
-                                <!-- IMAGEN -->
-                                <img
-                                    [src]="img"
-                                    class="w-full h-56 object-cover hover:scale-105 transition duration-300"
-                                />
-
-                                <!-- FOOTER SIMPLE -->
-                                <mat-card-content class="p-3">
-
-                                    <div class="flex justify-between items-center">
-
-                                    <span class="text-sm font-medium">
-                                        Imagen generada
-                                    </span>
-
-                                    <button mat-icon-button  (click)="openImage(img)">
-                                        <mat-icon>zoom_in</mat-icon>
-                                    </button>
-
-                                    </div>
-
-                                </mat-card-content>
-
-                                </mat-card>
-
                             </div>
 
-                        </div>
-                        <!--  -->
+                            
+                            
 
-                        <div class="mt-3 flex gap-2">
-                            <button mat-flat-button color="accent" (click)="guardarRespuesta()">
-                                Guardar esta respuesta para esta pregunta
-                            </button>
-                        </div>
-                    </form>
+                            <div class="mt-3 flex gap-2">
+                                <button mat-flat-button color="accent" (click)="guardarRespuesta()">
+                                    Guardar esta respuesta para esta pregunta
+                                </button>
+                            </div>
+                        </form>
 
-                </mat-card-content>
-            </mat-card>
-        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <!-- 
+                COLUMNAS DE CAPITULOS Y OPCIONES 
+            -->
+            <div class="col-span-12 lg:col-span-3">
 
-       <div class="col-span-12 lg:col-span-3">
+                <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
 
-            <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
-
-                <div class="p-4">
-                <mat-card-title class="mat-mdc-card-title">
-                    Modulos/Capitulos
-                </mat-card-title>
-                </div>
-
-                <mat-card-content class="border-t border-border">
-
-                <mat-chip-listbox aria-label="Color selection">
-
-                    <mat-chip-option
-                    *ngFor="let section of sections; let i = index"
-                    selected
-                    color="primary">
-
-                    {{ section.title }} : {{ section.description }}
-
-                    </mat-chip-option>
-
-                </mat-chip-listbox>
-
-                </mat-card-content>
-
-            </mat-card>
-             <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
-
-                <div class="p-4">
-                <mat-card-title class="mat-mdc-card-title">
-                    Opciones
-                </mat-card-title>
-                </div>
-
-                <mat-card-content class="border-t border-border">
-
-                <mat-chip-listbox aria-label="Color selection">
-
-                    <div class="flex sm:flex-row! flex-col items-center justify-center gap-3 flex-wrap">
-                        <button mat-flat-button (click)="irAvance()">Ver avance del plan </button>
-                        <button mat-flat-button class="bg-secondary text-white!" (click)="irEditCapitulo()">Editar capitulo</button>
-                        <button mat-flat-button class="bg-warning text-white!" (click)="generarArchivo()">GENERAR</button>
-                        <button mat-flat-button class="bg-error text-white!">Volver a la pregunta anterior</button>
-                        <button mat-flat-button class="bg-success text-white!" (click)="irDeleteCapitulo()">Eliminar respuestas del capitulo</button>
-                        <!-- <button mat-flat-button disabled>Disabled</button> -->
-                        <!-- <a mat-flat-button href="https://www.google.com/" target="_blank">Link</a> -->
+                    <div class="p-4">
+                        <mat-card-title class="mat-mdc-card-title">
+                            Modulos/Capitulos
+                        </mat-card-title>
                     </div>
 
-                </mat-chip-listbox>
+                    <mat-card-content class="border-t border-border">
 
-                </mat-card-content>
+                        <mat-chip-listbox aria-label="Color selection">
 
-            </mat-card>
+                            <mat-chip-option *ngFor="let section of sections; let i = index" selected color="primary">
+
+                                {{ section.title }} : {{ section.description }}
+
+                            </mat-chip-option>
+
+                        </mat-chip-listbox>
+
+                    </mat-card-content>
+
+                </mat-card>
+                <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
+
+                    <div class="p-4">
+                        <mat-card-title class="mat-mdc-card-title">
+                            Opciones
+                        </mat-card-title>
+                    </div>
+
+                    <mat-card-content class="border-t border-border">
+
+                        <mat-chip-listbox aria-label="Color selection">
+
+                            <div class="flex sm:flex-row! flex-col items-center justify-center gap-3 flex-wrap">
+                                <button mat-flat-button (click)="irAvance()">Ver avance del plan </button>
+                                <button mat-flat-button class="bg-secondary text-white!"
+                                    (click)="irEditCapitulo()">Editar capitulo</button>
+                                <button mat-flat-button class="bg-warning text-white!"
+                                    (click)="generarArchivo()">GENERAR</button>
+                                <button mat-flat-button class="bg-error text-white!">Volver a la pregunta
+                                    anterior</button>
+                                <button mat-flat-button class="bg-success text-white!"
+                                    (click)="irDeleteCapitulo()">Eliminar respuestas del capitulo</button>
+                                <!-- <button mat-flat-button disabled>Disabled</button> -->
+                                <!-- <a mat-flat-button href="https://www.google.com/" target="_blank">Link</a> -->
+                            </div>
+
+                        </mat-chip-listbox>
+
+                    </mat-card-content>
+
+                </mat-card>
+
+            </div>
+
+
+
 
         </div>
-       
-
-
-
-    </div>
     </mat-card-content>
 </mat-card>
 <!--MODAL ver detalle -->
@@ -466,63 +475,80 @@
 <!-- Modal -->
 <ng-template #tableModal>
 
-  <h2 mat-dialog-title>
-    {{ tablaGenerada!.title }}
-  </h2>
+    <h2 mat-dialog-title>
+        {{ tablaGenerada!.title }}
+    </h2>
 
-  <mat-dialog-content>
+    <mat-dialog-content>
 
-    <table mat-table [dataSource]="tablaGenerada!.rows" class="w-full mat-elevation-z2">
+        <table mat-table [dataSource]="tablaGenerada!.rows" class="w-full mat-elevation-z2">
 
-      <!-- Columna 0 -->
-      <ng-container matColumnDef="col0">
-        <th mat-header-cell *matHeaderCellDef>
-          {{ tablaGenerada!.columns[0] }}
-        </th>
-        <td mat-cell *matCellDef="let row">
-          {{ row[0] }}
-        </td>
-      </ng-container>
+            <!-- Columna 0 -->
+            <ng-container matColumnDef="col0">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{ tablaGenerada!.columns[0] }}
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row[0] }}
+                </td>
+            </ng-container>
 
-      <!-- Columna 1 -->
-      <ng-container matColumnDef="col1">
-        <th mat-header-cell *matHeaderCellDef>
-          {{ tablaGenerada!.columns[1] }}
-        </th>
-        <td mat-cell *matCellDef="let row">
-          {{ row[1] }}
-        </td>
-      </ng-container>
+            <!-- Columna 1 -->
+            <ng-container matColumnDef="col1">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{ tablaGenerada!.columns[1] }}
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row[1] }}
+                </td>
+            </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="['col0','col1']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['col0','col1']"></tr>
+            <tr mat-header-row *matHeaderRowDef="['col0','col1']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['col0','col1']"></tr>
 
-    </table>
+        </table>
 
-  </mat-dialog-content>
+    </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Cerrar</button>
-  </mat-dialog-actions>
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>Cerrar</button>
+    </mat-dialog-actions>
 
 </ng-template>
 
-<div   *ngIf="selectedImage"
-  class="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
-  (click)="closeImage()">
+<div *ngIf="selectedImage" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
+    (click)="closeImage()">
 
-  <img
-    [src]="selectedImage"
-    class="max-w-4xl max-h-[90vh] rounded-lg shadow-xl"
-    (click)="$event.stopPropagation()"
-  />
+    <img [src]="selectedImage" class="max-w-4xl max-h-[90vh] rounded-lg shadow-xl" (click)="$event.stopPropagation()" />
 
-  <button
-     mat-icon-button
-    class="absolute top-4 right-4 text-white bg-black/50"
-    (click)="closeImage()"
-  >
-    <mat-icon>close</mat-icon>
-  </button>
+    <button mat-icon-button class="absolute top-4 right-4 text-white bg-black/50" (click)="closeImage()">
+        <mat-icon>close</mat-icon>
+    </button>
 
 </div>
+
+<!-- VIEW ZOOM IMAGEN IA -->
+ <ng-template #dialogTemplate>
+
+    <div class="flex justify-center items-center w-full h-full bg-black p-4 relative">
+
+        <button
+            mat-icon-button
+            class="absolute top-2 right-2 text-white z-10"
+            mat-dialog-close>
+
+            <mat-icon>close</mat-icon>
+
+        </button>
+
+        <ng-container *ngIf="iaImageResponse?.output?.length">
+
+            <img
+                [src]="iaImageResponse!.output![0]"
+                class="max-w-full max-h-[90vh] object-contain">
+
+        </ng-container>
+
+    </div>
+
+</ng-template>
