@@ -5,6 +5,7 @@ export interface ChatResponse {
   feedback?: string | '';
   image ?: IaImageResponse;
   message?: string | '';
+  count_ia_image?: number;
 
 }
 

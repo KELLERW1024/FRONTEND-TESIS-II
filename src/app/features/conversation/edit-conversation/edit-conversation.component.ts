@@ -78,6 +78,7 @@ export class EditConversationComponent {
   images: string[] = [];
   imagesSafe: any[] = [];
   selectedImage: string | null = null; // mostrar imagen generada por la IA
+  descripcionImagenIA: string = '';
 
   openImage(img: string) {
     this.selectedImage = img;
@@ -371,6 +372,11 @@ export class EditConversationComponent {
               JSON.stringify(this.tablaGenerada)
             );
 
+            if( this.iaImageResponse?.output?.length ){
+                  formData.append( 'url_imagen_ia', this.iaImageResponse.output[0] ) ;
+                  formData.append( 'desc_imagen_ia',  this.descripcionImagenIA ) ;
+            }
+
         break;
 
     }
@@ -499,6 +505,7 @@ export class EditConversationComponent {
           this.reply = this.iaResponse.response ?? '';
           this.iaImageResponse = resp.image ?? null;
           this.tablaGenerada = resp.table ?? null;
+          console.log("COUNT IMAGEN IA=> {} ", resp.count_ia_image ?? 0 );
           
 
           // if (this.images.length > 0) {
@@ -525,14 +532,7 @@ export class EditConversationComponent {
 
   guardarRespuesta(){
     //FORMATO 
-    // console.log("guardarRespuesta" + this.idPlan)
-    // const payload =  { 
-    //     idPlan : this.plan.id ,
-    //     idConversation: this.idSuscriptionConversation,
-    //     idSection: this.sectionProgress?.id , 
-    //     idQuestion : this.currentQuestion?.id,
-    //     reply: this.reply
-    // }
+
     const formDataPayload = this.buildFormData("save");
 
     this.conversationService.guardarRespuestas( formDataPayload ).subscribe ({
@@ -647,6 +647,16 @@ descargarImagen(url: string) {
     window.URL.revokeObjectURL(objectUrl);
 
   });
+}
+
+eliminarImagenIA(): void {
+
+    if (this.iaImageResponse) {
+        this.iaImageResponse.output = [];
+    }
+
+    // Si quieres ocultar completamente la tarjeta
+    this.iaImageResponse = null;
 }
 
 
