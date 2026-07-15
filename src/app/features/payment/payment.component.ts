@@ -227,9 +227,17 @@ export class PaymentComponent implements OnInit {
 
     const bricksBuilder = mp.bricks();
 
+    let precioFinal = 0 ;
+
+    if( !this.isCouponApplied ){
+        precioFinal = Number(this.package!.local_price);
+    }else{
+      precioFinal = this.finalAmount;
+    }
+
     bricksBuilder.create('payment', 'paymentBrick_container', {
       initialization: {
-        amount: Number( 100 ) // ✅ FIX CRÍTICO
+        amount: Number( precioFinal ) // ✅ FIX CRÍTICO
       },
 
       customization: {
@@ -256,6 +264,8 @@ export class PaymentComponent implements OnInit {
             original_price: this.couponApplied ? this.originalPrice.toString(): null ,
             final_amount : this.couponApplied ? this.finalAmount.toString() : null ,
             package_id :  this.idPackage.toString() ,
+            plans: this.selectedPlans,
+
 
           };
          
@@ -271,18 +281,26 @@ export class PaymentComponent implements OnInit {
 
                   if (resp.status === 'approved') {
                     console.log('Pago aprobado 🎉');
-                    // this.startConversationSuscription(this.idPlan);
+                    this.showDialog('success', 'El pago se realizo correctamente', 'Success');
+                    resolve(true);
+                    setTimeout(() => {
+                      this.router.navigate(['/conversations']);
+                    }, 1500);
+                    return;
                   }
 
                   if (resp.status === 'rejected') {
+                    this.showDialog('error', 'Pago rechazado', 'Error');
                     console.log('Pago rechazado ❌');
-                    // this.startConversationSuscription(this.idPlan);
+                    resolve(true);
+                    return;
 
                   }
 
-                  resolve(true);
+                  // resolve(true);
               },
               error: (err) => {
+                 return this.showDialog('error', 'Pago rechazado', 'Error');
                 console.error('Error pago:', err);
                 reject(err);
               }
@@ -291,6 +309,7 @@ export class PaymentComponent implements OnInit {
         },
 
         onError: (error: any) => {
+          return this.showDialog('error', 'Pago rechazado', 'Error');
           console.error('Brick error:', error);
         }
       }
@@ -364,7 +383,7 @@ export class PaymentComponent implements OnInit {
 
     this.selectedPlans.forEach(planId => {
         formData.append('plans[]', planId.toString());
-      });
+    });
 
     formData.append(
       'security_code',

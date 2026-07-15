@@ -1,16 +1,76 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
 
-    <div class="p-6 flex">
-        <mat-card-title class="mat-mdc-card-title mb-0">
-            {{ plan?.name }}
-        </mat-card-title>
-    </div>
+<div class="p-6 flex justify-between items-center">
+
+  <div class="text-lg font-medium">
+    <strong>{{ plan?.name }}</strong>
+  </div>
+
+  <!-- Botones derecha -->
+  <div class="flex items-center gap-2">
+
+    <button mat-flat-button [matMenuTriggerFor]="menuCap" aria-label="Capítulos">
+      <mat-icon>menu</mat-icon>
+      Capítulos
+    </button>
+
+    <mat-menu #menuCap="matMenu">
+
+      <button mat-menu-item *ngFor="let section of sections">
+        <span class="dot-icon">•</span>
+        <span>
+          {{ section.title }} : {{ section.description }}
+        </span>
+      </button>
+
+    </mat-menu>
+
+
+    <button mat-flat-button [matMenuTriggerFor]="menu">
+      Acciones
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+
+      <button mat-menu-item (click)="irAvance()">
+        <mat-icon>visibility</mat-icon>
+        <span>Ver avance del plan</span>
+      </button>
+
+      <button mat-menu-item (click)="irEditCapitulo()">
+        <mat-icon>edit</mat-icon>
+        <span>Editar capítulo</span>
+      </button>
+
+      <button mat-menu-item (click)="generarArchivo()">
+        <mat-icon>download</mat-icon>
+        <span>Generar archivo</span>
+      </button>
+
+      <button mat-menu-item>
+        <mat-icon>arrow_back</mat-icon>
+        <span>Volver a la pregunta anterior</span>
+      </button>
+
+      <mat-divider></mat-divider>
+
+      <button mat-menu-item (click)="irDeleteCapitulo()">
+        <mat-icon color="warn">delete</mat-icon>
+        <span>Eliminar respuestas del capítulo</span>
+      </button>
+
+    </mat-menu>
+
+  </div>
+
+</div>
 
     <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
 
         <div class="grid grid-cols-12 gap-6">
 
-            <div class="col-span-12 lg:col-span-9">
+            <div class="col-span-12 lg:col-span-12">
 
 
                 <div *ngIf="finalizado" class="max-w-5xl px-3 mx-auto">
@@ -25,10 +85,11 @@
 
                 <mat-card *ngIf="!finalizado" class="mat-mdc-card border border-border shadow-none mb-0">
 
-                    <div class="p-4">
+                    <div class="p-4 text-center">
                         <mat-card-title>
                             {{ sectionProgress?.title }}: {{ sectionProgress?.description }}
                         </mat-card-title>
+                           
                     </div>
 
                     <mat-card-content class="border-t border-border">
@@ -40,7 +101,7 @@
                                     <mat-label class="font-semibold mb-2 block">
                                         {{ currentQuestion?.text }}
 
-                                        <small class="text-info cursor-pointer" title="Ver detalle"
+                                        <small class="text-success cursor-pointer" title="Ver detalle"
                                             (click)="verDetalle(currentQuestion)">
                                             <strong>Ver detalle para responder</strong>
 
@@ -97,7 +158,7 @@
 
                                     </div>
 
-                                    <div class="flex items-center gap-2 w-full">
+                                    <div class="flex items-center gap-1 w-full">
 
                                         <mat-form-field appearance="outline" class="flex-1">
                                             <textarea matInput rows="3" autofocus formControlName="answer">
@@ -106,11 +167,14 @@
                                         </mat-form-field>
 
                                     </div>
-                                    <p>
-                                        <mat-checkbox formControlName="showImages" color="primary">Generar imagen.</mat-checkbox>
-                                        <mat-checkbox formControlName="crearCuadro" color="primary">Crear cuadro a
-                                            partir de la respuesta.</mat-checkbox>
-                                    </p>
+                                    <!-- <p> -->
+                                    <mat-checkbox formControlName="showImages" color="primary">
+                                       <strong> Generar imagen. </strong>
+                                    </mat-checkbox>
+                                    <mat-checkbox formControlName="crearCuadro" color="primary">
+                                        <strong> Crear cuadro a partir de la respuesta.</strong>
+                                    </mat-checkbox>
+                                    <!-- </p> -->
                                     <!-- <p>
                                     <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
                                 </p> -->
@@ -352,7 +416,7 @@
             <!-- 
                 COLUMNAS DE CAPITULOS Y OPCIONES 
             -->
-            <div class="col-span-12 lg:col-span-3">
+            <!-- <div class="col-span-12 lg:col-span-3">
 
                 <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
 
@@ -399,8 +463,7 @@
                                     anterior</button>
                                 <button mat-flat-button class="bg-success text-white!"
                                     (click)="irDeleteCapitulo()">Eliminar respuestas del capitulo</button>
-                                <!-- <button mat-flat-button disabled>Disabled</button> -->
-                                <!-- <a mat-flat-button href="https://www.google.com/" target="_blank">Link</a> -->
+                                
                             </div>
 
                         </mat-chip-listbox>
@@ -409,7 +472,7 @@
 
                 </mat-card>
 
-            </div>
+            </div> -->
 
 
 

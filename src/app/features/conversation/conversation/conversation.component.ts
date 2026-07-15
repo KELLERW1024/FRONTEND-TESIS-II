@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 export type ConversationStatus = 'active' | 'completed' | 'archived';
 
@@ -46,7 +47,7 @@ export interface Conversation {
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
-    RouterLink, MatCard
+    RouterLink, MatCard, TablerIconsModule
   ],
   templateUrl: './conversation.component.html',
   styleUrl: './conversation.component.scss',
@@ -57,7 +58,7 @@ export class ConversationComponent {
 
 @ViewChild('editDialog') editDialog!: TemplateRef<any>;
 
-  displayedColumns1: string[] = ['paquete', 'plan', 'title', 'status', 'actions'];
+  displayedColumns1: string[] = ['paquete', 'plan', 'title', 'status', 'paymentstatus' , 'actions'];
 
   dataSource1 = new MatTableDataSource<Conversation>([]);
 

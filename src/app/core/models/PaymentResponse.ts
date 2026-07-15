@@ -1,8 +1,12 @@
 export interface PaymentResponse {
-  status: 'approved' | 'rejected' | 'in_process' | string;
+  status: string;
   status_detail: string;
   id: number;
+  payment_id: number;
+  amount: number;
   date_approved: string | null;
+  subscription_id: number;
+  conversation_ids: number[] ;
 
   payer: {
     email?: string;
