@@ -1,0 +1,58 @@
+<div class="mb-4">
+    <button mat-stroked-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Regresar
+    </button>
+</div>
+<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+
+    <div class="p-6 flex justify-center items-center">
+        <mat-card-title class="mat-mdc-card-title mb-0">
+            {{ plan?.name }}
+        </mat-card-title>
+    </div>
+
+    <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+
+        <div class="grid grid-cols-12 gap-6">
+
+            <div class="col-span-12 lg:col-span-12">
+
+
+
+
+                <mat-card *ngFor="let section of sections" class="mb-4">
+
+                    <div class="p-4 flex justify-center items-center">
+                        <mat-card-title class="text-center">
+                            {{ section.title }}: {{ section.description }}
+                        </mat-card-title>
+                    </div>
+
+                    <!-- SUBCAPÍTULOS (QUESTIONS) -->
+                    <div class="px-4 pb-4">
+                        <div *ngFor="let question of section.questions">
+
+                            <mat-card-subtitle class="text-Left">
+                                <strong>{{ question.text }}:</strong> 
+                            </mat-card-subtitle>
+
+                         
+
+
+                        </div>
+                    </div>
+
+                </mat-card>
+
+                <!--  -->
+
+
+                <!--  -->
+            </div>
+
+
+        </div>
+    </mat-card-content>
+</mat-card>
+<!--MODAL ver detalle -->

@@ -1,173 +1,132 @@
+<div class="mb-2 flex gap-2">
+    <button mat-stroked-button color="primary" class="text-sm px-2 py-1" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Regresar
+    </button>
+</div>
 <mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
-  
-  <div class="p-6 flex justify-center items-center" >
+
+  <div class="p-6 flex justify-center items-center">
     <mat-card-title class="mat-mdc-card-title mb-0">
       {{ plan?.name }}
     </mat-card-title>
   </div>
 
-    <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
+  <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
 
     <div class="grid grid-cols-12 gap-6">
 
-        <div class="col-span-12 lg:col-span-12">
+      <div class="col-span-12 lg:col-span-12">
 
 
-          
 
-           <mat-card *ngFor="let section of sections" class="mb-4">
 
-                <div class="p-4 flex justify-center items-center">
-                    <mat-card-title class="text-center">
-                    {{ section.title }}: {{ section.description }}
-                    </mat-card-title>
-                </div>
+        <mat-card *ngFor="let section of sections" class="mb-4 ">
 
-                <!-- SUBCAPÍTULOS (QUESTIONS) -->
-                <div class="px-4 pb-4">
-                    <div *ngFor="let question of section.questions">
-                    
-                    <mat-card-subtitle class="text-center">
-                        <strong>{{ question.text }}:</strong> {{ question.answer_question }}
-                    </mat-card-subtitle>
+          <div class="p-4 flex justify-center items-center  mt-10">
+            <mat-card-title class="text-center">
+              {{ section.title }}: {{ section.description }}
+            </mat-card-title>
+          </div>
 
-                    <!-- IMGEN -->
-               <mat-card-content *ngIf="question.files?.length" class="mt-6 mb-10">
+          <!-- SUBCAPÍTULOS (QUESTIONS) -->
+          <div class="px-4 pb-4">
+            <div *ngFor="let question of section.questions">
 
-                    <div  class="grid grid-cols-12 gap-3">
+              <mat-card-subtitle class="text-justify" style="margin: 0 15px 16px 10px;">
+                {{ question.answer_question }}
+              </mat-card-subtitle>
 
-                        <div class="col-span-3" *ngFor="let file of question.files">
+              <!-- IMGEN -->
+              <mat-card-content *ngIf="question.files?.length" class="mt-6 mb-10">
 
-                        <div *ngIf="file.file_type === 'image'">
+                <div class="flex justify-center">
 
-                            <img
-                            [src]="file.file_url"
-                            class="w-70 h-50 aspect-square object-cover rounded-sm"
-                            />
+                  <div class="col-span-12" *ngFor="let file of question.files; let i = index">
 
-                            <p class="text-sm mt-2 text-gray-700">
-                            {{ file.description || 'Sin descripción' }}
-                            </p>
+                    <div *ngIf="file.file_type === 'image'">
+                      <h4 class="font-semibold mb-2">
+                        Imagen {{ file.numero  }}
+                      </h4>
+                        <a *ngIf="file.file_type === 'image'" [href]="file.file_url" target="_blank"
+                          class="text-blue-500 underline block mt-2">
 
-                            <p class="text-xs text-gray-500">
-                            Fuente: {{ file.fuente || 'No especificada' }}
-                            </p>
+                          <img [src]="file.file_url" class="max-w-full max-h-[450px] rounded-sm mx-auto"  />
+                        
 
-                        </div>
-
-                        <!-- IMAGEN -->
-                        <a
-                            *ngIf="file.file_type === 'image'"
-                            [href]="file.file_url"
-                            target="_blank"
-                            class="text-blue-500 underline block mt-2"
-                        >
-                            Ver imagen
                         </a>
 
-                        </div>
+                      <p class="text-sm text-gray-700 mb-1">
+                        {{ file.description || 'Sin descripción' }}
+                      </p>
+
+                      <p class="text-xs mt-0 text-gray-500 mt-0">
+                        Fuente: {{ file.fuente || 'No especificada' }}
+                      </p>
 
                     </div>
 
-                </mat-card-content>
+                   
 
+                  </div>
 
-                <!-- Tabla -->
-<mat-card-content *ngIf="question.tables?.length" class="mt-6 mb-10">
-
-  <div *ngFor="let table of question.tables" class="mb-6">
-
-    <!-- TITLE -->
-    <h3 class="text-lg font-semibold mb-3">
-      {{ table.title }}
-    </h3>
-
-    <!-- TABLE -->
-    <table class="w-full border border-gray-300 text-sm">
-
-      <!-- HEADER -->
-      <thead>
-        <tr >
-          <th
-            class="border px-2 py-1 bg-gray-100 text-left"
-            *ngFor="let col of table.data.columns"
-          >
-            {{ col || '' }}
-          </th>
-        </tr>
-      </thead>
-
-      <!-- BODY -->
-      <tbody>
-        <tr *ngFor="let row of table.data.rows">
-          <td
-            class="border px-2 py-1"
-            *ngFor="let cell of row"
-          >
-            {{ cell }}
-          </td>
-        </tr>
-      </tbody>
-
-    </table>
-
-  </div>
-
-</mat-card-content>
-                  
-
-
-                    </div>
                 </div>
 
-            </mat-card>
-            
-            <!--  -->
-        <div class="flex items-center mb-4">
-            <button mat-flat-button color="primary" (click)="accordion.openAll()">
-            Expand All
-            </button>
-            <button mat-stroked-button color="primary" (click)="accordion.closeAll()" class="ms-2">
-            Collapse All
-            </button>
-        </div>
-        <mat-accordion multi>
-        <!-- step 1 -->
-      
-            <mat-expansion-panel class="cardWithShadow" *ngFor="let section of sections">
-                <mat-expansion-panel-header>
-                    <mat-panel-title class="font-semibold"> {{ section.title }}: {{ section.description }}</mat-panel-title>
-                    <mat-panel-description class="text-sm">
-                        Type your name and age
-                        <mat-icon class="ml-auto me-2">
-                            <i-tabler name="user-circle" class="size-5!"></i-tabler>
-                        </mat-icon>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <div class="grid grid-cols-12 gap-6">
-                    <div class="col-span-12 sm:col-span-6">
-                    <mat-form-field appearance="outline" color="primary" class="w-full hide-hint">
-                    <mat-label>First name</mat-label>
-                    <input matInput />
-                    </mat-form-field>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                    <mat-form-field appearance="outline" color="primary" class="w-full hide-hint">
-                    <mat-label>Age</mat-label>
-                    <input matInput type="number" min="1" />
-                    </mat-form-field>
-                    </div>
+              </mat-card-content>
+
+
+              <!-- Tabla -->
+              <mat-card-content *ngIf="question.tables?.length" class="mt-6 mb-10">
+
+                <div *ngFor="let table of question.tables" class="mb-6">
+
+                  <h4 class="font-semibold mb-2">
+                    Tabla {{ table.numero }}
+                  </h4>
+
+                  <!-- TITLE -->
+                  <h4 class="text-sm font-semibold mb-3">
+                    {{ table.title }}
+                  </h4>
+
+                  <!-- TABLE -->
+                  <table class="w-full border border-gray-300 text-sm">
+
+                    <!-- HEADER -->
+                    <thead>
+                      <tr>
+                        <th class="border px-2 py-1 bg-gray-100 text-left" *ngFor="let col of table.data.columns">
+                          {{ col || '' }}
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <!-- BODY -->
+                    <tbody>
+                      <tr *ngFor="let row of table.data.rows">
+                        <td class="border px-2 py-1" *ngFor="let cell of row">
+                          {{ cell }}
+                        </td>
+                      </tr>
+                    </tbody>
+
+                  </table>
+
                 </div>
-            </mat-expansion-panel>
-       
-      
-        </mat-accordion>
-        	<!--  -->
-        </div>
-        
-      
+
+              </mat-card-content>
+
+
+
+            </div>
+          </div>
+
+        </mat-card>
+
+      </div>
+
+
     </div>
-    </mat-card-content>
+  </mat-card-content>
 </mat-card>
 <!--MODAL ver detalle -->
-

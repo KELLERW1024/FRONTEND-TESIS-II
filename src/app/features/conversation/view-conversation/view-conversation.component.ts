@@ -9,10 +9,13 @@ import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MaterialModule } from 'src/app/material.module';
 import { ConversationService } from '../service/conversation.service';
-import { Plan, Section } from 'src/app/core/models/PlanResponse';
+import { FileQuestion, Plan, Section } from 'src/app/core/models/PlanResponse';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
+
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-view-conversation',
@@ -32,12 +35,13 @@ export class ViewConversationComponent {
 
   	@ViewChild(MatAccordion) accordion: MatAccordion;
 
-  idSuscriptionConversation!: number;
+    idSuscriptionConversation!: number;
     plan!: Plan;
     sections: Section[] = [];
+
     
 
-    constructor( 
+    constructor(  private location: Location,
     private router: Router , private route: ActivatedRoute, private conversationService: ConversationService,
      ) {}
 
@@ -54,6 +58,11 @@ export class ViewConversationComponent {
     
     this.obtenerDataConversation();
     // this.addConversation();
+
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   obtenerDataConversation(){
@@ -65,6 +74,41 @@ export class ViewConversationComponent {
       console.log('Conversation => ',  resp);
       this.plan = resp.data.plan;
       this.sections = this.plan.sections ;
+
+
+      // Numerar imágenes
+      let contadorImagen = 1;
+
+      this.sections.forEach(section => {
+        section.questions.forEach(question => {
+
+          if (question.files?.length) {
+            question.files.forEach( (file: FileQuestion ) => {
+              
+              if (file.file_type === 'image') {
+                file.numero = contadorImagen++;
+              }
+
+            });
+          }
+
+        });
+      });
+
+       // Numerar tablas
+        let contadorTabla = 1;
+
+        this.sections.forEach(section => {
+          section.questions.forEach(question => {
+
+            if (question.tables?.length) {
+              question.tables.forEach( (table: any) => {
+                table.numero = contadorTabla++;
+              });
+            }
+
+          });
+        });
 
      
       },

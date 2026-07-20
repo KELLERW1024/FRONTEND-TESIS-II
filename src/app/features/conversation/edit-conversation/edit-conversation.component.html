@@ -9,22 +9,10 @@
   <!-- Botones derecha -->
   <div class="flex items-center gap-2">
 
-    <button mat-flat-button [matMenuTriggerFor]="menuCap" aria-label="Capítulos">
+    <button mat-flat-button  aria-label="Capítulos" (click)="viewStructure()">
       <mat-icon>menu</mat-icon>
-      Capítulos
+       Estructura del plan
     </button>
-
-    <mat-menu #menuCap="matMenu">
-
-      <button mat-menu-item *ngFor="let section of sections">
-        <span class="dot-icon">•</span>
-        <span>
-          {{ section.title }} : {{ section.description }}
-        </span>
-      </button>
-
-    </mat-menu>
-
 
     <button mat-flat-button [matMenuTriggerFor]="menu">
       Acciones
@@ -97,20 +85,21 @@
                         <form [formGroup]="form" (ngSubmit)="conversationPayloadResponse()">
                             <div class="grid grid-cols-8 gap-x-4 text-sm">
 
-                                <div class="col-span-8">
-                                    <mat-label class="font-semibold mb-2 block">
-                                        {{ currentQuestion?.text }}
+                                <div class="col-span-8 ">
+                                   <div class="flex justify-between items-center">
 
-                                        <small class="text-success cursor-pointer" title="Ver detalle"
-                                            (click)="verDetalle(currentQuestion)">
-                                            <strong>Ver detalle para responder</strong>
+                                        <mat-label class="font-semibold mb-2 block">
+                                            {{ currentQuestion?.text }} = >
 
-                                        </small>
+                                            <small 
+                                                class=" italic cursor-pointer" 
+                                                title="Ver detalle"
+                                                (click)="verDetalle(currentQuestion)">
+                                                <strong> Ver detalle para responder</strong>
+                                            </small>
+                                        </mat-label>
 
-                                    </mat-label>
-                                    <mat-label class="font-semibold mb-2 block">
-
-                                        <button *ngIf="currentQuestion?.image == 1" type="button"
+                                        <!-- <button type="button"
                                             class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
                                             title="Adjuntar archivo" (click)="fileInput.click()">
 
@@ -123,15 +112,59 @@
                                                 <path fill="currentColor"
                                                     d="M12 11a.75.75 0 0 1 .75.75V13H14a.75.75 0 0 1 0 1.5h-1.25v1.25a.75.75 0 0 1-1.5 0V14.5H10a.75.75 0 0 1 0-1.5h1.25v-1.25A.75.75 0 0 1 12 11" />
                                             </svg>
-                                            <span class="mdc-button__label"> Img / Doc </span>
+                                        </button> -->
+                                        
+
+                                        <!-- <input type="file" #fileInput multiple style="display: none"
+                                            (change)="onFileSelected($event)" />
+                                        <div *ngIf="selectedFiles.length > 0" class="mt-1">
+                                            <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se
+                                                    permite max. una imagen y un documento)</small> </p>
+
+                                            <ul>
+                                                <li
+                                                    *ngFor="let file of selectedFiles; let i = index; trackBy: trackByFile">
+                                                    {{ file.name }} ({{ file.size / 1024 | number:'1.0-0' }} KB)
+
+                                                    <button type="button" (click)="removeFile(i)"
+                                                        class="ml-2 text-red-500 hover:text-red-700"
+                                                        title="Eliminar archivo">
+                                                        ✖
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div> -->
 
 
-
+                                        <button mat-stroked-button type="button" class="border border-secondary! text-secondary" (click)="mostrarSeccion()">
+                                            Agregar archivo como respuesta => {{ mostrarDiv ? 'Ocultar' : 'Mostrar' }}
                                         </button>
 
-                                        <input type="file" #fileInput multiple style="display: none"
+                                    </div>
+                                    <mat-label class="font-semibold mb-2 block">
+
+                                            <div [hidden]="!mostrarDiv"
+                                            class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50"
+                                            (dragover)="onDragOver2($event)"
+                                            (drop)="onDrop2($event)"
+                                            (click)="fileInput.click()">
+
+                                            <mat-icon class="text-gray-500 text-4xl">
+                                                cloud_upload
+                                            </mat-icon>
+
+                                            <p class="mt-2 text-gray-600">
+                                                Arrastra tus imágenes aquí o haz clic para seleccionar
+                                            </p>
+
+                                           <input type="file" #fileInput multiple style="display: none"
                                             (change)="onFileSelected($event)" />
-                                        <div *ngIf="selectedFiles.length > 0" class="mt-2">
+
+                                        </div>
+
+                                    </mat-label>
+                                    <div class="flex gap-2 mt-2">
+                                         <div *ngIf="selectedFiles.length > 0" class="mt-1">
                                             <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se
                                                     permite max. una imagen y un documento)</small> </p>
 
@@ -149,31 +182,29 @@
                                             </ul>
                                         </div>
 
-                                    </mat-label>
-                                    <div class="flex gap-2 mt-2">
-
                                         <div *ngFor="let img of previewFiles">
                                             <img [src]="img" width="80" class="rounded" />
                                         </div>
 
                                     </div>
+                                    <mat-checkbox formControlName="showImages" color="primary">
+                                       <strong> Generar imagen referencial en la respuesta. </strong>
+                                    </mat-checkbox>
+                                    <mat-checkbox formControlName="crearCuadro" color="primary">
+                                        <strong> Generar cuadro en la respuesta.</strong>
+                                    </mat-checkbox>
 
                                     <div class="flex items-center gap-1 w-full">
 
                                         <mat-form-field appearance="outline" class="flex-1">
-                                            <textarea matInput rows="3" autofocus formControlName="answer">
+                                            <textarea matInput rows="5" autofocus formControlName="answer">
                                         </textarea>
 
                                         </mat-form-field>
 
                                     </div>
                                     <!-- <p> -->
-                                    <mat-checkbox formControlName="showImages" color="primary">
-                                       <strong> Generar imagen. </strong>
-                                    </mat-checkbox>
-                                    <mat-checkbox formControlName="crearCuadro" color="primary">
-                                        <strong> Crear cuadro a partir de la respuesta.</strong>
-                                    </mat-checkbox>
+                                    
                                     <!-- </p> -->
                                     <!-- <p>
                                     <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
@@ -182,12 +213,11 @@
 
                             </div>
 
-                            <div class="mt-3 flex gap-2">
-                                <button mat-flat-button color="primary">
-                                    Enviar informacion
+                            <div class="mt-0 flex gap-2">
+                                <button mat-flat-button class="bg-secondary text-white!">
+                                    Validar información
                                 </button>
-
-                                <button mat-stroked-button color="warn">
+                                <button mat-stroked-button class="border border-warning! text-warning">
                                     Limpiar
                                 </button>
                             </div>
@@ -205,8 +235,8 @@
                             <div class="grid grid-cols-8 gap-x-4 text-sm">
 
                                 <div class="col-span-8">
-                                    <mat-label class="font-semibold mb-2 block">
-                                        Respuesta obtenida
+                                    <mat-label class="font-semibold mb-5 mt-3 block text-center">
+                                        Respuesta obtenida previa revisión <small>( ésta respuesta se guardará en el sistema. Libre para editar )</small>
                                     </mat-label>
 
                                     <mat-form-field appearance="outline" class="w-full">
@@ -235,9 +265,8 @@
                                     <input #fileInputAddDoc type="file" accept="image/*, 
                                             .xls,
                                             .xlsx" hidden (change)="onFileSelectedAddDoc($event)">
-                                    <!-- *ngIf="currentQuestion?.image == 1" -->
 
-                                    <button type="button"
+                                    <!-- <button type="button"
                                         class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
                                         title="Adjuntar archivo" (click)="fileInputAddDoc.click()">
 
@@ -249,8 +278,35 @@
                                                 clip-rule="evenodd" />
                                         </svg>
 
-                                    </button>
+                                    </button> -->
                                     
+                                                                        <!-- INI -->
+                                    <div
+                                        class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50"
+                                        (dragover)="onDragOver($event)"
+                                        (drop)="onDrop($event)"
+                                        (click)="fileInputAddDoc.click()"
+                                        >
+
+                                        <mat-icon class="text-gray-500 text-4xl">
+                                            cloud_upload
+                                        </mat-icon>
+
+                                        <p class="mt-2 text-gray-600">
+                                            Arrastra tus imágenes aquí o haz clic para seleccionar
+                                        </p>
+
+                                        <!-- <input
+                                            #fileInput
+                                            type="file"
+                                            hidden
+                                            multiple
+                                            accept="image/*"
+                                            (change)="onFileSelectedAddDoc($event)"
+                                        /> -->
+
+                                    </div>
+                                    <!-- FIN -->
                                     <!-- PREVIEW DE LA IMAGEN O ARCHIVO  SELECCIONADO -->
                                     <div class="grid grid-cols-12 gap-6 mt-4">
 
@@ -319,6 +375,24 @@
                                         </div>
 
                                     </div>
+
+
+
+
+                                    <!-- Vista previa -->
+                                    <!-- <div class="grid grid-cols-4 gap-4 mt-4">
+
+                                    <div *ngFor="let image of imagesPreview">
+                                        <img
+                                        [src]="image"
+                                        class="rounded-lg w-full h-32 object-cover"
+                                        />
+                                    </div>
+
+                                    </div> -->
+                                    <!-- Fin -->
+
+                                    
                                 </div>
 
 
@@ -605,3 +679,20 @@
     </div>
 
 </ng-template>
+
+ <!-- Loading -->
+    <div 
+        *ngIf="isLoading"
+        class="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
+
+        <div class="flex flex-col items-center gap-3">
+
+            <mat-spinner diameter="50"></mat-spinner>
+
+            <span class="text-gray-600 text-sm">
+                Procesando, espere por favor...
+            </span>
+
+        </div>
+
+    </div>

@@ -19,6 +19,8 @@ import { ChatResponse, ChatTable, IaImageResponse, IaResponse } from 'src/app/co
 import { DomSanitizer } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 @Component({
   selector: 'app-edit-conversation',
   imports: [ MatTableModule,
@@ -28,7 +30,7 @@ import { HttpClient } from '@angular/common/http';
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
-    RouterLink, ReactiveFormsModule ,   FormsModule],
+    RouterLink, ReactiveFormsModule ,   FormsModule, MatProgressSpinnerModule],
   templateUrl: './edit-conversation.component.html',
   styleUrl: './edit-conversation.component.scss',
 })
@@ -80,6 +82,10 @@ export class EditConversationComponent {
   selectedImage: string | null = null; // mostrar imagen generada por la IA
   descripcionImagenIA: string = '';
 
+  mostrarDiv = false;
+
+  isLoading = false;
+
   openImage(img: string) {
     this.selectedImage = img;
       document.body.style.overflow = 'hidden';
@@ -118,6 +124,9 @@ export class EditConversationComponent {
     this.obtenerDataConversation();
     // this.addConversation();
   }
+  viewStructure() {
+    this.router.navigate(['/conversations/structure', this.idSuscriptionConversation]);
+  }
   irAvance() {
     this.router.navigate(['/conversations/view', this.idSuscriptionConversation]);
   }
@@ -127,107 +136,175 @@ export class EditConversationComponent {
   irDeleteCapitulo() {
     this.router.navigate(['/conversations/delete-capitulo-conversation', this.idSuscriptionConversation]);
   }
+  // DOCUMENTO 
+  onFileSelected(event: any): void {
 
-  verDetalle(question: any) {
-    this.selectedQuestion = question;
-    this.showModal = true;
-  }
+    const files = Array.from(event.target.files as FileList);
 
-  cerrarModal() {
-    this.showModal = false;
-  }
+    if (!files.length) {
+      return;
+    }
 
-  obtenerDataConversation(){
+    const allowedDocTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+       // PowerPoint
+      'application/vnd.ms-powerpoint', // .ppt
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
+      
+    ];
 
-    console.log("Suscription => obtenerDataConversation "   )
+    // Todos los archivos (existentes + nuevos)
+    const allFiles = [...this.selectedFiles, ...files];
 
-    this.conversationService.getDataConversation( this.idSuscriptionConversation ).subscribe ({
-      next: (resp: any) => {
-      this.plan = resp.data.plan;
-      console.log('PLAN => ',  resp);
-
-      this.sections = this.plan.sections ;
-      console.log('Sections => ',  this.sections);
-
-      this.sectionProgress = this.sections.find(
-          (s: any) =>
-                      s.progress_section === 'in_progress' ||
-                      s.progress_section === null
-              ) ?? null;
-
-      console.log('SectionCurrent => ',  this.sectionProgress );
-
-      this.questions = this.sectionProgress?.questions ?? [];
-
-      this.currentQuestion =  this.questions.find(q => q.answer_question === null) ?? null;
-
-      console.log(" QUESTION CURRENT => {}" , this.currentQuestion);
-
-      this.finalizado = this.sections.every((s: any) => !!s.answer);
-      },
-      error: (err: any) => {
-        console.error(err);
-      },
-      complete: () => {
-        console.log('Completado');
-      }
-  
-    }) 
-  }
-  onFileSelected(event: any) {
-
-     const files: FileList = event.target.files;
-
-      // IMPORTANTE: no perder referencia previa si quieres acumular
-      const newFiles: File[] = [];
-
-      for (let i = 0; i < files.length && i < 2; i++) {
-        newFiles.push(files[i]);
-      }
-
-      // si quieres REEMPLAZAR siempre:
-      this.selectedFiles = [...this.selectedFiles, ...newFiles];
-
-      // reset para permitir re-selección del mismo archivo
+    // Máximo 2 archivos
+    if (allFiles.length > 2) {
+      this.showDialog('error', 'Solo se permiten dos archivos.', 'Error');
       event.target.value = '';
+      return;
+    }
+
+    const images = allFiles.filter(file => file.type.startsWith('image/'));
+    const docs = allFiles.filter(file => allowedDocTypes.includes(file.type));
+
+    // Solo una imagen
+    if (images.length > 1) {
+      this.showDialog('info', 'Solo puedes subir una imagen.', 'Info');
+      event.target.value = '';
+      return;
+    }
+
+    // Solo un documento
+    if (docs.length > 1) {
+      this.showDialog('info', 'Solo puedes subir un documento.', 'Info');
+      event.target.value = '';
+      return;
+    }
+
+    // No se permiten otros tipos de archivo
+    if (images.length + docs.length !== allFiles.length) {
+      this.showDialog('error', 'Solo se permiten imágenes y documentos.', 'Error');
+      event.target.value = '';
+      return;
+    }
+
+    this.selectedFiles = allFiles;
+    event.target.value = '';
+  }
+  mostrarSeccion(): void {
+    this.mostrarDiv = !this.mostrarDiv;
+  }
+  onDragOver2(event: DragEvent) {
+    event.preventDefault();
+  }
+  onDrop2(event: DragEvent): void {
+    event.preventDefault();
+
+    const files = event.dataTransfer?.files;
+
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const allowedDocTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+       // PowerPoint
+      'application/vnd.ms-powerpoint', // .ppt
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
+    ];
+
+    // Solo para validar
+    const newFiles = Array.from(files);
+    const allFiles = [...this.selectedFiles, ...newFiles];
+
+    // Máximo 2 archivos
+    if (allFiles.length > 2) {
+      this.showDialog('error', 'Solo se permiten dos archivos.', 'Error');
+      return;
+    }
+
+    const images = allFiles.filter(file => file.type.startsWith('image/'));
+    const docs = allFiles.filter(file => allowedDocTypes.includes(file.type));
+
+    if (images.length > 1) {
+      this.showDialog('info', 'Solo puedes subir una imagen.', 'Info');
+      return;
+    }
+
+    if (docs.length > 1) {
+      this.showDialog('info', 'Solo puedes subir un documento.', 'Info');
+      return;
+    }
+
+    const invalidFile = allFiles.find(file => !this.isValidFile(file));
+
+    if (invalidFile) {
+      this.showDialog(
+        'info',
+        'Solo se permiten documentos (DOCX, DOC, PDF, XLS, XLSX) e imágenes (JPG, PNG).',
+        'Info'
+      );
+      return;
+    }
+
+    // Aquí sigues enviando el FileList original
+    this.processFiles2(files);
   }
 
-  // onFileSelectedAdd(event: any) : void {
+   private processFiles2(files: FileList): void {
 
-  //     const files: FileList = event.target.files;
+    Array.from(files).forEach(file => {
 
-  //     const readers = Array.from(files).map(file => {
+      const isImage = file.type.startsWith('image/');
 
-  //         return new Promise<any>((resolve) => {
+      const item: any = {
+        file,
+        category: isImage ? 'image' : 'document',
+        description: '',
+        fuente: '',
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        preview: null
+      };
 
-  //           const reader = new FileReader();
-  //           reader.onload = () => {
+      if (isImage) {
 
-  //             resolve({
-  //               file: file,
-  //               preview: reader.result,
-  //               description: '', 
-  //               fuente:  ''
-  //             });
+        const reader = new FileReader();
 
-  //           };
+        reader.onload = () => {
+          item.preview = reader.result;
 
-  //           reader.readAsDataURL(file);
-  //         });
+          this.selectedFiles = [
+            ...this.selectedFiles,
+            item
+          ];
+        };
 
-  //     });
+        reader.readAsDataURL(file);
 
-  //     Promise.all(readers).then(results => {
+      } else {
 
-  //       this.selectedFilesAdd = [
-  //         ...this.selectedFilesAdd,
-  //         ...results
-  //       ];
+        this.selectedFiles = [
+          ...this.selectedFiles,
+          item
+        ];
 
-  //     });
+      }
 
-  //     event.target.value = '';
-  // }
+    });
+
+  }
+ 
+  // 
   onFileSelectedAddDoc(event: any) : void {
 
         const files: FileList = event.target.files;
@@ -286,6 +363,169 @@ export class EditConversationComponent {
   removeFile(index: number): void {
     this.selectedFiles.splice(index, 1);
   }
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+
+    const files = event.dataTransfer?.files;
+
+    if (!files || files.length === 0) return;
+
+      const allowedFiles = Array.from(files).filter(file => {
+
+      const isImage = file.type.startsWith('image/');
+
+      const isExcel =
+        file.type === 'application/vnd.ms-excel' || // .xls
+        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || // .xlsx
+        file.name.toLowerCase().endsWith('.xls') ||
+        file.name.toLowerCase().endsWith('.xlsx');
+
+      return isImage || isExcel;
+
+    });
+
+    if (allowedFiles.length === 0) {
+      return this.showDialog('info', 
+        'Solo se permiten imágenes y archivos Excel.', 'Info'
+      );
+    }
+
+    this.processFiles(files);
+  }
+  private processFiles(files: FileList): void {
+
+    Array.from(files).forEach(file => {
+
+      const isImage = file.type.startsWith('image/');
+
+      const item: any = {
+        file,
+        category: isImage ? 'image' : 'document',
+        description: '',
+        fuente: '',
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        preview: null
+      };
+
+      if (isImage) {
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          item.preview = reader.result;
+
+          this.selectedFilesAddDoc = [
+            ...this.selectedFilesAddDoc,
+            item
+          ];
+        };
+
+        reader.readAsDataURL(file);
+
+      } else {
+
+        this.selectedFilesAddDoc = [
+          ...this.selectedFilesAddDoc,
+          item
+        ];
+
+      }
+
+    });
+
+  }
+  // 
+
+  verDetalle(question: any) {
+    this.selectedQuestion = question;
+    this.showModal = true;
+  }
+
+  cerrarModal() {
+    this.showModal = false;
+  }
+
+  obtenerDataConversation(){
+
+    console.log("Suscription => obtenerDataConversation "   )
+
+    this.conversationService.getDataConversation( this.idSuscriptionConversation ).subscribe ({
+      next: (resp: any) => {
+      this.plan = resp.data.plan;
+      console.log('PLAN => ',  resp);
+
+      this.sections = this.plan.sections ;
+      console.log('Sections => ',  this.sections);
+
+      this.sectionProgress = this.sections.find(
+          (s: any) =>
+                      s.progress_section === 'in_progress' ||
+                      s.progress_section === null
+              ) ?? null;
+
+      console.log('SectionCurrent => ',  this.sectionProgress );
+
+      this.questions = this.sectionProgress?.questions ?? [];
+
+      this.currentQuestion =  this.questions.find(q => q.answer_question === null) ?? null;
+
+      console.log(" QUESTION CURRENT => {}" , this.currentQuestion);
+
+      this.finalizado = this.sections.every((s: any) => !!s.answer);
+      },
+      error: (err: any) => {
+        console.error(err);
+      },
+      complete: () => {
+        console.log('Completado');
+      }
+  
+    }) 
+  }
+ 
+
+  // onFileSelectedAdd(event: any) : void {
+
+  //     const files: FileList = event.target.files;
+
+  //     const readers = Array.from(files).map(file => {
+
+  //         return new Promise<any>((resolve) => {
+
+  //           const reader = new FileReader();
+  //           reader.onload = () => {
+
+  //             resolve({
+  //               file: file,
+  //               preview: reader.result,
+  //               description: '', 
+  //               fuente:  ''
+  //             });
+
+  //           };
+
+  //           reader.readAsDataURL(file);
+  //         });
+
+  //     });
+
+  //     Promise.all(readers).then(results => {
+
+  //       this.selectedFilesAdd = [
+  //         ...this.selectedFilesAdd,
+  //         ...results
+  //       ];
+
+  //     });
+
+  //     event.target.value = '';
+  // }
+
 
   trackByFile(index: number, file: File): string {
     return file.name + file.lastModified;
@@ -448,45 +688,16 @@ export class EditConversationComponent {
        return this.showDialog('error', 'La respuesta es obligatoria', 'Error');
     }
 
-    if (this.selectedFiles.length > 2) {
-      return this.showDialog('error', 'Solo se permiten dos archivos', 'Error');
-    }
-
-    const allowedDocTypes = [
-                            'application/pdf',
-                            'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'application/vnd.ms-excel',
-                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                          ];
-    const images = this.selectedFiles.filter(f => f.type.startsWith('image/'));
-    const docs = this.selectedFiles.filter(f =>
-                                              allowedDocTypes.includes(f.type)
-                                            );
-
-    if (images.length > 1 || docs.length > 1) {
-      return this.showDialog(
-        'info',
-        'Solo puedes subir como máximo 1 imagen y 1 documento por envío.',
-        'Info'
-      );
-    }
-
-    const invalidFile = this.selectedFiles.find(
-      file => !this.isValidFile(file)
-    );
-
-    if (invalidFile) {
-      return this.showDialog('info', 
-        'Solo se permiten documentos (DOCX, DOC, PDF) e imágenes (JPG, PNG) y hojas de cálculo (XLS, XLSX)', 'Info'
-      );
-    }
+    
     
     const formDataPayload = this.buildFormData("validate");
 
     console.log('Payload:', formDataPayload);
     this.iaResponse = null;
+    this.reply = '' ;
+    this.selectedFilesAddDoc = [];
 
+    this.isLoading = true;
      this.conversationService.enviarContextoRespuestas(formDataPayload).subscribe({
         next: (resp: ChatResponse) => {
 
@@ -525,6 +736,7 @@ export class EditConversationComponent {
         },
 
         complete: () => {
+           this.isLoading = false;
           console.log('Completado');
         }
       });

@@ -1,5 +1,7 @@
 export interface PaymentResponse {
   status: string;
+  message: string;
+  success: boolean;
   status_detail: string;
   id: number;
   payment_id: number;

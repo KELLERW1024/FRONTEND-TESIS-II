@@ -4,6 +4,7 @@ import { ViewConversationComponent } from "./view-conversation/view-conversation
 import { EditConversationComponent } from "./edit-conversation/edit-conversation.component";
 import { EditCapituloConversationComponent } from "./edit-capitulo-conversation/edit-capitulo-conversation.component";
 import { DeleteCapituloConversationComponent } from "./delete-capitulo-conversation/delete-capitulo-conversation.component";
+import { StructureComponent } from "./structure/structure.component";
 
 export const ConversationRoutes: Routes = [
    {
@@ -27,6 +28,11 @@ export const ConversationRoutes: Routes = [
   {
    path: 'delete-capitulo-conversation/:id',
    component: DeleteCapituloConversationComponent,
+  },
+  {
+   path: 'structure/:id',
+   component: StructureComponent,
   }
+
 
 ];

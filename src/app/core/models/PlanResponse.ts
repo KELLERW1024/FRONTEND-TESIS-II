@@ -5,7 +5,7 @@ export interface Section {
   description: string | null;
   order: number;
   progress: any,
-  questions: any[]; // luego puedes tiparlo mejor
+  questions: Question[]; // luego puedes tiparlo mejor
   answer: string | null;
 }
 export interface Question {
@@ -19,6 +19,7 @@ export interface Question {
   image: number;
   answer_question : string;
   tables?: Table[];
+   files?: FileQuestion[];
 }
 
 export interface Plan {
@@ -33,5 +34,17 @@ export interface Plan {
 
 export interface Table {
   title: string;
-  data: any;
+  data: {
+    columns: string[];
+    rows: any[][];
+  };
+  numero?: number;
+}
+
+export interface FileQuestion {
+  file_type: string;
+  file_url: string;
+  description?: string;
+  fuente?: string;
+  numero?: number;
 }

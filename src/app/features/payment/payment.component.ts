@@ -279,6 +279,14 @@ export class PaymentComponent implements OnInit {
                 console.log('Pago creado:', resp);
                     console.log('STATUS:', resp.status);
 
+                  if (resp.success == false) {
+                    console.log('Pago no realizado  🎉' + resp.message );
+                    this.showDialog('info', resp.message , 'Info');
+                    resolve(true);
+                   
+                    return;
+                  }
+
                   if (resp.status === 'approved') {
                     console.log('Pago aprobado 🎉');
                     this.showDialog('success', 'El pago se realizo correctamente', 'Success');
@@ -286,6 +294,17 @@ export class PaymentComponent implements OnInit {
                     setTimeout(() => {
                       this.router.navigate(['/conversations']);
                     }, 1500);
+                    
+                    return;
+                  }
+                  if (resp.status === 'in_process') {
+                    console.log('Pago en estado pendiente ');
+                    this.showDialog('success', 'El pago esta pendiente de aprobacion, verificar en modulo conversations', 'Success');
+                    resolve(true);
+                    setTimeout(() => {
+                      this.router.navigate(['/conversations']);
+                    }, 1500);
+
                     return;
                   }
 
