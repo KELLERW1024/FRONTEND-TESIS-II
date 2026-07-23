@@ -285,7 +285,7 @@ export class EditConversationComponent {
 
           this.selectedFiles = [
             ...this.selectedFiles,
-            item
+            ...Array.from(files)
           ];
         };
 
@@ -295,7 +295,7 @@ export class EditConversationComponent {
 
         this.selectedFiles = [
           ...this.selectedFiles,
-          item
+          ...Array.from(files)
         ];
 
       }
@@ -450,6 +450,10 @@ export class EditConversationComponent {
     this.showModal = false;
   }
 
+  limpiar(): void {
+    this.form.reset();
+  }
+
   obtenerDataConversation(){
 
     console.log("Suscription => obtenerDataConversation "   )
@@ -578,7 +582,8 @@ export class EditConversationComponent {
 
           formData.append('apa', this.currentQuestion?.apa || '' );
 
-          this.selectedFiles.forEach(file => {
+
+          this.selectedFiles.forEach( file => {
             formData.append('files[]', file, file.name);
           });
 
