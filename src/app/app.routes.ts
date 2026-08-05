@@ -33,10 +33,15 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/pages.routes').then((m) => m.PagesRoutes),
       },
-       {
+      {
         path: 'payment/:packageId',
         loadComponent: () =>
           import('./features/payment/payment.component').then((m) => m.PaymentComponent),
+      },
+      {
+        path: 'diagnostic',
+        loadComponent: () =>
+          import('./features/diagnostic/diagnostic.component').then((m) => m.DiagnosticComponent),
       },
       {
         path: 'conversations',
