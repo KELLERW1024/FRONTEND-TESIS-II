@@ -5,6 +5,8 @@ import { EditConversationComponent } from "./edit-conversation/edit-conversation
 import { EditCapituloConversationComponent } from "./edit-capitulo-conversation/edit-capitulo-conversation.component";
 import { DeleteCapituloConversationComponent } from "./delete-capitulo-conversation/delete-capitulo-conversation.component";
 import { StructureComponent } from "./structure/structure.component";
+import { DiagnosticComponent } from "../diagnostic/diagnostic.component";
+import { QuestionDiagnosticComponent } from "./question-diagnostic-modal/question-diagnostic.component";
 
 export const ConversationRoutes: Routes = [
    {
@@ -32,6 +34,10 @@ export const ConversationRoutes: Routes = [
   {
    path: 'structure/:id',
    component: StructureComponent,
+  },
+  {
+   path: 'question-diagnostic-type/:id',
+   component: QuestionDiagnosticComponent,
   }
 
 

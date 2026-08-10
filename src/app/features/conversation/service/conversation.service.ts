@@ -40,6 +40,24 @@ export class ConversationService {
       );*/
     }
 
+    getVerficationDiagnosticExist( idConversation : number ){
+      console.log("TOKEN: " + this.authService.token )
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+      return this.http.get( this.url + "/verficationdiagnosticexist" ,
+        {   headers,
+            params: { idConversation: idConversation} 
+        });
+    }
+
+    getQuestionsDiagnostic( idConversation : number ){
+      console.log("TOKEN: " + this.authService.token )
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+      return this.http.get( this.url + "/diagnosticplan" ,
+        {   headers,
+            params: { idConversation: idConversation} 
+        });
+    }
+
     startConversation( idPlan : number){
         let headers = new HttpHeaders({
             'Authorization': 'Bearer ' + this.authService.token
@@ -76,6 +94,12 @@ export class ConversationService {
     guardarRespuestas( data: any ){
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
         let URL = URL_SERVICIOS+"/conversation/savereply";
+        return this.http.post(URL,data,{headers: headers});
+    }
+
+    saveAnswerDiagnostic( data: any ){
+        let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
+        let URL = URL_SERVICIOS+"/conversation/saveanswerdiagnostic";
         return this.http.post(URL,data,{headers: headers});
     }
 

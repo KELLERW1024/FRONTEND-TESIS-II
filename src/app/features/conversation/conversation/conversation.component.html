@@ -129,7 +129,7 @@
                 <mat-icon>edit</mat-icon>
                 <span>Editar nombre plan</span>
               </button>
-              <button mat-menu-item [routerLink]="['/conversations/edit', element.id]">
+              <button mat-menu-item (click)="editConversation(element.id)" >
                 <mat-icon><span class="material-symbols-outlined">
                     edit_square
                   </span></mat-icon>

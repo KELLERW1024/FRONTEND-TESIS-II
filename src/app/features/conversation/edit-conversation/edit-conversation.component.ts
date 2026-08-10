@@ -86,6 +86,8 @@ export class EditConversationComponent {
 
   isLoading = false;
 
+  questionsDiagnostic: any = [];
+
   openImage(img: string) {
     this.selectedImage = img;
       document.body.style.overflow = 'hidden';
@@ -99,7 +101,10 @@ export class EditConversationComponent {
   constructor( private sanitizer: DomSanitizer, 
     private conversationService: ConversationService,
     private router: Router , 
-    private route: ActivatedRoute, private fb: FormBuilder, private snackBar: MatSnackBar, private dialog: MatDialog, 
+    private route: ActivatedRoute, 
+    private fb: FormBuilder, 
+    private snackBar: MatSnackBar, 
+    private dialog: MatDialog, 
     private http: HttpClient
   ) {}
 
@@ -122,8 +127,9 @@ export class EditConversationComponent {
     console.log("ONIT => " + this.idSuscriptionConversation)
     
     this.obtenerDataConversation();
-    // this.addConversation();
+
   }
+
   viewStructure() {
     this.router.navigate(['/conversations/structure', this.idSuscriptionConversation]);
   }

@@ -67,7 +67,8 @@ export class ConversationComponent {
   loading = false;
 
   newTitle = '';
-selectedConversation: any;
+
+  selectedConversation: any;
 
   constructor(private router: Router, private conversationService : ConversationService,  public dialog: MatDialog ) {}
 
@@ -112,6 +113,29 @@ selectedConversation: any;
       width: '500px'
     });
 
+  }
+  editConversation( idConversation: number ){
+
+     this.conversationService.getVerficationDiagnosticExist( idConversation )
+      .subscribe({
+        next: (resp: any ) => {
+          console.log(resp);
+
+          // [routerLink]="['/conversations/edit', element.id]"
+          if( resp.exists && resp.summary != null ){
+               this.router.navigate(['/conversations/edit', idConversation]);
+          }else{
+            this.router.navigate(['/conversations/question-diagnostic-type', idConversation]);
+          }
+        },
+
+        error: (err) => {
+
+          console.error(err);
+          this.loading = false;
+        }
+      });
+    
   }
 
   updateNameConversation() {

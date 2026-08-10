@@ -1,0 +1,154 @@
+<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+
+    <!-- HEADER -->
+    <div class="p-6 flex justify-between items-center">
+
+        <div class="text-lg font-medium">
+            <strong>Diagnóstico inicial</strong>
+        </div>
+
+    </div>
+
+
+    <!-- CONTENT -->
+    <mat-card-content class="border-t border-border pt-6">
+
+        <div class="grid grid-cols-12 gap-6">
+
+            <div class="col-span-12">
+
+                <!-- PREGUNTAS -->
+                <div
+                    *ngFor="let question of questions; let i = index"
+                    class="mb-8 pb-6 border-b border-gray-200">
+
+                    <!-- PREGUNTA -->
+                    <div class="mb-3">
+
+                        <div class="font-semibold text-base">
+
+                            <span class="text-primary mr-2">
+                                {{ i + 1 }}.
+                            </span>
+
+                            {{ question.question_text }}
+
+                        </div>
+
+
+                        <!-- DETALLE -->
+                        <small
+                            class="italic cursor-pointer ml-6 text-primary"
+                            title="Ver detalle" (click)="verDetalle(question)" >
+
+                            <strong>
+                                Ver detalle para responder
+                            </strong>
+
+                        </small>
+
+                    </div>
+
+
+                    <!-- RESPUESTA -->
+                    <div class="w-full">
+
+                        <mat-form-field
+                            appearance="outline"
+                            class="w-full">
+
+                            <mat-label>
+                                Respuesta
+                            </mat-label>
+
+                            <textarea
+                                matInput
+                                rows="5"
+                                [(ngModel)]="question.answer"
+                                [name]="'answer_' + question.id"
+                                placeholder="Escribe aquí tu respuesta...">
+                            </textarea>
+
+                        </mat-form-field>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTONES -->
+                <div class="mt-6 flex gap-2">
+
+                    <button
+                        mat-flat-button
+                        class="bg-secondary text-white!"
+                        type="button"
+                        (click)="guardarInformacion()">
+
+                        Guardar información
+
+                    </button>
+
+
+                    <button
+                        mat-stroked-button
+                        class="border border-warning! text-warning"
+                        type="button"
+                        >
+
+                        Limpiar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </mat-card-content>
+
+</mat-card>
+
+<!-- MODAL -->
+<div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+
+    <div class="bg-white w-full max-w-lg rounded-lg shadow-lg">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between p-4 ">
+
+            <h5 class="font-semibold text-lg">
+                Detalle pregunta
+            </h5>
+
+            <button mat-icon-button (click)="cerrarModal()">
+                <mat-icon>close</mat-icon>
+            </button>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="p-4 space-y-2 text-sm">
+
+            <p><strong>Pregunta:</strong> {{ selectedQuestion?.question_text }}</p>
+
+            <p><strong>Detalle:</strong> {{ selectedQuestion?.question_detail }}</p>
+
+            <p><strong>Ejemplo:</strong> {{ selectedQuestion?.question_example }}</p>
+
+            <!-- <p><strong>Validacion:</strong> {{ selectedQuestion?.validation_detail }}</p> -->
+
+
+        </div>
+        <div class="flex justify-end gap-2 p-4 ">
+
+            <button mat-stroked-button color="warn" (click)="cerrarModal()">
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
