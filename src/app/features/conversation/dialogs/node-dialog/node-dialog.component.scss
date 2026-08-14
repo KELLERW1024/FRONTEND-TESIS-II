@@ -1,0 +1,23 @@
+:host {
+    display: block;
+}
+
+mat-dialog-content {
+    min-width: 450px;
+    padding-top: 10px;
+}
+
+.full-width {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+h2[mat-dialog-title] {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+mat-dialog-actions {
+    padding-bottom: 8px;
+}

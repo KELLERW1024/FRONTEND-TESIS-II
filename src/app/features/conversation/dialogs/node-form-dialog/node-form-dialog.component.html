@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>
+    {{ title }}
+</h2>
+
+<mat-dialog-content>
+
+    <form [formGroup]="form">
+
+        <mat-form-field
+            appearance="outline"
+            class="w-full"
+        >
+            <mat-label>Título</mat-label>
+
+            <input
+                matInput
+                formControlName="titulo"
+                maxlength="200"
+                autocomplete="off"
+            >
+
+            <mat-error
+                *ngIf="form.get('titulo')?.hasError('required')"
+            >
+                El título es obligatorio
+            </mat-error>
+
+            <mat-error
+                *ngIf="form.get('titulo')?.hasError('maxlength')"
+            >
+                Máximo 200 caracteres
+            </mat-error>
+
+        </mat-form-field>
+
+
+        <mat-form-field
+            appearance="outline"
+            class="w-full"
+        >
+            <mat-label>Objetivo</mat-label>
+
+            <textarea
+                matInput
+                formControlName="objective"
+                rows="4"
+            ></textarea>
+
+        </mat-form-field>
+
+    </form>
+
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+
+    <button
+        mat-button
+        type="button"
+        (click)="cancel()"
+    >
+        Cancelar
+    </button>
+
+    <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="form.invalid"
+        (click)="save()"
+    >
+        {{ isEdit ? 'Guardar cambios' : 'Crear' }}
+    </button>
+
+</mat-dialog-actions>

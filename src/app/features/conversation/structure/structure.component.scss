@@ -1,0 +1,401 @@
+/* ================================
+   BOTÓN REGRESAR
+================================ */
+
+.back-button {
+    border-radius: 10px;
+    height: 42px;
+    padding: 0 16px;
+    gap: 8px;
+
+    mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+    }
+}
+
+
+/* ================================
+   CARD PRINCIPAL
+================================ */
+
+.plan-card {
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.plan-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    padding: 28px 32px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(63, 81, 181, 0.08),
+        rgba(63, 81, 181, 0.02)
+    );
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.plan-icon {
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: var(--mat-sys-primary);
+
+    color: white;
+
+    flex-shrink: 0;
+
+    mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+    }
+}
+
+.plan-header-content {
+    min-width: 0;
+}
+
+.plan-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+
+    color: var(--mat-sys-primary);
+}
+
+.plan-title {
+    margin: 0;
+
+    font-size: 26px;
+    line-height: 1.25;
+    font-weight: 700;
+
+    color: var(--mat-sys-on-surface);
+}
+
+
+/* ================================
+   CONTENIDO
+================================ */
+
+.plan-content {
+    padding: 28px 32px !important;
+}
+
+.plan-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+/* ================================
+   CAPÍTULO
+================================ */
+
+.chapter {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    margin-top: 14px;
+    margin-bottom: 8px;
+
+    padding: 16px 18px;
+
+    border-radius: 12px;
+
+    background: rgba(63, 81, 181, 0.06);
+
+    border-left: 4px solid var(--mat-sys-primary);
+}
+
+.chapter:first-child {
+    margin-top: 0;
+}
+
+.chapter-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: rgba(63, 81, 181, 0.12);
+
+    color: var(--mat-sys-primary);
+
+    flex-shrink: 0;
+
+    mat-icon {
+        font-size: 21px;
+        width: 21px;
+        height: 21px;
+    }
+}
+
+.chapter-content {
+    min-width: 0;
+}
+
+.chapter-label {
+    display: block;
+
+    margin-bottom: 2px;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    color: var(--mat-sys-primary);
+}
+
+.chapter-title {
+    margin: 0;
+
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+
+/* ================================
+   SUBCAPÍTULOS
+================================ */
+
+.subchapter {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 46px;
+
+    padding: 5px 10px 5px 18px;
+
+    border-radius: 8px;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.subchapter:hover {
+    background: rgba(63, 81, 181, 0.05);
+
+    transform: translateX(3px);
+}
+
+.subchapter-line {
+    width: 2px;
+    height: 24px;
+
+    margin-right: 14px;
+
+    border-radius: 2px;
+
+    background: rgba(63, 81, 181, 0.25);
+
+    flex-shrink: 0;
+}
+
+.subchapter-content {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+.subchapter-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 48px;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    background: rgba(63, 81, 181, 0.08);
+
+    color: var(--mat-sys-primary);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.subchapter-title {
+    color: var(--mat-sys-on-surface);
+
+    font-size: 14px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+
+    .plan-header {
+        padding: 22px 20px;
+    }
+
+    .plan-content {
+        padding: 20px !important;
+    }
+
+    .plan-title {
+        font-size: 21px;
+    }
+
+    .chapter {
+        padding: 14px;
+    }
+
+    .subchapter {
+        margin-left: 0 !important;
+    }
+
+}
+
+.chapter {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 14px;
+    margin-bottom: 8px;
+
+    padding: 16px 12px 16px 18px;
+
+    border-radius: 12px;
+
+    background: rgba(63, 81, 181, 0.06);
+
+    border-left: 4px solid var(--mat-sys-primary);
+}
+
+.chapter-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.chapter-menu-button {
+    flex-shrink: 0;
+
+    opacity: 0.65;
+
+    transition:
+        opacity 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.chapter:hover .chapter-menu-button {
+    opacity: 1;
+}
+
+.chapter-menu-button:hover {
+    background: rgba(63, 81, 181, 0.1);
+}
+
+.delete-menu-item {
+    color: #dc2626 !important;
+}
+
+.delete-menu-item mat-icon {
+    color: #dc2626 !important;
+}
+
+.subchapter {
+    display: flex;
+    align-items: center;
+
+    min-height: 46px;
+
+    padding: 5px 8px 5px 18px;
+
+    border-radius: 8px;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.subchapter:hover {
+    background: rgba(63, 81, 181, 0.05);
+    transform: translateX(3px);
+}
+
+.subchapter-content {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    flex: 1;
+    min-width: 0;
+}
+
+.subchapter-menu-button {
+    flex-shrink: 0;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.subchapter:hover .subchapter-menu-button {
+    opacity: 1;
+}
+
+.subchapter-menu-button:hover {
+    background: rgba(63, 81, 181, 0.1);
+}
+
+.delete-menu-item {
+    color: #dc2626 !important;
+}
+
+.delete-menu-item mat-icon {
+    color: #dc2626 !important;
+}
+
+
+

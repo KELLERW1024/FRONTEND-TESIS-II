@@ -1,0 +1,94 @@
+<h2 mat-dialog-title>
+
+    <mat-icon>
+        {{ data?.mode === 'child'
+            ? 'subdirectory_arrow_right'
+            : 'add'
+        }}
+    </mat-icon>
+
+    {{ data?.mode === 'child'
+        ? 'Agregar subcapítulo'
+        : 'Agregar debajo'
+    }}
+
+</h2>
+
+
+<mat-dialog-content>
+
+    <form [formGroup]="form">
+
+        <mat-form-field
+            appearance="outline"
+            class="full-width"
+        >
+
+            <mat-label>
+                Título
+            </mat-label>
+
+            <input
+                matInput
+                formControlName="titulo"
+                maxlength="200"
+                autocomplete="off"
+            />
+
+            <mat-hint align="end">
+                {{ form.get('titulo')?.value?.length || 0 }}/200
+            </mat-hint>
+
+            <mat-error
+                *ngIf="form.get('titulo')?.hasError('required')"
+            >
+                El título es obligatorio
+            </mat-error>
+
+        </mat-form-field>
+
+
+        <mat-form-field
+            appearance="outline"
+            class="full-width"
+        >
+
+            <mat-label>
+                Objetivo
+            </mat-label>
+
+            <textarea
+                matInput
+                formControlName="objective"
+                rows="4"
+            ></textarea>
+
+        </mat-form-field>
+
+    </form>
+
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+
+    <button
+        mat-button
+        type="button"
+        (click)="cancelar()"
+    >
+        Cancelar
+    </button>
+
+    <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="form.invalid"
+        (click)="guardar()"
+    >
+        <mat-icon>save</mat-icon>
+        Guardar
+    </button>
+
+</mat-dialog-actions>
