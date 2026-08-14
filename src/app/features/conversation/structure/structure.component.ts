@@ -22,6 +22,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { StructureService } from '../service/structure.service';
 import { NodeDialogComponent } from '../dialogs/node-dialog/node-dialog.component';
 import { MoveNodeDialogComponent } from '../dialogs/move-node-dialog/move-node-dialog.component';
+import { EditNodeDialogComponent } from '../dialogs/edit-node-dialog/edit-node-dialog.component';
+import { DeleteNodeDialogComponent } from '../dialogs/delete-node-dialog/delete-node-dialog.component';
 
 
 @Component({
@@ -47,29 +49,15 @@ import { MoveNodeDialogComponent } from '../dialogs/move-node-dialog/move-node-d
 })
 export class StructureComponent implements OnInit {
 
-  /**
-   * ID de la conversación/suscripción
-   */
   idSuscriptionConversation!: number;
 
-  /**
-   * Información del plan
-   */
+
   plan!: Plan;
 
-  /**
-   * Árbol de nodos
-   *
-   * Los nodos pueden contener:
-   *
-   * children: PlanNode[]
-   */
+
   planNode: PlanNode[] = [];
 
-  /**
-   * Secciones
-   */
-  sections: Section[] = [];
+  // sections: Section[] = [];
 
 
   constructor(
@@ -98,7 +86,6 @@ export class StructureComponent implements OnInit {
     });
 
   }
-
 
   /**
    * Regresar a la pantalla anterior
@@ -308,13 +295,20 @@ export class StructureComponent implements OnInit {
   }
 
 
-  /**
-   * Ordenar nodos recursivamente
-   *
-   * El backend ya proporciona "orden",
-   * por lo que Angular solamente respeta
-   * ese orden.
-   */
+
+getNodeCode(
+  node: PlanNode,
+  parentCode: string = ''
+): string {
+
+  const code = parentCode
+    ? `${parentCode}.${node.orden}`
+    : `${node.orden}`;
+
+  return code;
+}
+
+
   private sortChildren(nodes: PlanNode[]): void {
 
     nodes.sort(
@@ -336,19 +330,6 @@ export class StructureComponent implements OnInit {
       }
 
     });
-
-  }
-
-
-  /**
-   * EDITAR
-   */
-  editNode(node: PlanNode): void {
-
-    console.log(
-      'Editar nodo:',
-      node
-    );
 
   }
 
@@ -439,7 +420,7 @@ export class StructureComponent implements OnInit {
   addChild(node: PlanNode): void {
 
     const dialogRef = this.dialog.open(
-    MoveNodeDialogComponent,
+    NodeDialogComponent,
     {
       width: '550px',
 
@@ -662,6 +643,69 @@ private findSiblings(
 
 
 
+ /**
+   * EDITAR
+   */
+
+editNode(node: PlanNode): void {
+
+  console.log('EDITAR NODE:', node);
+
+  const dialogRef = this.dialog.open(
+    EditNodeDialogComponent,
+    {
+      width: '600px',
+
+      data: {
+        node: node
+      }
+    }
+  );
+
+  dialogRef.afterClosed().subscribe(result => {
+
+    if (!result) {
+      return;
+    }
+
+    console.log(
+      'DATOS PARA ACTUALIZAR:',
+      result
+    );
+
+    this.structureService
+      .updateNode(
+        node.id,
+        {
+          titulo: result.titulo,
+          objective: result.objective
+        }
+      )
+      .subscribe({
+
+        next: (resp: any) => {
+
+          console.log(
+            'Nodo actualizado correctamente:',
+            resp
+          );
+
+          this.obtenerDataConversation();
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'Error actualizando nodo:',
+            err
+          );
+
+        }
+
+      });
+
+  });
+}
 
 
   /**
@@ -670,13 +714,63 @@ private findSiblings(
    * El backend actualmente elimina
    * todo el subárbol.
    */
-  deleteNode(node: PlanNode): void {
+ deleteNode(node: PlanNode): void {
+
+  console.log('ELIMINAR NODE:', node);
+
+  const children = node.children ?? [];
+
+  const dialogRef = this.dialog.open(
+    DeleteNodeDialogComponent,
+    {
+      width: '500px',
+
+      data: {
+        node: node,
+        hasChildren: children.length > 0,
+        childrenCount: children.length
+      }
+    }
+  );
+
+  dialogRef.afterClosed().subscribe(confirmado => {
+
+    if (!confirmado) {
+      return;
+    }
 
     console.log(
-      'Eliminar nodo:',
-      node
+      'ELIMINANDO NODE:',
+      node.id
     );
 
-  }
+    this.structureService
+      .deleteNode(node.id)
+      .subscribe({
+
+        next: (resp: any) => {
+
+          console.log(
+            'Nodo eliminado:',
+            resp
+          );
+
+          this.obtenerDataConversation();
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'Error eliminando nodo:',
+            err
+          );
+
+        }
+
+      });
+
+  });
+}
+
 
 }

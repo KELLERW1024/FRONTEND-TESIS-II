@@ -71,7 +71,22 @@
             <!-- ================================== -->
             <!-- ÁRBOL -->
             <!-- ================================== -->
+             <div class="plan-tree">
 
+    <ng-container
+        *ngTemplateOutlet="
+            nodeTemplate;
+            context: {
+                $implicit: planNode,
+                parentCode: ''
+            }
+        "
+    >
+    </ng-container>
+
+</div>
+
+<!-- 
             <ng-container
                 *ngFor="let node of planNode"
             >
@@ -84,164 +99,145 @@
                 >
                 </ng-container>
 
-            </ng-container>
+            </ng-container> -->
 
 
             <!-- ================================== -->
             <!-- PLANTILLA RECURSIVA -->
             <!-- ================================== -->
 
-            <ng-template
-                #nodeTemplate
-                let-node
+           <ng-template
+    #nodeTemplate
+    let-nodes
+    let-parentCode="parentCode"
+>
+
+    <ng-container *ngFor="let node of nodes">
+
+        <!-- ========================= -->
+        <!-- NODO -->
+        <!-- ========================= -->
+
+        <div
+            class="chapter"
+            *ngIf="node.nivel === 1"
+        >
+
+            <div class="chapter-icon">
+
+                <mat-icon>
+                    folder_open
+                </mat-icon>
+
+            </div>
+
+
+            <div class="chapter-content">
+
+                <span class="chapter-label">
+
+                    CAPÍTULO
+                    {{ getNodeCode(node, parentCode) }}
+
+                </span>
+
+
+                <h2 class="chapter-title">
+
+                    {{ node.titulo }}
+
+                </h2>
+
+            </div>
+
+
+            <button
+                mat-icon-button
+                [matMenuTriggerFor]="nodeMenu"
+                [matMenuTriggerData]="{ node: node }"
             >
 
+                <mat-icon>
+                    more_vert
+                </mat-icon>
 
-                <!-- ================================= -->
-                <!-- CAPÍTULO / NODO RAÍZ -->
-                <!-- nivel = 1 -->
-                <!-- ================================= -->
+            </button>
 
-                <div
-                    *ngIf="node.nivel === 1"
-                    class="chapter"
-                >
+        </div>
 
 
-                    <!-- ICONO -->
+        <!-- ========================= -->
+        <!-- SUBNODO -->
+        <!-- ========================= -->
 
-                    <div class="chapter-icon">
+        <div
+            class="subchapter"
+            *ngIf="node.nivel > 1"
+            [style.margin-left.px]="(node.nivel - 2) * 32"
+        >
 
-                        <mat-icon>
-                            folder_open
-                        </mat-icon>
-
-                    </div>
-
-
-                    <!-- CONTENIDO -->
-
-                    <div class="chapter-content">
-
-                        <span class="chapter-label">
-                            CAPÍTULO
-                        </span>
+            <div class="subchapter-line"></div>
 
 
-                        <h2 class="chapter-title">
-                            {{ node.titulo }}
-                        </h2>
+            <div class="subchapter-content">
 
-                    </div>
+                <span class="subchapter-code">
 
+                    {{ getNodeCode(node, parentCode) }}
 
-                    <!-- MENÚ -->
-
-                    <button
-                        mat-icon-button
-                        [matMenuTriggerFor]="nodeMenu"
-                        [matMenuTriggerData]="{ node: node }"
-                        aria-label="Opciones del capítulo"
-                    >
-
-                        <mat-icon>
-                            more_vert
-                        </mat-icon>
-
-                    </button>
-
-                </div>
+                </span>
 
 
+                <span class="subchapter-title">
 
-                <!-- ================================= -->
-                <!-- SUBCAPÍTULO -->
-                <!-- nivel > 1 -->
-                <!-- ================================= -->
+                    {{ node.titulo }}
 
-                <div
-                    *ngIf="node.nivel > 1"
-                    class="subchapter"
-                    [style.margin-left.px]="(node.nivel - 2) * 32"
-                >
+                </span>
+
+            </div>
 
 
-                    <!-- LÍNEA -->
+            <button
+                mat-icon-button
+                class="subchapter-menu-button"
+                [matMenuTriggerFor]="nodeMenu"
+                [matMenuTriggerData]="{ node: node }"
+                aria-label="Opciones del nodo"
+            >
 
-                    <div class="subchapter-line"></div>
+                <mat-icon>
+                    more_vert
+                </mat-icon>
 
+            </button>
 
-                    <!-- CONTENIDO -->
-
-                    <div class="subchapter-content">
-
-
-                        <!-- CÓDIGO -->
-
-                        <span class="subchapter-code">
-
-                            {{ node.codigo }}
-
-                        </span>
+        </div>
 
 
-                        <!-- TÍTULO -->
+        <!-- ========================= -->
+        <!-- HIJOS -->
+        <!-- ========================= -->
 
-                        <span class="subchapter-title">
+        <ng-container
+            *ngIf="node.children?.length"
+        >
 
-                            {{ node.titulo }}
+            <ng-container
+                *ngTemplateOutlet="
+                    nodeTemplate;
+                    context: {
+                        $implicit: node.children,
+                        parentCode: getNodeCode(node, parentCode)
+                    }
+                "
+            >
+            </ng-container>
 
-                        </span>
+        </ng-container>
 
-                    </div>
+    </ng-container>
 
-
-                    <!-- MENÚ -->
-
-                    <button
-                        mat-icon-button
-                        class="subchapter-menu-button"
-                        [matMenuTriggerFor]="nodeMenu"
-                        [matMenuTriggerData]="{ node: node }"
-                        aria-label="Opciones del subcapítulo"
-                    >
-
-                        <mat-icon>
-                            more_vert
-                        </mat-icon>
-
-                    </button>
-
-                </div>
-
-
-
-                <!-- ================================= -->
-                <!-- HIJOS -->
-                <!-- ================================= -->
-
-                <ng-container
-                    *ngIf="node.children?.length"
-                >
-
-                    <ng-container
-                        *ngFor="let child of node.children"
-                    >
-
-                        <ng-container
-                            *ngTemplateOutlet="
-                                nodeTemplate;
-                                context: { $implicit: child }
-                            "
-                        >
-                        </ng-container>
-
-                    </ng-container>
-
-                </ng-container>
-
-
-            </ng-template>
+</ng-template>
 
 
 

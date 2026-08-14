@@ -1,0 +1,78 @@
+<h2 mat-dialog-title>
+
+    <mat-icon color="warn">
+        warning
+    </mat-icon>
+
+    Eliminar nodo
+
+</h2>
+
+
+<mat-dialog-content>
+
+    <p>
+        ¿Estás seguro de que deseas eliminar este nodo?
+    </p>
+
+    <div class="node-info">
+
+        <strong>
+            {{ data.node.titulo }}
+        </strong>
+
+        <span *ngIf="data.node.codigo">
+            Código: {{ data.node.codigo }}
+        </span>
+
+    </div>
+
+
+    <div
+        class="warning-message"
+        *ngIf="data.hasChildren"
+    >
+
+        <mat-icon>
+            account_tree
+        </mat-icon>
+
+        <span>
+            Este nodo tiene
+            <strong>{{ data.childrenCount }}</strong>
+            nodo(s) hijo(s).
+            Al eliminarlo también se eliminarán todos sus descendientes.
+        </span>
+
+    </div>
+
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+
+    <button
+        mat-button
+        type="button"
+        (click)="cancelar()"
+    >
+        Cancelar
+    </button>
+
+
+    <button
+        mat-flat-button
+        color="warn"
+        type="button"
+        (click)="eliminar()"
+    >
+
+        <mat-icon>
+            delete
+        </mat-icon>
+
+        Eliminar
+
+    </button>
+
+</mat-dialog-actions>
