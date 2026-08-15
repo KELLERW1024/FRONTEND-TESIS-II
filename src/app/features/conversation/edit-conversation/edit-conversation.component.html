@@ -3,7 +3,7 @@
 <div class="p-6 flex justify-between items-center">
 
   <div class="text-lg font-medium">
-    <strong>{{ plan?.name }}</strong>
+    <strong>{{ dataCurrentQuestion?.plan_name }}</strong>
   </div>
 
   <!-- Botones derecha -->
@@ -75,8 +75,9 @@
 
                     <div class="p-4 text-center">
                         <mat-card-title>
-                            {{ sectionProgress?.title }}: {{ sectionProgress?.description }}
+                            {{ dataCurrentQuestion?.parent_node?.titulo }}
                         </mat-card-title>
+
                            
                     </div>
 
@@ -89,13 +90,13 @@
                                    <div class="flex justify-between items-center">
 
                                         <mat-label class="font-semibold mb-2 block">
-                                            {{ currentQuestion?.text }} = >
+                                             {{ dataCurrentQuestion?.question?.question_text }} = >
 
                                             <small 
                                                 class=" italic cursor-pointer" 
                                                 title="Ver detalle"
-                                                (click)="verDetalle(currentQuestion)">
-                                                <strong> Ver detalle para responder</strong>
+                                                (click)="verDetalle(dataCurrentQuestion?.question)">
+                                                <strong> Indicaciones</strong>
                                             </small>
                                         </mat-label>
 
@@ -564,7 +565,7 @@
         <div class="flex items-center justify-between p-4 ">
 
             <h5 class="font-semibold text-lg">
-                Detalle pregunta
+                Indicaciones pregunta
             </h5>
 
             <button mat-icon-button (click)="cerrarModal()">
@@ -576,15 +577,13 @@
         <!-- BODY -->
         <div class="p-4 space-y-2 text-sm">
 
-            <p><strong>Pregunta:</strong> {{ selectedQuestion?.text }}</p>
+            <p><strong>Pregunta:</strong> {{ selectedQuestion?.question_text }}</p>
 
-            <p><strong>Detalle:</strong> {{ selectedQuestion?.detail }}</p>
+            <p><strong>Detalle:</strong> {{ selectedQuestion?.question_detail }}</p>
 
-            <p><strong>Validacion:</strong> {{ selectedQuestion?.validation }}</p>
+            <p><strong>Ejemplo:</strong> {{ selectedQuestion?.question_example}}</p>
 
-            <p><strong>Evidencia:</strong> {{ selectedQuestion?.evidence }}</p>
 
-            <p><strong>APA:</strong> {{ selectedQuestion?.apa }}</p>
 
         </div>
         <div class="flex justify-end gap-2 p-4 ">

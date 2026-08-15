@@ -20,6 +20,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ConversationPlanResponse } from 'src/app/core/models/ConversationPlanResponse';
 
 @Component({
   selector: 'app-edit-conversation',
@@ -47,12 +48,12 @@ export class EditConversationComponent {
   idSuscriptionConversation!: number;
   idPlan!: number;
   idConversation!: number; 
-  plan!: Plan;
-  sections: Section[] = [];
+  dataCurrentQuestion!: ConversationPlanResponse;
+  // sections: Section[] = [];
 
-  sectionProgress: Section | null = null;
-  questions: Question[] = [];
-  currentQuestion!: Question | null;
+  // sectionProgress: Section | null = null;
+  // questions: Question[] = [];
+  // currentQuestion!: Question | null;
   answers: string[] = [];
 
   reply : string = "";
@@ -465,28 +466,19 @@ export class EditConversationComponent {
     console.log("Suscription => obtenerDataConversation "   )
 
     this.conversationService.getDataConversation( this.idSuscriptionConversation ).subscribe ({
-      next: (resp: any) => {
-      this.plan = resp.data.plan;
-      console.log('PLAN => ',  resp);
+      next: (resp: ConversationPlanResponse ) => {
+      // this.plan = resp.data.plan;
 
-      this.sections = this.plan.sections ;
-      console.log('Sections => ',  this.sections);
+      this.dataCurrentQuestion = resp;
+      console.log('Data Question Ultimate => ',  resp);
 
-      this.sectionProgress = this.sections.find(
-          (s: any) =>
-                      s.progress_section === 'in_progress' ||
-                      s.progress_section === null
-              ) ?? null;
+      // this.sections = this.plan.sections ;
 
-      console.log('SectionCurrent => ',  this.sectionProgress );
+     
 
-      this.questions = this.sectionProgress?.questions ?? [];
+      // console.log(" QUESTION CURRENT => {}" , this.currentQuestion);
 
-      this.currentQuestion =  this.questions.find(q => q.answer_question === null) ?? null;
-
-      console.log(" QUESTION CURRENT => {}" , this.currentQuestion);
-
-      this.finalizado = this.sections.every((s: any) => !!s.answer);
+      // this.finalizado = this.sections.every((s: any) => !!s.answer);
       },
       error: (err: any) => {
         console.error(err);
@@ -562,31 +554,29 @@ export class EditConversationComponent {
     const formData = new FormData();
 
     // 🔥 DATA BASE (siempre)
-    formData.append('idPlan', String(this.plan.id));
-    // formData.append('plan', this.plan.name);
-    formData.append('idSection', String(this.sectionProgress?.id ?? ''));
+    // formData.append('idPlan', String(this.plan.id));
+    // formData.append('idSection', String(this.sectionProgress?.id ?? ''));
     formData.append('idConversation', String(this.idSuscriptionConversation ?? ''));
-    formData.append('idQuestion', String(this.currentQuestion?.id ?? ''));
+    formData.append('idQuestion', String(this.dataCurrentQuestion.question?.id ?? ''));
 
     switch( tipo ){
 
       case "validate":
 
-          formData.append('plan', this.plan.name);
-          formData.append('title', this.sectionProgress?.title ?? '');
+          // formData.append('plan', this.plan.name);
+          // formData.append('title', this.dataCurrentQuestion?.question?.question_text ?? '');
          
-          formData.append( 'detail', this.currentQuestion?.detail || '' );
-          formData.append( 'validation', this.currentQuestion?.validation || '' );
 
-          formData.append('description', this.sectionProgress?.description ?? '');
-          formData.append('question', this.currentQuestion?.text ?? '');
+          formData.append('description', this.dataCurrentQuestion?.parent_node?.titulo?? '');
+          formData.append('question', this.dataCurrentQuestion?.question?.question_text ?? '');
+          formData.append( 'detail', this.dataCurrentQuestion?.question?.question_detail || '' );
+          formData.append( 'validation', this.dataCurrentQuestion?.question?.validation_detail || '' );
 
           formData.append('response', this.form.value.answer ?? '');
           
           formData.append('generate_table', this.form.value.crearCuadro ? '1' : '0');
           formData.append('is_visual', this.form.value.showImages ? '1' : '0');
 
-          formData.append('apa', this.currentQuestion?.apa || '' );
 
 
           this.selectedFiles.forEach( file => {

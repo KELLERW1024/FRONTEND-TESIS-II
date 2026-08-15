@@ -6,6 +6,7 @@ import { ApiResponse } from '../conversation/conversation.component';
 import { AnswerValidationResponse } from 'src/app/core/models/ValidarRespuestaResponse';
 import { Observable } from 'rxjs';
 import { ChatResponse, IaResponse } from 'src/app/core/models/IAResponse';
+import { ConversationPlanResponse } from 'src/app/core/models/ConversationPlanResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -143,7 +144,7 @@ export class ConversationService {
       // this.url 
       console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
-      return this.http.get( this.url + "/conversationPlan" ,
+      return this.http.get<ConversationPlanResponse>( this.url + "/conversationPlan" ,
         {   headers,
             params: { idConversation: idConversation } 
         });
