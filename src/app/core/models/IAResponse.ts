@@ -18,7 +18,10 @@ export interface IaResponse {
   references: Reference[] | null;
 }
 export interface IaImageResponse {
+  id?: string  ;
   output: string[];
+  
+  status?: string;
 } 
 
 export interface Reference {
@@ -32,14 +35,7 @@ export interface Reference {
 
 export interface ChatTable {
   title: string;
-  columns: TableColumn[];
-  rows: TableRow[];
+  columns: string[];
+  rows: string[][];
 }
 
-export interface TableColumn {
-  [key: string]: string | number | boolean | null;
-}
-
-export interface TableRow {
-  [key: string]: string | number | boolean | null;
-}

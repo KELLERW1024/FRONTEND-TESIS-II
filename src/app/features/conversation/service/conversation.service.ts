@@ -167,6 +167,20 @@ export class ConversationService {
         let URL = URL_SERVICIOS+"/conversation/updatetitleconversation";
         return this.http.post(URL,data,{headers: headers});
     }
+
+    getReplicatePrediction(idPrediction: string ){
+      // this.url 
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+     const url = `${this.url}/replicate/prediction/${idPrediction}`;
+
+      console.log('this.url:', this.url);
+      console.log('idPrediction:', idPrediction);
+      console.log('URL FINAL:', url);
+
+      return this.http.get(url, { headers });
+     
+    }
+
     
 
   

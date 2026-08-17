@@ -399,67 +399,84 @@
 
                             </div>
                             <!-- VER DE LA IMAGEN GENERADA POR LA IA -->
-                            <div class="grid grid-cols-12 gap-4" *ngIf="iaImageResponse "> 
+                           <!-- VER IMAGEN GENERADA POR LA IA -->
+<div
+    class="grid grid-cols-12 gap-4"
+    *ngIf="iaImageResponse?.status === 'succeeded' && iaImageResponse?.output">
 
-                                <div class="col-span-12 sm:col-span-6 lg:col-span-4" >
+    <div class="col-span-12 sm:col-span-6 lg:col-span-4">
 
-                                    <mat-card class="cardWithShadow overflow-hidden rounded-xl">
+        <mat-card class="cardWithShadow overflow-hidden rounded-xl">
 
-                                        <img   *ngIf="iaImageResponse"
-                                                [src]="iaImageResponse.output[0]"
-                                                class="w-full h-56 object-cover hover:scale-105 transition duration-300"
-                                                (click)="verImagenGrande(dialogTemplate)" />
+            <img
+                    *ngIf="
+                        mostrarImagenIA &&
+                        iaImageResponse?.status === 'succeeded' &&
+                        iaImageResponse?.output
+                    "
+                    [src]="iaImageResponse.output"
+                    class="w-full h-56 object-cover hover:scale-105 transition duration-300"
+                    (click)="verImagenGrande(dialogTemplate)"
+                    alt="Imagen generada por IA"
+                />
 
-                                        <mat-card-content class="p-3">
+            <mat-card-content class="p-3">
 
-                                            <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center">
 
-                                                <button mat-icon-button  color="primary"
-                                                                        (click)="verImagenGrande(dialogTemplate)">
-                                                    <mat-icon>zoom_in</mat-icon>
-                                                </button>
-                                                <button
-                                                    mat-icon-button
-                                                    color="accent"
-                                                    (click)="descargarImagen(iaImageResponse!.output![0])">
+                    <!-- VER IMAGEN GRANDE -->
+                    <button
+                        mat-icon-button
+                        color="primary"
+                        (click)="verImagenGrande(dialogTemplate)">
+                        <mat-icon>zoom_in</mat-icon>
+                    </button>
 
-                                                    <mat-icon>download</mat-icon>
+                    <!-- DESCARGAR -->
+                    <button
+                        mat-icon-button
+                        color="accent"
+                        (click)="descargarImagen(iaImageResponse!.output!)">
+                        <mat-icon>download</mat-icon>
+                    </button>
 
-                                                </button>
-                                                <button
-                                                    mat-icon-button
-                                                    color="warn"
-                                                    (click)="eliminarImagenIA()">
-                                                    <mat-icon>delete</mat-icon>
-                                                </button>
+                    <!-- ELIMINAR -->
+                    <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="eliminarImagenIA()">
+                        <mat-icon>delete</mat-icon>
+                    </button>
 
-                                            </div>
-                                           <div>
+                </div>
 
-                                                <div class="mb-3">
-                                                    <span class="text-sm font-small">
-                                                       Fuente: Elaboración propia
-                                                    </span>
-                                                </div>
+                <div>
 
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        name="descripcionImagenIA"
-                                                        [(ngModel)]="descripcionImagenIA"
-                                                        placeholder="Descripcion imagen"
-                                                        class="border rounded w-full p-2 text-sm">
-                                                </div>
+                    <div class="mb-3">
+                        <span class="text-sm font-small">
+                            Fuente: Elaboración propia
+                        </span>
+                    </div>
 
-                                            </div>
+                    <div>
+                        <input
+                            type="text"
+                            name="descripcionImagenIA"
+                            [(ngModel)]="descripcionImagenIA"
+                            placeholder="Descripción imagen"
+                            class="border rounded w-full p-2 text-sm">
+                    </div>
 
-                                        </mat-card-content>
+                </div>
 
-                                    </mat-card>
+            </mat-card-content>
 
-                                </div>
+        </mat-card>
 
-                            </div>
+    </div>
+
+</div>
+
                             <!-- LISTA DE BIBLIOGFIA UTILIZADA EN LA CONSTRUCCION DEL PARRAFO -->
                             <div class="col-span-12 lg:col-span-3">
 
@@ -602,45 +619,88 @@
 <ng-template #tableModal>
 
     <h2 mat-dialog-title>
-        {{ tablaGenerada!.title }}
+        {{ tablaGenerada?.title }}
     </h2>
 
     <mat-dialog-content>
 
-        <table mat-table [dataSource]="tablaGenerada!.rows" class="w-full mat-elevation-z2">
+        <div *ngIf="tablaGenerada?.columns?.length && tablaGenerada?.rows?.length; else noTable">
 
-            <!-- Columna 0 -->
-            <ng-container matColumnDef="col0">
-                <th mat-header-cell *matHeaderCellDef>
-                    {{ tablaGenerada!.columns[0] }}
-                </th>
-                <td mat-cell *matCellDef="let row">
-                    {{ row[0] }}
-                </td>
-            </ng-container>
+            <div class="overflow-x-auto">
 
-            <!-- Columna 1 -->
-            <ng-container matColumnDef="col1">
-                <th mat-header-cell *matHeaderCellDef>
-                    {{ tablaGenerada!.columns[1] }}
-                </th>
-                <td mat-cell *matCellDef="let row">
-                    {{ row[1] }}
-                </td>
-            </ng-container>
+                <table
+                    mat-table
+                    [dataSource]="tablaGenerada!.rows"
+                    class="w-full mat-elevation-z2">
 
-            <tr mat-header-row *matHeaderRowDef="['col0','col1']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['col0','col1']"></tr>
+                    <!-- COLUMNAS DINÁMICAS -->
+                    <ng-container
+                        *ngFor="let column of tablaGenerada!.columns; let i = index"
+                        [matColumnDef]="'col' + i">
 
-        </table>
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{ column }}
+                        </th>
+
+                        <td mat-cell *matCellDef="let row">
+                            {{ row[i] }}
+                        </td>
+
+                    </ng-container>
+
+                    <!-- HEADER -->
+                    <tr
+                        mat-header-row
+                        *matHeaderRowDef="displayedTableColumns">
+                    </tr>
+
+                    <!-- ROWS -->
+                    <tr
+                        mat-row
+                        *matRowDef="let row; columns: displayedTableColumns">
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <ng-template #noTable>
+
+            <div class="p-6 text-center">
+
+                <mat-icon color="warn">
+                    table_chart
+                </mat-icon>
+
+                <p class="mt-3">
+                    No hay información disponible para mostrar.
+                </p>
+
+                <pre class="text-left text-xs mt-4"
+                     style="white-space: pre-wrap;">
+{{ tablaGenerada | json }}
+                </pre>
+
+            </div>
+
+        </ng-template>
 
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cerrar</button>
+
+        <button
+            mat-button
+            mat-dialog-close>
+            Cerrar
+        </button>
+
     </mat-dialog-actions>
 
 </ng-template>
+
 
 <div *ngIf="selectedImage" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
     (click)="closeImage()">
@@ -667,13 +727,17 @@
 
         </button>
 
-        <ng-container *ngIf="iaImageResponse?.output?.length">
+            <ng-container *ngIf="iaImageResponse?.output">
 
             <img
-                [src]="iaImageResponse!.output![0]"
-                class="max-w-full max-h-[90vh] object-contain">
+                *ngIf="iaImageResponse?.output"
+                [src]="iaImageResponse.output"
+                class="max-w-full max-h-[90vh] object-contain"
+                alt="Imagen generada">
 
-        </ng-container>
+
+            </ng-container>
+
 
     </div>
 

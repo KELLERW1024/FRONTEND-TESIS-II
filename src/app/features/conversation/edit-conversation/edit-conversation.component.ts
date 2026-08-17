@@ -89,6 +89,10 @@ export class EditConversationComponent {
 
   questionsDiagnostic: any = [];
 
+  displayedTableColumns: string[] = [];
+  mostrarImagenIA = false;
+
+
   openImage(img: string) {
     this.selectedImage = img;
       document.body.style.overflow = 'hidden';
@@ -548,6 +552,34 @@ export class EditConversationComponent {
       }
     });
   }
+  prepararTabla(): void {
+
+  if (!this.tablaGenerada) {
+    this.displayedTableColumns = [];
+    return;
+  }
+
+  // console.log('Preparando tabla:', this.tablaGenerada);
+
+  if (
+    Array.isArray(this.tablaGenerada.columns) &&
+    Array.isArray(this.tablaGenerada.rows)
+  ) {
+
+    this.displayedTableColumns = this.tablaGenerada.columns.map(
+      (_: string, index: number) => `col${index}`
+    );
+
+    // console.log('Columnas para Angular:', this.displayedTableColumns);
+    // console.log('Filas:', this.tablaGenerada.rows);
+
+  } else {
+
+    console.error('Formato de tabla incorrecto:', this.tablaGenerada);
+    this.displayedTableColumns = [];
+  }
+}
+
 
   private buildFormData( tipo : string ): FormData {
 
@@ -704,7 +736,7 @@ export class EditConversationComponent {
 
           this.iaResponse = resp.response;
           console.log("Respuesta Completa : {}", resp );
-          console.log("Respuesta  VALID : ", this.iaResponse );
+          // console.log("Respuesta  VALID : ", this.iaResponse );
           console.log("Respuesta feedback : {}", this.iaResponse.is_valid );
           console.log("IMAGEN IA=> {} ", resp.image ?? null );
 
@@ -716,19 +748,29 @@ export class EditConversationComponent {
           } 
           this.reply = this.iaResponse.response ?? '';
           this.iaImageResponse = resp.image ?? null;
+          const predictionId = this.iaImageResponse?.id;
+          if (
+            this.iaImageResponse &&
+            (this.iaImageResponse.status === 'processing' || this.iaImageResponse.status === 'starting')
+             && predictionId
+          ) {
+
+             console.log(  '🚀 INICIANDO POLLING REPLICATE:',  predictionId);
+            this.consultarImagenReplicate(
+              predictionId
+            );
+           
+          }
           this.tablaGenerada = resp.table ?? null;
-          console.log("COUNT IMAGEN IA=> {} ", resp.count_ia_image ?? 0 );
           
+          // console.log("COUNT IMAGEN IA=> {} ", resp.count_ia_image ?? 0 );
+          console.log('================ TABLE ================');
+console.log(this.tablaGenerada);
+console.log('========================================');
+          
+          this.prepararTabla();
 
-          // if (this.images.length > 0) {
-
-          //   this.imagesSafe = this.images.map((img: string) =>
-          //     this.sanitizer.bypassSecurityTrustUrl(img)
-          //   );
-
-          // } else {
-          //   this.imagesSafe = [];
-          // }
+         
         },
 
         error: (err: any) => {
@@ -742,6 +784,106 @@ export class EditConversationComponent {
         }
       });
   }
+  // POLLING IMAGE REPLICATE
+  private consultarImagenReplicate(predictionId: string): void {
+
+    let intentos = 0;
+
+    const maxIntentos = 60;
+
+    const intervalo = setInterval(() => {
+
+      intentos++;
+
+      console.log(
+        `Consultando imagen ${intentos}/${maxIntentos}`
+      );
+
+      this.conversationService.getReplicatePrediction(predictionId)
+        .subscribe({
+
+          next: (resp: any) => {
+
+            console.log(
+              'Estado Replicate:',
+              resp.status
+            );
+
+            if (
+              resp.status === 'starting' ||
+              resp.status === 'processing'
+            ) {
+
+              if (intentos >= maxIntentos) {
+
+                clearInterval(intervalo);
+
+                console.warn(
+                  'Se alcanzó el tiempo máximo de espera'
+                );
+
+                return;
+              }
+
+              return;
+            }
+
+            if (resp.status === 'succeeded') {
+
+              clearInterval(intervalo);
+
+              this.mostrarImagenIA = false;
+
+              this.iaImageResponse = {
+                status: 'succeeded',
+                output: resp.output
+              };
+
+              setTimeout(() => {
+                this.mostrarImagenIA = true;
+              });
+
+              console.log('Imagen lista:', resp.output);
+
+              return;
+            }
+
+
+            if (
+              resp.status === 'failed' ||
+              resp.status === 'canceled'
+            ) {
+
+              clearInterval(intervalo);
+
+              console.error(
+                'Replicate terminó con:',
+                resp.status,
+                resp.error
+              );
+
+              this.iaImageResponse = null;
+
+            }
+
+          },
+
+          error: (err) => {
+
+            clearInterval(intervalo);
+
+            console.error(
+              'Error consultando imagen:',
+              err
+            );
+
+          }
+
+        });
+
+    }, 2000);
+  }
+
 
   guardarRespuesta(){
     //FORMATO 
@@ -830,12 +972,37 @@ export class EditConversationComponent {
     return isValidType && isValidSize;
   }
   
-  openModalTable(): void {
-    this.dialog.open(this.tableModal, {
-      width: '900px',
-      maxHeight: '80vh'
-    });
+openModalTable(): void {
+
+  console.log('Intentando abrir tabla...');
+  console.log('tablaGenerada:', this.tablaGenerada);
+  console.log('displayedTableColumns:', this.displayedTableColumns);
+
+  if (!this.tablaGenerada) {
+    console.warn('No existe tabla generada');
+    return;
   }
+
+  if (!Array.isArray(this.tablaGenerada.columns)) {
+    console.error('tablaGenerada.columns no es un array');
+    return;
+  }
+
+  if (!Array.isArray(this.tablaGenerada.rows)) {
+    console.error('tablaGenerada.rows no es un array');
+    return;
+  }
+
+  this.prepararTabla();
+
+  this.dialog.open(this.tableModal, {
+    width: '90vw',
+    maxWidth: '1200px',
+    maxHeight: '80vh',
+    autoFocus: false
+  });
+}
+
 
   verImagenGrande( template: TemplateRef<any> ) {
     this.dialog.open(template, {
