@@ -22,7 +22,13 @@ export interface IaImageResponse {
   output: string[];
   
   status?: string;
+  urls?: urls;
 } 
+
+export interface urls{
+  cancel?: string;
+  get?: string;
+}
 
 export interface Reference {
   authors: string[];

@@ -408,17 +408,15 @@
 
         <mat-card class="cardWithShadow overflow-hidden rounded-xl">
 
+            @if (imagenGenerada && mostrarImagenIA &&
+                        iaImageResponse?.status === 'succeeded' ) {
             <img
-                    *ngIf="
-                        mostrarImagenIA &&
-                        iaImageResponse?.status === 'succeeded' &&
-                        iaImageResponse?.output
-                    "
-                    [src]="iaImageResponse.output"
+                    [src]="urlImagenIA"
                     class="w-full h-56 object-cover hover:scale-105 transition duration-300"
                     (click)="verImagenGrande(dialogTemplate)"
                     alt="Imagen generada por IA"
                 />
+            }
 
             <mat-card-content class="p-3">
 
@@ -433,12 +431,14 @@
                     </button>
 
                     <!-- DESCARGAR -->
-                    <button
-                        mat-icon-button
-                        color="accent"
-                        (click)="descargarImagen(iaImageResponse!.output!)">
-                        <mat-icon>download</mat-icon>
-                    </button>
+                     @if (imagenGenerada) {
+                        <button
+                            mat-icon-button
+                            color="accent"
+                            (click)="descargarImagen(urlImagenIA)">
+                            <mat-icon>download</mat-icon>
+                        </button>
+                    }
 
                     <!-- ELIMINAR -->
                     <button
@@ -729,11 +729,17 @@
 
             <ng-container *ngIf="iaImageResponse?.output">
 
-            <img
+            <!-- <img
                 *ngIf="iaImageResponse?.output"
                 [src]="iaImageResponse.output"
                 class="max-w-full max-h-[90vh] object-contain"
-                alt="Imagen generada">
+                alt="Imagen generada"> -->
+                @if (imagenGenerada) {
+                    <img
+                        [src]="urlImagenIA"
+                        alt="Imagen generada"
+                    />
+                }
 
 
             </ng-container>

@@ -1,132 +1,297 @@
 <div class="mb-2 flex gap-2">
-    <button mat-stroked-button color="primary" class="text-sm px-2 py-1" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-        Regresar
-    </button>
+
+  <button
+    mat-stroked-button
+    color="primary"
+    class="text-sm px-2 py-1"
+    (click)="goBack()"
+  >
+
+    <mat-icon>arrow_back</mat-icon>
+
+    Regresar
+
+  </button>
+
 </div>
-<mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
+
+
+<mat-card
+  class="mat-mdc-card mdc-card cardWithShadow theme-card"
+>
+
+  <!-- ========================================== -->
+  <!-- ENCABEZADO -->
+  <!-- ========================================== -->
 
   <div class="p-6 flex justify-center items-center">
+
     <mat-card-title class="mat-mdc-card-title mb-0">
-      {{ plan?.name }}
+      <!-- {{ plan?.name }} -->
     </mat-card-title>
+
   </div>
 
-  <mat-card-content class="mat-mdc-card-content border-t border-border pt-6">
 
-    <div class="grid grid-cols-12 gap-6">
+  <mat-card-content
+    class="border-t border-border pt-6"
+  >
 
-      <div class="col-span-12 lg:col-span-12">
+    <!-- ======================================== -->
+    <!-- ÁRBOL -->
+    <!-- ======================================== -->
 
+    <ng-container
+      *ngTemplateOutlet="
+        nodeTemplate;
+        context: { $implicit: planNodeView }
+      "
+    >
+    </ng-container>
 
+  </mat-card-content>
 
-
-        <mat-card *ngFor="let section of sections" class="mb-4 ">
-
-          <div class="p-4 flex justify-center items-center  mt-10">
-            <mat-card-title class="text-center">
-              {{ section.title }}: {{ section.description }}
-            </mat-card-title>
-          </div>
-
-          <!-- SUBCAPÍTULOS (QUESTIONS) -->
-          <div class="px-4 pb-4">
-            <div *ngFor="let question of section.questions">
-
-              <mat-card-subtitle class="text-justify" style="margin: 0 15px 16px 10px;">
-                {{ question.answer_question }}
-              </mat-card-subtitle>
-
-              <!-- IMGEN -->
-              <mat-card-content *ngIf="question.files?.length" class="mt-6 mb-10">
-
-                <div class="flex justify-center">
-
-                  <div class="col-span-12" *ngFor="let file of question.files; let i = index">
-
-                    <div *ngIf="file.file_type === 'image'">
-                      <h4 class="font-semibold mb-2">
-                        Imagen {{ file.numero  }}
-                      </h4>
-                        <a *ngIf="file.file_type === 'image'" [href]="file.file_url" target="_blank"
-                          class="text-blue-500 underline block mt-2">
-
-                          <img [src]="file.file_url" class="max-w-full max-h-[450px] rounded-sm mx-auto"  />
-                        
-
-                        </a>
-
-                      <p class="text-sm text-gray-700 mb-1">
-                        {{ file.description || 'Sin descripción' }}
-                      </p>
-
-                      <p class="text-xs mt-0 text-gray-500 mt-0">
-                        Fuente: {{ file.fuente || 'No especificada' }}
-                      </p>
-
-                    </div>
-
-                   
-
-                  </div>
-
-                </div>
-
-              </mat-card-content>
+</mat-card>
 
 
-              <!-- Tabla -->
-              <mat-card-content *ngIf="question.tables?.length" class="mt-6 mb-10">
+<!-- ====================================================== -->
+<!-- TEMPLATE RECURSIVO DEL ÁRBOL -->
+<!-- ====================================================== -->
 
-                <div *ngFor="let table of question.tables" class="mb-6">
+<ng-template
+  #nodeTemplate
+  let-nodes
+>
 
-                  <h4 class="font-semibold mb-2">
-                    Tabla {{ table.numero }}
-                  </h4>
+  <ng-container
+    *ngFor="let node of nodes"
+  >
 
-                  <!-- TITLE -->
-                  <h4 class="text-sm font-semibold mb-3">
-                    {{ table.title }}
-                  </h4>
+    <!-- ================================================= -->
+    <!-- NODO -->
+    <!-- ================================================= -->
 
-                  <!-- TABLE -->
-                  <table class="w-full border border-gray-300 text-sm">
-
-                    <!-- HEADER -->
-                    <thead>
-                      <tr>
-                        <th class="border px-2 py-1 bg-gray-100 text-left" *ngFor="let col of table.data.columns">
-                          {{ col || '' }}
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <!-- BODY -->
-                    <tbody>
-                      <tr *ngFor="let row of table.data.rows">
-                        <td class="border px-2 py-1" *ngFor="let cell of row">
-                          {{ cell }}
-                        </td>
-                      </tr>
-                    </tbody>
-
-                  </table>
-
-                </div>
-
-              </mat-card-content>
+    <div class="mb-8">
 
 
+      <!-- =============================================== -->
+      <!-- TÍTULO -->
+      <!-- =============================================== -->
 
-            </div>
-          </div>
+      <div
+        class="py-3 border-b border-gray-200"
+        [ngClass]="{
+          'mt-6': node.nivel === 1,
+          'mt-4': node.nivel > 1
+        }"
+      >
 
-        </mat-card>
+        <!-- NIVEL 1 -->
+
+        <h2
+          *ngIf="node.nivel === 1"
+          class="text-xl font-bold text-gray-800"
+        >
+
+          {{ node.titulo }}
+
+        </h2>
+
+
+        <!-- NIVEL 2 -->
+
+        <h3
+          *ngIf="node.nivel === 2"
+          class="text-lg font-semibold text-gray-800"
+        >
+
+          {{ node.titulo }}
+
+        </h3>
+
+
+        <!-- NIVEL 3+ -->
+
+        <h4
+          *ngIf="node.nivel >= 3"
+          class="text-base font-semibold text-gray-700"
+        >
+
+          {{ node.titulo }}
+
+        </h4>
 
       </div>
 
 
+      <!-- =============================================== -->
+      <!-- QUESTIONS -->
+      <!-- =============================================== -->
+
+      <ng-container
+        *ngFor="let question of node.questions"
+      >
+
+
+        <!-- ============================================= -->
+        <!-- RESPUESTA -->
+        <!-- ============================================= -->
+
+        <div
+          *ngIf="question.answer?.answer_text"
+          class="mt-4 mb-6 text-gray-700 whitespace-pre-line leading-7"
+        >
+
+          {{ question.answer?.answer_text }}
+
+        </div>
+
+
+        <!-- ============================================= -->
+        <!-- IMÁGENES -->
+        <!-- ============================================= -->
+        <div
+          *ngIf="question.answer?.files?.length"
+          class="mt-6 mb-8"
+        >
+          <div
+            *ngFor="let file of question.answer.files"
+            class="mb-8"
+          >
+            <div
+              *ngIf="file.file_type === 'image'"
+              class="flex flex-col items-center"
+            >
+
+              <!-- Título -->
+              <h4 class="font-semibold mb-3 text-gray-700 text-center w-full">
+                Imagen {{ file.orden }}
+              </h4>
+
+              <!-- Imagen -->
+              <a
+                [href]="file.file_path"
+                target="_blank"
+                class="block"
+              >
+                <img
+                  [src]="file.file_path"
+                  [alt]="'Imagen ' + file.orden"
+                  class="max-w-full max-h-[350px] rounded-sm"
+                />
+              </a>
+
+              <!-- Descripción -->
+              <p class="text-sm text-gray-700 mt-3 mb-1 text-center w-full">
+                {{ file.description || 'Sin descripción' }}
+              </p>
+
+              <!-- Fuente -->
+              <p class="text-xs text-gray-500 text-center w-full">
+                <span class="font-medium">Fuente:</span>
+                {{ file.fuente || 'No especificada' }}
+              </p>
+
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- ============================================= -->
+        <!-- TABLAS -->
+        <!-- ============================================= -->
+        <div
+          *ngIf="question.answer?.tables?.length"
+          class="mt-6 mb-8"
+        >
+          <div
+            *ngFor="let table of question.answer.tables"
+            class="mb-8"
+          >
+
+            <!-- Título -->
+            <h4 class="font-semibold mb-3 text-gray-700">
+              {{  table.nombre }}
+            </h4>
+            <h4 class="font-semibold mb-3 text-gray-700">
+              Fuente: {{ table.fuente}}
+            </h4>
+
+            <div
+              *ngIf="table.data?.columns?.length && table.data?.rows?.length"
+              class="overflow-x-auto"
+            >
+
+              <table
+                class="w-full border-collapse border border-gray-300 text-sm"
+              >
+
+                <thead>
+                  <tr>
+                    <th
+                      *ngFor="let col of table.data.columns"
+                      class="border border-gray-300 px-3 py-2 bg-gray-100 text-left font-semibold"
+                    >
+                      {{ col || '' }}
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr
+                    *ngFor="let row of table.data.rows"
+                  >
+                    <td
+                      *ngFor="let cell of row"
+                      class="border border-gray-300 px-3 py-2"
+                    >
+                      {{ cell ?? '' }}
+                    </td>
+                  </tr>
+                </tbody>
+
+              </table>
+                <h4 class="font-semibold mb-3 text-gray-700">
+              Tabla {{  table.orden }}
+            </h4>
+
+            </div>
+
+          </div>
+        </div>
+
+
+
+      </ng-container>
+
+
+      <!-- =============================================== -->
+      <!-- HIJOS -->
+      <!-- =============================================== -->
+
+      <div
+        *ngIf="
+          node.children &&
+          node.children.length > 0
+        "
+        class="ml-6"
+      >
+
+        <ng-container
+          *ngTemplateOutlet="
+            nodeTemplate;
+            context: {
+              $implicit: node.children
+            }
+          "
+        >
+        </ng-container>
+
+      </div>
+
     </div>
-  </mat-card-content>
-</mat-card>
-<!--MODAL ver detalle -->
+
+  </ng-container>
+
+</ng-template>

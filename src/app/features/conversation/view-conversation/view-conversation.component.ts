@@ -15,6 +15,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 
 import { Location } from '@angular/common';
+import { PlanNodeView } from 'src/app/core/models/PlanViewNodeResponse';
 
 
 @Component({
@@ -36,8 +37,9 @@ export class ViewConversationComponent {
   	@ViewChild(MatAccordion) accordion: MatAccordion;
 
     idSuscriptionConversation!: number;
-    plan!: Plan;
-    sections: Section[] = [];
+    planNodeView: PlanNodeView[] = [];
+
+    // sections: Section[] = [];
 
     
 
@@ -69,50 +71,56 @@ export class ViewConversationComponent {
 
     console.log("Suscription => obtenerDataConversation "   )
 
-    this.conversationService.getConversationPlanUser ( this.idSuscriptionConversation ).subscribe ({
+    this.conversationService.getViewConversationPlanUser ( this.idSuscriptionConversation ).subscribe ({
       next: (resp: any) => {
-      console.log('Conversation => ',  resp);
-      this.plan = resp.data.plan;
-      this.sections = this.plan.sections ;
+        // console.log(
+        //   'Conversation => ',
+        //   resp
+        // );
 
+        this.planNodeView = this.buildTree(resp.data);
+
+        console.log(
+          'ÁRBOL => ',
+          this.planNodeView
+        );
 
       // Numerar imágenes
-      let contadorImagen = 1;
+      // let contadorImagen = 1;
 
-      this.sections.forEach(section => {
-        section.questions.forEach(question => {
+      // this.sections.forEach(section => {
+      //   section.questions.forEach(question => {
 
-          if (question.files?.length) {
-            question.files.forEach( (file: FileQuestion ) => {
+      //     if (question.files?.length) {
+      //       question.files.forEach( (file: FileQuestion ) => {
               
-              if (file.file_type === 'image') {
-                file.numero = contadorImagen++;
-              }
+      //         if (file.file_type === 'image') {
+      //           file.numero = contadorImagen++;
+      //         }
 
-            });
-          }
+      //       });
+      //     }
 
-        });
-      });
+      //   });
+      // });
 
        // Numerar tablas
-        let contadorTabla = 1;
+        // let contadorTabla = 1;
 
-        this.sections.forEach(section => {
-          section.questions.forEach(question => {
+        // this.sections.forEach(section => {
+        //   section.questions.forEach(question => {
 
-            if (question.tables?.length) {
-              question.tables.forEach( (table: any) => {
-                table.numero = contadorTabla++;
-              });
-            }
+        //     if (question.tables?.length) {
+        //       question.tables.forEach( (table: any) => {
+        //         table.numero = contadorTabla++;
+        //       });
+        //     }
 
-          });
-        });
+        //   });
+        // });
 
      
-      },
-      error: (err: any) => {
+    }, error: (err: any) => {
         console.error(err);
       },
       complete: () => {
@@ -121,5 +129,105 @@ export class ViewConversationComponent {
   
     }) 
   }
+
+
+
+  buildTree(nodes: PlanNodeView[]): PlanNodeView[] {
+
+  const nodeMap = new Map<number, PlanNodeView>();
+
+  const roots: PlanNodeView[] = [];
+
+  // ============================================
+  // 1. REGISTRAR TODOS LOS NODOS
+  // ============================================
+
+  nodes.forEach(node => {
+
+    nodeMap.set(node.id, {
+      ...node,
+      children: []
+    });
+
+  });
+
+
+  // ============================================
+  // 2. CONSTRUIR RELACIÓN PADRE / HIJO
+  // ============================================
+
+  nodes.forEach(node => {
+
+    const currentNode = nodeMap.get(node.id);
+
+    if (!currentNode) {
+      return;
+    }
+
+
+    // ==========================================
+    // NODO RAÍZ
+    // ==========================================
+
+    if (node.parent_id === null) {
+
+      roots.push(currentNode);
+
+      return;
+    }
+
+
+    // ==========================================
+    // BUSCAR PADRE
+    // ==========================================
+
+    const parent = nodeMap.get(node.parent_id);
+
+
+    if (parent) {
+
+      parent.children.push(currentNode);
+
+    } else {
+
+      console.warn(
+        `No se encontró el padre ${node.parent_id} del nodo ${node.id}`
+      );
+
+    }
+
+  });
+
+
+  // ============================================
+  // 3. ORDENAR TODO EL ÁRBOL
+  // ============================================
+
+  this.sortChildren(roots);
+
+
+  return roots;
+}
+
+private sortChildren(nodes: PlanNodeView[]): void {
+
+  nodes.sort(
+    (a, b) => (a.orden ?? 0) - (b.orden ?? 0)
+  );
+
+  nodes.forEach(node => {
+
+    if (node.children && node.children.length > 0) {
+
+      this.sortChildren(node.children);
+
+    }
+
+  });
+
+}
+
+
+
 
 }

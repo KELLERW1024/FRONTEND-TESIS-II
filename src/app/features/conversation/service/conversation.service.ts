@@ -162,6 +162,17 @@ export class ConversationService {
      
     }
 
+    getViewConversationPlanUser(idConversation: number ){
+      // this.url 
+      console.log("TOKEN: " + this.authService.token )
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+      return this.http.get( this.url + "/viewconversationplanuser" ,
+        {   headers,
+            params: { idConversation: idConversation } 
+        });
+     
+    }
+
     updateTitleConversation( data: any ){
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
         let URL = URL_SERVICIOS+"/conversation/updatetitleconversation";
