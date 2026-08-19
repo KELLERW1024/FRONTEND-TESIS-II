@@ -773,4 +773,24 @@ editNode(node: PlanNode): void {
 }
 
 
+  closeStructura(){
+
+    this.structureService.closeStructura(this.idSuscriptionConversation)
+      .subscribe({
+
+        next: (resp: any) => {
+          console.log(  'Conversation => ',  resp  );
+
+        },
+        error: (err: any) => {
+          console.error(  'Error obteniendo estructura:', err );
+
+        },
+        complete: () => {
+          console.log( 'Completado' );
+        }
+
+      });
+  }
+
 }

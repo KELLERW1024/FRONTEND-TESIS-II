@@ -115,6 +115,17 @@ deleteNode(id: number): Observable<any> {
         let URL = URL_SERVICIOS+"/conversation/updatetitleconversation";
         return this.http.post(URL,data,{headers: headers});
     }
+
+     closeStructura( idConversation: number  ){
+        let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
+
+       return this.http.get( URL_SERVICIOS + "/conversation/closestructure" ,
+        {   headers,
+             params: {
+                idConversation
+            }
+        });
+    }
     
 
   

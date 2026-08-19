@@ -31,31 +31,39 @@
     <!-- HEADER DEL PLAN -->
     <!-- ======================================== -->
 
-    <div class="plan-header">
+<div class="plan-header">
 
-        <div class="plan-icon">
+    <div class="plan-icon">
+        <mat-icon>
+            menu_book
+        </mat-icon>
+    </div>
 
-            <mat-icon>
-                menu_book
-            </mat-icon>
+    <div class="plan-header-content">
 
-        </div>
+        <span class="plan-label">
+            PLAN DE ESTUDIO
+        </span>
 
-
-        <div class="plan-header-content">
-
-            <span class="plan-label">
-                PLAN DE ESTUDIO
-            </span>
-
-
-            <h1 class="plan-title">
-                {{ plan?.name }}
-            </h1>
-
-        </div>
+        <h1 class="plan-title">
+            {{ plan?.name }}
+        </h1>
 
     </div>
+
+    <!-- BOTÓN -->
+    <button
+        mat-raised-button
+        color="primary "
+        class="structure-button"
+        (click)="closeStructura()"
+    >
+        <mat-icon>account_tree</mat-icon>
+
+        Guardar estructura
+    </button>
+
+</div>
 
 
 

@@ -337,7 +337,7 @@
                                                     </div>
 
                                                     <!-- 📄 DOCUMENTO -->
-                                                    <div *ngIf="item.category === 'document'"
+                                                    <!-- <div *ngIf="item.category === 'document'"
                                                         class="w-full bg-gray-100 px-4 py-10 text-center">
 
                                                         <p class="text-5xl">
@@ -348,7 +348,7 @@
                                                             {{ item.name }}
                                                         </p>
 
-                                                    </div>
+                                                    </div> -->
 
                                                     <!-- 📝 DESCRIPCIÓN -->
                                                     <div class="p-3">
@@ -377,22 +377,6 @@
 
                                     </div>
 
-
-
-
-                                    <!-- Vista previa -->
-                                    <!-- <div class="grid grid-cols-4 gap-4 mt-4">
-
-                                    <div *ngFor="let image of imagesPreview">
-                                        <img
-                                        [src]="image"
-                                        class="rounded-lg w-full h-32 object-cover"
-                                        />
-                                    </div>
-
-                                    </div> -->
-                                    <!-- Fin -->
-
                                     
                                 </div>
 
@@ -400,82 +384,82 @@
                             </div>
                             <!-- VER DE LA IMAGEN GENERADA POR LA IA -->
                            <!-- VER IMAGEN GENERADA POR LA IA -->
-<div
-    class="grid grid-cols-12 gap-4"
-    *ngIf="iaImageResponse?.status === 'succeeded' && iaImageResponse?.output">
+                            <div
+                                class="grid grid-cols-12 gap-4"
+                                *ngIf="iaImageResponse?.status === 'succeeded' && iaImageResponse?.output">
 
-    <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+                                <div class="col-span-12 sm:col-span-6 lg:col-span-4">
 
-        <mat-card class="cardWithShadow overflow-hidden rounded-xl">
+                                    <mat-card class="cardWithShadow overflow-hidden rounded-xl">
 
-            @if (imagenGenerada && mostrarImagenIA &&
-                        iaImageResponse?.status === 'succeeded' ) {
-            <img
-                    [src]="urlImagenIA"
-                    class="w-full h-56 object-cover hover:scale-105 transition duration-300"
-                    (click)="verImagenGrande(dialogTemplate)"
-                    alt="Imagen generada por IA"
-                />
-            }
+                                        @if (imagenGenerada && mostrarImagenIA &&
+                                                    iaImageResponse?.status === 'succeeded' ) {
+                                        <img
+                                                [src]="urlImagenIA"
+                                                class="w-full h-56 object-cover hover:scale-105 transition duration-300"
+                                                (click)="verImagenGrande(dialogTemplate)"
+                                                alt="Imagen generada por IA"
+                                            />
+                                        }
 
-            <mat-card-content class="p-3">
+                                        <mat-card-content class="p-3">
 
-                <div class="flex justify-between items-center">
+                                            <div class="flex justify-between items-center">
 
-                    <!-- VER IMAGEN GRANDE -->
-                    <button
-                        mat-icon-button
-                        color="primary"
-                        (click)="verImagenGrande(dialogTemplate)">
-                        <mat-icon>zoom_in</mat-icon>
-                    </button>
+                                                <!-- VER IMAGEN GRANDE -->
+                                                <button
+                                                    mat-icon-button
+                                                    color="primary"
+                                                    (click)="verImagenGrande(dialogTemplate)">
+                                                    <mat-icon>zoom_in</mat-icon>
+                                                </button>
 
-                    <!-- DESCARGAR -->
-                     @if (imagenGenerada) {
-                        <button
-                            mat-icon-button
-                            color="accent"
-                            (click)="descargarImagen(urlImagenIA)">
-                            <mat-icon>download</mat-icon>
-                        </button>
-                    }
+                                                <!-- DESCARGAR -->
+                                                @if (imagenGenerada) {
+                                                    <button
+                                                        mat-icon-button
+                                                        color="accent"
+                                                        (click)="descargarImagen(urlImagenIA)">
+                                                        <mat-icon>download</mat-icon>
+                                                    </button>
+                                                }
 
-                    <!-- ELIMINAR -->
-                    <button
-                        mat-icon-button
-                        color="warn"
-                        (click)="eliminarImagenIA()">
-                        <mat-icon>delete</mat-icon>
-                    </button>
+                                                <!-- ELIMINAR -->
+                                                <button
+                                                    mat-icon-button
+                                                    color="warn"
+                                                    (click)="eliminarImagenIA()">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
 
-                </div>
+                                            </div>
 
-                <div>
+                                            <div>
 
-                    <div class="mb-3">
-                        <span class="text-sm font-small">
-                            Fuente: Elaboración propia
-                        </span>
-                    </div>
+                                                <div class="mb-3">
+                                                    <span class="text-sm font-small">
+                                                        Fuente: Elaboración propia
+                                                    </span>
+                                                </div>
 
-                    <div>
-                        <input
-                            type="text"
-                            name="descripcionImagenIA"
-                            [(ngModel)]="descripcionImagenIA"
-                            placeholder="Descripción imagen"
-                            class="border rounded w-full p-2 text-sm">
-                    </div>
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        name="descripcionImagenIA"
+                                                        [(ngModel)]="descripcionImagenIA"
+                                                        placeholder="Descripción imagen"
+                                                        class="border rounded w-full p-2 text-sm">
+                                                </div>
 
-                </div>
+                                            </div>
 
-            </mat-card-content>
+                                        </mat-card-content>
 
-        </mat-card>
+                                    </mat-card>
 
-    </div>
+                                </div>
 
-</div>
+                            </div>
 
                             <!-- LISTA DE BIBLIOGFIA UTILIZADA EN LA CONSTRUCCION DEL PARRAFO -->
                             <div class="col-span-12 lg:col-span-3">
@@ -505,68 +489,6 @@
                     </mat-card-content>
                 </mat-card>
             </div>
-            <!-- 
-                COLUMNAS DE CAPITULOS Y OPCIONES 
-            -->
-            <!-- <div class="col-span-12 lg:col-span-3">
-
-                <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
-
-                    <div class="p-4">
-                        <mat-card-title class="mat-mdc-card-title">
-                            Modulos/Capitulos
-                        </mat-card-title>
-                    </div>
-
-                    <mat-card-content class="border-t border-border">
-
-                        <mat-chip-listbox aria-label="Color selection">
-
-                            <mat-chip-option *ngFor="let section of sections; let i = index" selected color="primary">
-
-                                {{ section.title }} : {{ section.description }}
-
-                            </mat-chip-option>
-
-                        </mat-chip-listbox>
-
-                    </mat-card-content>
-
-                </mat-card>
-                <mat-card class="mat-mdc-card mdc-card border border-border shadow-none mb-0">
-
-                    <div class="p-4">
-                        <mat-card-title class="mat-mdc-card-title">
-                            Opciones
-                        </mat-card-title>
-                    </div>
-
-                    <mat-card-content class="border-t border-border">
-
-                        <mat-chip-listbox aria-label="Color selection">
-
-                            <div class="flex sm:flex-row! flex-col items-center justify-center gap-3 flex-wrap">
-                                <button mat-flat-button (click)="irAvance()">Ver avance del plan </button>
-                                <button mat-flat-button class="bg-secondary text-white!"
-                                    (click)="irEditCapitulo()">Editar capitulo</button>
-                                <button mat-flat-button class="bg-warning text-white!"
-                                    (click)="generarArchivo()">GENERAR</button>
-                                <button mat-flat-button class="bg-error text-white!">Volver a la pregunta
-                                    anterior</button>
-                                <button mat-flat-button class="bg-success text-white!"
-                                    (click)="irDeleteCapitulo()">Eliminar respuestas del capitulo</button>
-                                
-                            </div>
-
-                        </mat-chip-listbox>
-
-                    </mat-card-content>
-
-                </mat-card>
-
-            </div> -->
-
-
 
 
         </div>
@@ -690,6 +612,20 @@
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
+
+         <button
+            mat-button
+            color="warn"
+            type="button"
+            (click)="eliminarTabla()">
+
+            <mat-icon>
+                delete
+            </mat-icon>
+
+            Eliminar tabla
+
+        </button>
 
         <button
             mat-button

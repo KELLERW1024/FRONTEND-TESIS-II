@@ -957,6 +957,7 @@ export class EditConversationComponent {
     this.selectedFilesAddDoc = [];
 
     this.isLoading = true;
+    this.urlImagenIA = '';
 
     this.conversationService .enviarContextoRespuestas(  formDataPayload )
       .subscribe({
@@ -1036,23 +1037,13 @@ export class EditConversationComponent {
   // FORM DATA
   // ============================================================
 
-  private buildFormData( tipo: string ): FormData {
+  private buildFormData( tipo: string ): FormData | null  {
 
     const formData = new FormData();
 
-    formData.append(
-      'idConversation',
-      String(
-        this.idSuscriptionConversation ?? ''
-      )
-    );
+    formData.append(  'idConversation', String(  this.idSuscriptionConversation ?? '' )  );
 
-    formData.append(
-      'idQuestion',
-      String(
-        this.dataCurrentQuestion.question?.id ?? ''
-      )
-    );
+    formData.append(  'idQuestion',  String( this.dataCurrentQuestion.question?.id ?? '' ) );
 
     switch (tipo) {
 
@@ -1062,60 +1053,23 @@ export class EditConversationComponent {
 
       case 'validate':
 
-        formData.append(
-          'description',
-          this.dataCurrentQuestion
-            ?.parent_node
-            ?.titulo ?? ''
-        );
+        formData.append(  'description',  this.dataCurrentQuestion  ?.parent_node ?.titulo ?? '' );
 
-        formData.append(
-          'question',
-          this.dataCurrentQuestion
-            ?.question
-            ?.question_text ?? ''
-        );
+        formData.append( 'question', this.dataCurrentQuestion  ?.question ?.question_text ?? ''  );
 
-        formData.append(
-          'detail',
-          this.dataCurrentQuestion
-            ?.question
-            ?.question_detail || ''
-        );
+        formData.append(  'detail', this.dataCurrentQuestion  ?.question ?.question_detail || ''  );
 
-        formData.append(
-          'validation',
-          this.dataCurrentQuestion
-            ?.question
-            ?.validation_detail || ''
-        );
+        formData.append( 'validation', this.dataCurrentQuestion  ?.question  ?.validation_detail || ''  );
 
-        formData.append(
-          'response',
-          this.form.value.answer ?? ''
-        );
+        formData.append( 'response',  this.form.value.answer ?? ''  );
 
-        formData.append(
-          'generate_table',
-          this.form.value.crearCuadro
-            ? '1'
-            : '0'
-        );
+        formData.append(  'generate_table',  this.form.value.crearCuadro   ? '1'  : '0'  );
 
-        formData.append(
-          'is_visual',
-          this.form.value.showImages
-            ? '1'
-            : '0'
-        );
+        formData.append( 'is_visual', this.form.value.showImages  ? '1'  : '0' );
 
         this.selectedFiles.forEach(file => {
 
-          formData.append(
-            'files[]',
-            file,
-            file.name
-          );
+          formData.append(  'files[]',  file, file.name );
 
         });
 
@@ -1127,86 +1081,80 @@ export class EditConversationComponent {
       // --------------------------------------------------------
 
       case 'save':
+        if (!this.reply?.trim()) {
 
-        formData.append(
-          'reply',
-          this.reply
-        );
+            this.showDialog(
+                'info',
+                'Debes ingresar una respuesta antes de continuar.',
+                'Información'
+            );
 
-        formData.append(
-          'metadata',
-          JSON.stringify(
-            this.selectedFilesAddDoc.map(
-              item => ({
-                description:
-                  item.description,
+            return null;
+        }
 
-                fuente:
-                  item.fuente
-              })
-            )
+        formData.append(  'reply',  this.reply );
+
+        const archivoInvalido = this.selectedFilesAddDoc.some(item =>
+                                                                      !item.description?.trim() ||
+                                                                      !item.fuente?.trim()
+                                                                  );
+
+        if (archivoInvalido) {
+
+            this.showDialog(
+                'info',
+                'Debes completar la descripción y la fuente de todos los archivos.',
+                'Información'
+            );
+
+            return null;
+        }
+
+        formData.append(  'metadata', JSON.stringify(  this.selectedFilesAddDoc.map(
+                                                                                item => ({
+                                                                                  description:  item.description,
+
+                                                                                  fuente: item.fuente
+                                                                                })
+                                                                              )
           )
         );
 
         this.selectedFilesAddDoc.forEach(
           item => {
 
-            console.log(
-              'NAME:',
-              item.file.name
-            );
+            console.log( 'NAME:',  item.file.name  );
 
-            console.log(
-              'TYPE:',
-              item.file.type
-            );
+            console.log(  'TYPE:',  item.file.type  );
 
-            console.log(
-              'SIZE:',
-              item.file.size
-            );
+            console.log(  'SIZE:', item.file.size );
 
-            formData.append(
-              'files[]',
-              item.file,
-              item.file.name
-            );
+            formData.append( 'files[]', item.file, item.file.name  );
 
           }
         );
 
-        console.log(
-          this.iaResponse?.references
-        );
+        console.log(  this.iaResponse?.references  );
 
-        formData.append(
-          'references',
-          JSON.stringify(
-            this.iaResponse?.references ?? []
-          )
-        );
+        formData.append(  'references',  JSON.stringify( this.iaResponse?.references ?? [] )  );
 
-        formData.append(
-          'table',
-          JSON.stringify(
-            this.tablaGenerada
-          )
-        );
+        formData.append(  'table',  JSON.stringify(  this.tablaGenerada  )  );
 
-        if (
-          this.iaImageResponse?.status === 'succeeded' &&
-          this.iaImageResponse?.output?.length
-        ) {
+        if (  this.iaImageResponse?.status === 'succeeded' &&  this.iaImageResponse?.output?.length ) {
 
-          formData.append(
-            'url_imagen_ia',
-            this.urlImagenIA
-          );
+          if ( !this.descripcionImagenIA?.trim()) {
+                   this.showDialog(
+                    'info',
+                    'Debes ingresar una descripción para la imagen generada.',
+                    'Info'
+                  );
 
-          formData.append(
-            'desc_imagen_ia',
-            this.descripcionImagenIA ?? ''
-          );
+                  return null;
+          }
+
+          formData.append(  'url_imagen_ia',  this.urlImagenIA );
+
+          formData.append(  'desc_imagen_ia',  this.descripcionImagenIA ?? ''  );
 
         }
 
@@ -1214,27 +1162,15 @@ export class EditConversationComponent {
 
     }
 
-    for (
-      let pair of formData.entries()
-    ) {
+    for (  let pair of formData.entries()  ) {
 
-      if (
-        pair[1] instanceof File
-      ) {
+      if (  pair[1] instanceof File  ) {
 
-        console.log(
-          pair[0],
-          'FILE =>',
-          pair[1].name,
-          pair[1].size
-        );
+        console.log(  pair[0],  'FILE =>',  pair[1].name,  pair[1].size  );
 
       } else {
 
-        console.log(
-          pair[0],
-          pair[1]
-        );
+        console.log(  pair[0],  pair[1]  );
 
       }
 
@@ -1251,21 +1187,14 @@ export class EditConversationComponent {
 
   guardarRespuesta() {
 
-    const formDataPayload =
-      this.buildFormData('save');
+    const formDataPayload = this.buildFormData('save');
 
-    this.conversationService
-      .guardarRespuestas(
-        formDataPayload
-      )
+    this.conversationService  .guardarRespuestas(  formDataPayload  )
       .subscribe({
 
         next: (resp: any) => {
 
-          console.log(
-            "Estado Guaradar Respuesta {} ",
-            resp
-          );
+          console.log(  "Estado Guaradar Respuesta {} ",  resp  );
 
           this.obtenerDataConversation();
 
@@ -1278,6 +1207,9 @@ export class EditConversationComponent {
           this.form.reset();
 
           this.iaResponse = null;
+          this.iaImageResponse = null;
+
+          this.selectedFilesAddDoc = [];
 
           /*
           this.form.reset({
@@ -1648,6 +1580,17 @@ descargarImagen(url: string): void {
       );
 
   }
+
+  // ELIMINAR TABLA 
+  eliminarTabla(): void {
+
+      this.tablaGenerada = null;
+
+      this.displayedTableColumns = [];
+
+      this.dialog.closeAll();
+  }
+
 
 
   // ============================================================
