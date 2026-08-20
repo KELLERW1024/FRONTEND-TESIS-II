@@ -1,42 +1,369 @@
-<div class="flex h-screen w-full items-center justify-center overflow-hidden p-2">
-  <mat-card class="cardWithShadow overflow-hidden auth-card mx-auto mb-0">
-    <div class="grid grid-cols-12 gap-6">
-      <div class="lg:col-span-6 col-span-12 flex items-stretch">
-        <div class="w-full p-10 flex flex-col justify-center aling-center">
-          <div class="text-center">Your Social Campaigns</div>
+<div class="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4">
 
-          <form class="mt-8" [formGroup]="loginForm" >
-            <mat-label class="mat-subtitle-2 text-sm font-semibold mb-3 block text-start">Username</mat-label>
-            <mat-form-field appearance="outline" class="w-full" color="primary">
-              <input matInput  formControlName="email"/>
-            </mat-form-field>
+  <mat-card
+    class="w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 shadow-2xl">
 
-            <mat-label class="mat-subtitle-2 text-sm font-semibold mb-3 block text-start">Password</mat-label>
-            <mat-form-field appearance="outline" class="w-full" color="primary">
-              <input matInput type="password" formControlName="password" />
-            </mat-form-field>
+    <div class="grid grid-cols-12 min-h-[620px]">
 
-            <div class="flex items-center justify-between mb-3">
-              <mat-checkbox color="primary">Remember this Device</mat-checkbox>
-              <a [routerLink]="['/']" class="text-primary font-semibold no-underline text-sm">Forgot Password
-                ?</a>
+      <!-- ================= LOGIN ================= -->
+      <div class="col-span-12 lg:col-span-6 bg-white">
+
+        <div class="h-full flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14">
+
+          <!-- LOGO -->
+          <div class="flex items-center gap-3 mb-10">
+
+            <div
+              class="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-200">
+              AI
             </div>
-            <a  (click)="onSubmit()" mat-flat-button color="primary" class="w-full">
-              Sign In
+
+            <div>
+              <h1 class="text-lg font-bold text-slate-900">
+                ValiPlanAI
+              </h1>
+
+              <p class="text-xs text-slate-500">
+                Investigación inteligente
+              </p>
+            </div>
+
+          </div>
+
+
+          <!-- TITULO -->
+          <div class="mb-8">
+
+            <p class="text-sm font-semibold text-indigo-600 mb-2">
+              Bienvenido de nuevo
+            </p>
+
+            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
+              Ingresa a tu
+              <span class="text-indigo-600">
+                espacio de trabajo
+              </span>
+            </h2>
+
+            <p class="mt-3 text-sm sm:text-base text-slate-500 leading-6">
+              Continúa desarrollando tu plan de tesis, negocio,
+              innovación o suficiencia profesional con ayuda de IA.
+            </p>
+
+          </div>
+
+
+          <!-- FORMULARIO -->
+          <form class="mt-2" [formGroup]="loginForm">
+
+            <!-- EMAIL -->
+            <div class="mb-5">
+
+              <mat-label
+                class="mat-subtitle-2 text-sm font-semibold mb-2 block text-start text-slate-700">
+                Correo electrónico
+              </mat-label>
+
+              <mat-form-field
+                appearance="outline"
+                class="w-full"
+                color="primary">
+
+                <mat-icon matPrefix class="mr-2 text-slate-400">
+                  mail_outline
+                </mat-icon>
+
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email"
+                  placeholder="ejemplo@correo.com"
+                  autocomplete="email" />
+
+              </mat-form-field>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+            <div class="mb-4">
+
+              <div class="flex items-center justify-between mb-2">
+
+                <mat-label
+                  class="mat-subtitle-2 text-sm font-semibold block text-start text-slate-700">
+                  Contraseña
+                </mat-label>
+
+                <a
+                  [routerLink]="['/']"
+                  class="text-indigo-600 font-semibold no-underline text-xs hover:text-indigo-700">
+                  ¿Olvidaste tu contraseña?
+                </a>
+
+              </div>
+
+              <mat-form-field
+                appearance="outline"
+                class="w-full"
+                color="primary">
+
+                <mat-icon matPrefix class="mr-2 text-slate-400">
+                  lock_outline
+                </mat-icon>
+
+                <input
+                  matInput
+                  type="password"
+                  formControlName="password"
+                  placeholder="Ingresa tu contraseña"
+                  autocomplete="current-password" />
+
+              </mat-form-field>
+
+            </div>
+
+
+            <!-- RECORDAR -->
+            <div class="flex items-center justify-between mb-6">
+
+              <mat-checkbox color="primary">
+                <span class="text-sm text-slate-600">
+                  Recordar este dispositivo
+                </span>
+              </mat-checkbox>
+
+            </div>
+
+
+            <!-- BOTON LOGIN -->
+            <a
+              (click)="onSubmit()"
+              mat-flat-button
+              color="primary"
+              class="w-full !h-12 !rounded-xl flex items-center justify-center text-sm font-semibold">
+
+              <mat-icon class="mr-2">
+                login
+              </mat-icon>
+
+              Ingresar
+
             </a>
 
           </form>
-          <span class="block font-medium text-center mt-6">New to Modernize?
-            <a [routerLink]="['/authentication/register']" class="no-underline text-primary font-medium text-sm">
-              Create an account</a>
-          </span>
+
+
+          <!-- REGISTRO -->
+          <div class="mt-8 text-center">
+
+            <span class="text-sm text-slate-500">
+              ¿Aún no tienes una cuenta?
+            </span>
+
+            <a
+              [routerLink]="['/authentication/register']"
+              class="no-underline text-indigo-600 font-semibold text-sm ml-1 hover:text-indigo-700">
+
+              Crear una cuenta
+
+            </a>
+
+          </div>
+
+
+          <!-- SEGURIDAD -->
+          <div class="flex items-center justify-center gap-2 mt-8 text-xs text-slate-400">
+
+            <mat-icon class="!text-base !w-4 !h-4">
+              verified_user
+            </mat-icon>
+
+            <span>
+              Tu información está protegida
+            </span>
+
+          </div>
+
         </div>
+
       </div>
-      <div class="lg:col-span-6 col-span-12 relative hidden lg:flex justify-center items-stretch bg-light p-5">
-        <div class="flex items-center justify-center w-full">
-          <img src="/assets/images/backgrounds/login-bg.svg" alt="login" class="img-fluid object-cover" />
+
+
+      <!-- ================= PANEL DERECHO ================= -->
+      <div
+        class="hidden lg:flex lg:col-span-6 relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-cyan-600">
+
+        <!-- DECORACIONES -->
+        <div
+          class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/10">
         </div>
+
+        <div
+          class="absolute -bottom-40 -left-32 w-96 h-96 rounded-full bg-cyan-300/10">
+        </div>
+
+
+        <div
+          class="relative z-10 w-full flex flex-col justify-center p-12 xl:p-14 text-white">
+
+          <!-- BADGE -->
+          <div
+            class="inline-flex self-start items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm mb-8">
+
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+
+            <span class="text-xs font-semibold">
+              Plataforma impulsada por Inteligencia Artificial
+            </span>
+
+          </div>
+
+
+          <!-- TITULO -->
+          <h2 class="text-4xl xl:text-5xl font-bold leading-tight">
+
+            Desarrolla tu proyecto
+
+            <span class="block text-cyan-200">
+              de forma inteligente.
+            </span>
+
+          </h2>
+
+
+          <p class="mt-5 text-indigo-100 leading-7 text-sm xl:text-base">
+            ThesisAI te acompaña paso a paso para estructurar,
+            desarrollar y organizar tu proyecto académico o profesional
+            utilizando Inteligencia Artificial.
+          </p>
+
+
+          <!-- BENEFICIOS -->
+          <div class="mt-9 space-y-5">
+
+            <div class="flex items-start gap-4">
+
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+
+                <mat-icon>
+                  auto_awesome
+                </mat-icon>
+
+              </div>
+
+              <div>
+
+                <h3 class="font-semibold">
+                  Asistencia con IA
+                </h3>
+
+                <p class="text-sm text-indigo-100 mt-1">
+                  Obtén orientación contextual durante el desarrollo
+                  de cada sección.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="flex items-start gap-4">
+
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+
+                <mat-icon>
+                  account_tree
+                </mat-icon>
+
+              </div>
+
+              <div>
+
+                <h3 class="font-semibold">
+                  Proyecto estructurado
+                </h3>
+
+                <p class="text-sm text-indigo-100 mt-1">
+                  Avanza de manera ordenada y conoce qué debes
+                  completar en cada etapa.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="flex items-start gap-4">
+
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+
+                <mat-icon>
+                  description
+                </mat-icon>
+
+              </div>
+
+              <div>
+
+                <h3 class="font-semibold">
+                  Documento final
+                </h3>
+
+                <p class="text-sm text-indigo-100 mt-1">
+                  Genera tu documento una vez que completes
+                  el desarrollo de tu proyecto.
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- TIPOS DE PROYECTO -->
+          <div class="mt-9 pt-7 border-t border-white/20">
+
+            <p class="text-xs uppercase tracking-wider text-indigo-200 font-semibold mb-4">
+              Puedes desarrollar
+            </p>
+
+            <div class="flex flex-wrap gap-2">
+
+              <span
+                class="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-medium">
+                📚 Plan de Tesis
+              </span>
+
+              <span
+                class="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-medium">
+                💼 Plan de Negocios
+              </span>
+
+              <span
+                class="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-medium">
+                💡 Plan de Innovación
+              </span>
+
+              <span
+                class="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-medium">
+                🎓 Suficiencia Profesional
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
+
     </div>
+
   </mat-card>
+
 </div>

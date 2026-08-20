@@ -1,64 +1,643 @@
-<!-- CONTENT -->
+<!-- ============================= -->
+<!-- PAGOS -->
+<!-- ============================= -->
+
 <mat-card class="cardWithShadow theme-card">
-    <!-- ACTION BAR -->
-    <div class="p-6 flex justify-between items-center">
-        <mat-card-title class="mb-0">
-            Pagos
+
+  <!-- ============================= -->
+  <!-- HEADER -->
+  <!-- ============================= -->
+
+  <div class="p-6">
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+      <div>
+
+        <mat-card-title class="mb-1">
+          Gestión de pagos
         </mat-card-title>
+
+        <p class="text-sm text-muted">
+          Revisa, valida y gestiona los pagos realizados por los usuarios.
+        </p>
+
+      </div>
+
+      <div class="flex items-center gap-2">
+
+       <button
+            mat-stroked-button
+            color="primary"
+            (click)="refreshPayments()">
+
+            <mat-icon class="mr-2">
+                refresh
+            </mat-icon>
+
+            Actualizar
+
+        </button>
+
+
+      </div>
+
     </div>
 
-    <mat-card-content class="border-t border-border">
-        <!-- TABLE / CONTENT AREA -->
+  </div>
 
-    </mat-card-content>
-    <div class="container">
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>Buscar pago</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Ej: SAVE10">
+  <!-- ============================= -->
+  <!-- SEPARADOR -->
+  <!-- ============================= -->
+
+  <mat-card-content class="border-t border-border">
+
+
+   
+
+
+    <!-- ============================= -->
+    <!-- FILTROS -->
+    <!-- ============================= -->
+
+    <div
+      class="rounded-2xl border border-border bg-white p-5 mb-6">
+
+      <div class="flex flex-col lg:flex-row gap-4">
+
+        <!-- BUSCAR -->
+
+        <mat-form-field
+          appearance="outline"
+          class="w-full lg:flex-1">
+
+          <mat-label>
+            Buscar pago
+          </mat-label>
+
+          <mat-icon matPrefix>
+            search
+          </mat-icon>
+
+          <input
+            matInput
+            (keyup)="applyFilter($event)"
+            placeholder="Usuario, correo, operación o pago">
+
         </mat-form-field>
 
-        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-            <!-- Code -->
-            <ng-container matColumnDef="user">
-                <th mat-header-cell *matHeaderCellDef> Usuario </th>
-                <td mat-cell *matCellDef="let conversation">{{ conversation.user?.name }}</td>
-            </ng-container>
+        <!-- TIPO DE PAGO -->
 
-            <ng-container matColumnDef="plan">
-                <th mat-header-cell *matHeaderCellDef> Plan</th>
-                <td mat-cell *matCellDef="let conversation">{{ conversation.plan_name}}</td>
-            </ng-container>
+        <mat-form-field
+          appearance="outline"
+          class="w-full lg:w-56">
 
-            <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef> Status </th>
-                <td mat-cell *matCellDef="let conversation">{{ conversation.status}}</td>
-            </ng-container>
+          <mat-label>
+            Medio de pago
+          </mat-label>
 
-            <ng-container matColumnDef="status_payment">
-                <th mat-header-cell *matHeaderCellDef> Status payment </th>
-                <td mat-cell *matCellDef="let conversation">
-                    <span *ngFor="let payment of conversation.payments; let last = last">
-                        {{ payment.status }}<span *ngIf="!last">, </span>
-                    </span>
-                </td>
-            </ng-container>
+            <mat-select
+                [value]="selectedPaymentMethod"
+                (selectionChange)="filterPaymentMethod($event.value)">
 
-            <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef> Opciones </th>
-                <td mat-cell *matCellDef="let conversation">{{ conversation.status}}</td>
-            </ng-container>
+                <mat-option value="all">
+                    Todos
+                </mat-option>
 
-            <!-- Header & Rows -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <mat-option value="yape">
+                    Yape
+                </mat-option>
 
-        </table>
+                <mat-option value="mercadopago">
+                    Mercado Pago
+                </mat-option>
 
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
-        </mat-paginator>
+            </mat-select>
+
+
+        </mat-form-field>
+
+
+        <!-- ESTADO -->
+
+        <mat-form-field
+          appearance="outline"
+          class="w-full lg:w-56">
+
+          <mat-label>
+            Estado
+          </mat-label>
+
+        <mat-select
+            [value]="selectedStatus"
+            (selectionChange)="filterStatus($event.value)">
+
+            <mat-option value="all">
+                Todos
+            </mat-option>
+
+            <mat-option value="pending">
+                Pendientes
+            </mat-option>
+
+            <mat-option value="completed">
+                Completados
+            </mat-option>
+
+            <mat-option value="failed">
+                Rechazados
+            </mat-option>
+
+            <mat-option value="refunded">
+                Reembolsados
+            </mat-option>
+
+        </mat-select>
+
+
+        </mat-form-field>
+
+      </div>
 
     </div>
+
+
+    <!-- ============================= -->
+    <!-- ALERTA YAPE -->
+    <!-- ============================= -->
+
+    <div
+      class="flex items-start gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 mb-6">
+
+      <div
+        class="w-10 h-10 flex-shrink-0 rounded-xl bg-amber-100 flex items-center justify-center">
+
+        <mat-icon class="text-amber-600">
+          smartphone
+        </mat-icon>
+
+      </div>
+
+      <div>
+
+        <p class="font-semibold text-amber-800">
+          Pagos por Yape requieren validación manual
+        </p>
+
+        <p class="text-sm text-amber-700 mt-1 leading-6">
+
+          Verifica el número de operación, código de seguridad,
+          monto y comprobante antes de activar la suscripción
+          del usuario.
+
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- TABLA -->
+    <!-- ============================= -->
+
+    <div class="overflow-x-auto rounded-2xl border border-border">
+
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        matSort
+        class="w-full">
+
+
+        <!-- ============================= -->
+        <!-- USUARIO -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="user">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Usuario
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <div class="flex items-center gap-3 py-2">
+
+              <div
+                class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold">
+
+                {{ conversation.user?.name?.charAt(0) }}
+
+              </div>
+
+              <div>
+
+                <p class="font-semibold text-sm">
+
+                  {{ conversation.user?.name }}
+
+                </p>
+
+                <p class="text-xs text-muted">
+
+                  {{ conversation.user?.email }}
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- PLAN -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="plan">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Plan / Paquete
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <div>
+
+              <p class="font-semibold text-sm">
+                {{ conversation.plan_name }}
+              </p>
+
+              <p class="text-xs text-muted mt-1">
+                Suscripción
+              </p>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- ESTADO SUSCRIPCIÓN -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="status">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Suscripción
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <span
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="{
+                'bg-green-100 text-green-700': conversation.status === 'active',
+                'bg-amber-100 text-amber-700': conversation.status === 'pending',
+                'bg-red-100 text-red-700': conversation.status === 'cancelled',
+                'bg-slate-100 text-slate-600': conversation.status === 'expired'
+              }">
+
+              <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+
+              {{ conversation.status }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- ESTADO PAGO -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="status_payment">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Estado del pago
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <div class="flex flex-col gap-1">
+
+              <span
+                *ngFor="let payment of conversation.payments; let last = last"
+                class="inline-flex items-center gap-2">
+
+                <span
+                  class="w-2 h-2 rounded-full"
+                  [ngClass]="{
+                    'bg-green-500': payment.status === 'completed',
+                    'bg-amber-500': payment.status === 'pending',
+                    'bg-red-500': payment.status === 'failed',
+                    'bg-slate-400': payment.status === 'refunded'
+                  }">
+                </span>
+
+                <span class="text-sm font-medium">
+                  {{ payment.status }}
+                </span>
+
+              </span>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- MEDIO DE PAGO -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="payment_method">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Medio
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <div class="flex items-center gap-2">
+
+              <div
+                class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+
+                <mat-icon class="!text-lg text-slate-600">
+                  payments
+                </mat-icon>
+
+              </div>
+
+              <div>
+
+                <p class="text-sm font-semibold">
+                  {{ conversation.payment_provider || 'Pago' }}
+                </p>
+
+                <p class="text-xs text-muted">
+                  {{ conversation.currency || 'PEN' }}
+                </p>
+
+              </div>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- MONTO -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="amount">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Monto
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <span class="font-bold text-slate-800">
+
+              {{ conversation.final_amount || conversation.amount || '--' }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- OPERACIÓN -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="operation">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef>
+
+            Operación
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation">
+
+            <div>
+
+              <p class="font-mono text-xs font-semibold">
+                {{ conversation.operation_number || '--' }}
+              </p>
+
+              <p class="text-xs text-muted mt-1">
+                {{ conversation.created_at || '' }}
+              </p>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- ACCIONES -->
+        <!-- ============================= -->
+
+        <ng-container matColumnDef="acciones">
+
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            class="text-right">
+
+            Opciones
+
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let conversation"
+            class="text-right">
+
+            <div class="flex items-center justify-end gap-1">
+
+              
+
+
+              <!-- Más opciones -->
+              <button
+                mat-icon-button
+                [matMenuTriggerFor]="paymentMenu"
+                matTooltip="Más opciones">
+
+                <mat-icon>
+                  more_vert
+                </mat-icon>
+
+              </button>
+
+            </div>
+
+
+            <!-- MENU -->
+
+            <mat-menu #paymentMenu="matMenu">
+
+                <button
+                    mat-menu-item
+                    (click)="verDetalle(conversation)">
+
+                    <mat-icon>
+                    visibility
+                    </mat-icon>
+
+                    <span>
+                    Ver detalle
+                    </span>
+
+                </button>
+
+
+                <button
+                    mat-menu-item
+                    (click)="verComprobante(conversation)">
+
+                    <mat-icon>
+                    image
+                    </mat-icon>
+
+                    <span>
+                    Ver comprobante
+                    </span>
+
+                </button>
+
+
+                <button
+                    mat-menu-item
+                    (click)="validarPago(conversation)">
+
+                    <mat-icon>
+                    check_circle
+                    </mat-icon>
+
+                    <span>
+                    Validar pago
+                    </span>
+
+                </button>
+
+
+                <button
+                    mat-menu-item
+                    (click)="rechazarPago(conversation)">
+
+                    <mat-icon>
+                    close
+                    </mat-icon>
+
+                    <span>
+                    Rechazar pago
+                    </span>
+
+                </button>
+
+            </mat-menu>
+
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- HEADER / ROWS -->
+        <!-- ============================= -->
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns">
+        </tr>
+
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns;"
+          class="hover:bg-slate-50 transition">
+        </tr>
+
+      </table>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- PAGINADOR -->
+    <!-- ============================= -->
+
+    <div class="mt-2">
+
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
+
+    </div>
+
+  </mat-card-content>
 
 </mat-card>

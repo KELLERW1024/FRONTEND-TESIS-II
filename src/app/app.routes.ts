@@ -43,6 +43,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/diagnostic/diagnostic.component').then((m) => m.DiagnosticComponent),
       },
+       {
+        path: 'packages',
+        loadComponent: () =>
+          import('./features/packages/view-packages/view-packages.component').then((m) => m.ViewPackagesComponent),
+      },
       {
         path: 'conversations',
         loadChildren: () =>

@@ -219,3 +219,154 @@
         </button>
     </mat-dialog-actions>
 </ng-template>
+
+ <!-- ============================= -->
+    <!-- RESUMEN DE PAGOS -->
+    <!-- ============================= -->
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-6">
+
+      <!-- PENDIENTES -->
+
+      <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+
+        <div class="flex items-center justify-between">
+
+          <div>
+
+            <p class="text-sm text-amber-700 font-medium">
+              Pendientes de revisión
+            </p>
+
+            <p class="text-3xl font-bold text-amber-800 mt-2">
+              --
+            </p>
+
+          </div>
+
+          <div
+            class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center">
+
+            <mat-icon class="text-amber-600">
+              pending_actions
+            </mat-icon>
+
+          </div>
+
+        </div>
+
+        <p class="text-xs text-amber-600 mt-3">
+          Principalmente pagos realizados por Yape
+        </p>
+
+      </div>
+
+
+      <!-- APROBADOS -->
+
+      <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+
+        <div class="flex items-center justify-between">
+
+          <div>
+
+            <p class="text-sm text-emerald-700 font-medium">
+              Pagos aprobados
+            </p>
+
+            <p class="text-3xl font-bold text-emerald-800 mt-2">
+              --
+            </p>
+
+          </div>
+
+          <div
+            class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+
+            <mat-icon class="text-emerald-600">
+              check_circle
+            </mat-icon>
+
+          </div>
+
+        </div>
+
+        <p class="text-xs text-emerald-600 mt-3">
+          Suscripciones activadas
+        </p>
+
+      </div>
+
+
+      <!-- RECHAZADOS -->
+
+      <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+
+        <div class="flex items-center justify-between">
+
+          <div>
+
+            <p class="text-sm text-red-700 font-medium">
+              Rechazados
+            </p>
+
+            <p class="text-3xl font-bold text-red-800 mt-2">
+              --
+            </p>
+
+          </div>
+
+          <div
+            class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center">
+
+            <mat-icon class="text-red-600">
+              cancel
+            </mat-icon>
+
+          </div>
+
+        </div>
+
+        <p class="text-xs text-red-600 mt-3">
+          Pagos no validados
+        </p>
+
+      </div>
+
+
+      <!-- TOTAL -->
+
+      <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+
+        <div class="flex items-center justify-between">
+
+          <div>
+
+            <p class="text-sm text-indigo-700 font-medium">
+              Total procesado
+            </p>
+
+            <p class="text-3xl font-bold text-indigo-800 mt-2">
+              --
+            </p>
+
+          </div>
+
+          <div
+            class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center">
+
+            <mat-icon class="text-indigo-600">
+              payments
+            </mat-icon>
+
+          </div>
+
+        </div>
+
+        <p class="text-xs text-indigo-600 mt-3">
+          Pagos registrados
+        </p>
+
+      </div>
+
+    </div>

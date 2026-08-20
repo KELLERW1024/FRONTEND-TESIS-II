@@ -33,21 +33,16 @@ export const navItems: NavItem[] = [
     route: 'content',
     children: [
       {
-        displayName: 'Secciones',
+        displayName: 'Paquetes',
         iconName: 'tabler:point',
-        route: '/content/sections',
+        route: '/packages',
       },
       {
-        displayName: 'Preguntas',
+        displayName: 'Planes',
         iconName: 'tabler:point',
-        route: '/content/questions',
+        route: '/plans',
       }
     ]
-  },
-  {
-    displayName: 'Planes',
-    iconName: 'solar:danger-circle-line-duotone',
-    route: '/plans',
   },
   {
     displayName: 'Cupones',
