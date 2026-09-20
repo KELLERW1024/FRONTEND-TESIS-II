@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { DashboardService } from 'src/app/components/dashboard.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 interface Package {
   id: number;
@@ -40,7 +41,7 @@ interface Package {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-MatDividerModule,
+    MatDividerModule,
     MatButtonModule,
     MatCardModule,
     MatDialogModule,
@@ -53,7 +54,8 @@ MatDividerModule,
     MatSortModule,
     MatMenuModule,
     MatTooltipModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatCheckboxModule
   ],
 
   templateUrl: './view-packages.component.html',
@@ -82,6 +84,16 @@ export class ViewPackagesComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('detailDialog') detailDialog!: TemplateRef<any>;
+  @ViewChild('packageDialog') packageDialog!: TemplateRef<any>;
+    selectedPackage: Package | null = null;
+    showForm: boolean = false;
+    isEdit: boolean = false;
+    @ViewChild('plansDialog') plansDialog!: TemplateRef<any>;
+    allPlans: any[] = [];
+    selectedPlanIds: number[] = [];
+    managingPackage: Package | null = null;
+    savingPlans: boolean = false;
 
 
   // =========================================================
@@ -196,7 +208,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // INIT
   // =========================================================
@@ -204,9 +215,18 @@ export class ViewPackagesComponent implements OnInit {
   ngOnInit(): void {
 
     this.getPackages();
+    this.loadAllPlans();
 
   }
 
+  loadAllPlans(): void {
+  this.service.getPlans().subscribe({
+    next: (resp: any) => {
+      this.allPlans = resp.data || resp || [];
+    },
+    error: (err: any) => console.error('Error al cargar planes:', err)
+  });
+}
 
   // =========================================================
   // LISTAR PAQUETES
@@ -250,7 +270,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // CONFIGURAR TABLA
   // =========================================================
@@ -262,7 +281,6 @@ export class ViewPackagesComponent implements OnInit {
     this.dataSource.sort = this.sort;
 
   }
-
 
   // =========================================================
   // BUSCAR
@@ -281,7 +299,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // FILTRO ESTADO
   // =========================================================
@@ -293,7 +310,6 @@ export class ViewPackagesComponent implements OnInit {
     this.applyFilters();
 
   }
-
 
   // =========================================================
   // FILTRO DURACIÓN
@@ -307,7 +323,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // FILTRO TIPO
   // =========================================================
@@ -320,7 +335,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // APLICAR TODOS LOS FILTROS
   // =========================================================
@@ -328,7 +342,6 @@ export class ViewPackagesComponent implements OnInit {
   applyFilters(): void {
 
     let filtered = [...this.packages];
-
 
     // -----------------------------------------
     // BUSCADOR
@@ -350,7 +363,6 @@ export class ViewPackagesComponent implements OnInit {
 
     }
 
-
     // -----------------------------------------
     // ESTADO
     // -----------------------------------------
@@ -365,7 +377,6 @@ export class ViewPackagesComponent implements OnInit {
 
     }
 
-
     // -----------------------------------------
     // DURACIÓN
     // -----------------------------------------
@@ -379,7 +390,6 @@ export class ViewPackagesComponent implements OnInit {
       );
 
     }
-
 
     // -----------------------------------------
     // TIPO
@@ -397,7 +407,6 @@ export class ViewPackagesComponent implements OnInit {
     this.dataSource.data = filtered;
 
   }
-
 
   // =========================================================
   // TIPO DE PAQUETE
@@ -423,12 +432,13 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // CREAR
   // =========================================================
 
   createPackage(): void {
+
+    this.isEdit = false;
 
     this.editingPackage = null;
 
@@ -455,15 +465,21 @@ export class ViewPackagesComponent implements OnInit {
       is_active: 1
 
     });
+      this.dialog.open(this.packageDialog, {
+      width: '680px',
+      disableClose: false,
+      autoFocus: false
+    });
 
   }
-
 
   // =========================================================
   // EDITAR
   // =========================================================
 
   editPackage(pkg: Package): void {
+
+    this.isEdit = true;
 
     this.editingPackage = pkg;
 
@@ -490,9 +506,20 @@ export class ViewPackagesComponent implements OnInit {
       is_active: pkg.is_active
 
     });
+      this.dialog.open(this.packageDialog, {
+      width: '680px',
+      disableClose: false,
+      autoFocus: false
+    });
 
   }
 
+  cancelForm(): void {
+    this.showForm = false;
+    this.editingPackage = null;
+    this.packageForm.reset();
+    this.dialog.closeAll();
+  }
 
   // =========================================================
   // GUARDAR
@@ -516,6 +543,12 @@ export class ViewPackagesComponent implements OnInit {
     if (this.editingPackage) {
 
       // EDITAR
+      this.service.updatePackage(this.editingPackage.id, formValue).subscribe({
+
+        next: (resp: any) => {
+
+          const updated = resp.data || { ...this.editingPackage, ...formValue };
+
 
       const index = this.packages.findIndex(
         pkg => pkg.id === this.editingPackage!.id
@@ -523,21 +556,41 @@ export class ViewPackagesComponent implements OnInit {
 
       if (index !== -1) {
 
-        this.packages[index] = {
+          this.packages[index] = updated;
 
-          ...this.packages[index],
+          }
 
-          ...formValue
+          this.dataSource.data = [...this.packages];
 
-        };
+          this.updateStatistics();
 
-      }
+          this.applyFilters();
 
+          this.dialog.closeAll();
+
+          this.saving = false;
+
+        },
+
+        error: (err: any) => {
+
+          console.error('Error al actualizar paquete:', err);
+
+          this.saving = false;
+
+        }
+
+      });
     } else {
 
       // CREAR
 
-      const newPackage: Package = {
+      this.service.createPackage(formValue).subscribe({
+
+        next: (resp: any) => {
+
+        const newPackage: Package = resp.data || {
+
 
         id: Date.now(),
 
@@ -554,19 +607,31 @@ export class ViewPackagesComponent implements OnInit {
         newPackage
       ];
 
+      this.dataSource.data = [...this.packages];
+
+          this.updateStatistics();
+
+          this.applyFilters();
+
+          this.dialog.closeAll();
+
+          this.saving = false;
+
+        },
+
+        error: (err: any) => {
+
+          console.error('Error al crear paquete:', err);
+
+          this.saving = false;
+
+        }
+
+      });
+
     }
 
-
-    this.dataSource.data = this.packages;
-
-    this.updateStatistics();
-
-    this.applyFilters();
-
-    this.saving = false;
-
   }
-
 
   // =========================================================
   // ACTIVAR / DESACTIVAR
@@ -584,40 +649,39 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // ACTIVAR
   // =========================================================
-
   activatePackage(pkg: Package): void {
-
-    pkg.is_active = 1;
-
-    this.dataSource.data = [...this.packages];
-
-    this.updateStatistics();
-
-    this.applyFilters();
-
+    this.service.updatePackage(pkg.id, { is_active: 1 }).subscribe({
+      next: () => {
+        pkg.is_active = 1;
+        this.dataSource.data = [...this.packages];
+        this.updateStatistics();
+        this.applyFilters();
+      },
+      error: (err: any) => {
+        console.error('Error al activar el paquete:', err);
+      }
+    });
   }
-
 
   // =========================================================
   // DESACTIVAR
   // =========================================================
-
   deactivatePackage(pkg: Package): void {
-
-    pkg.is_active = 0;
-
-    this.dataSource.data = [...this.packages];
-
-    this.updateStatistics();
-
-    this.applyFilters();
-
+    this.service.updatePackage(pkg.id, { is_active: 0 }).subscribe({
+      next: () => {
+        pkg.is_active = 0;
+        this.dataSource.data = [...this.packages];
+        this.updateStatistics();
+        this.applyFilters();
+      },
+      error: (err: any) => {
+        console.error('Error al desactivar el paquete:', err);
+      }
+    });
   }
-
 
   // =========================================================
   // DUPLICAR
@@ -654,28 +718,80 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // VER DETALLE
   // =========================================================
 
   viewPackage(pkg: Package): void {
 
-    console.log('Ver paquete:', pkg);
+    this.selectedPackage = pkg;
+    this.dialog.open(this.detailDialog, {
+      width: '500px',
+      disableClose: false,
+      autoFocus: false
+    });
 
   }
-
 
   // =========================================================
   // GESTIONAR PLANES
   // =========================================================
 
-  managePlans(pkg: Package): void {
+managePlans(pkg: Package): void {
+  console.log('1. Click en Gestionar planes para el paquete:', pkg);
+  this.managingPackage = pkg;
 
-    console.log('Gestionar planes del paquete:', pkg);
+  console.log('2. plansDialog existe?', !!this.plansDialog);
 
+  this.service.getPackagePlans(pkg.id).subscribe({
+    next: (resp: any) => {
+      console.log('3. Respuesta de getPackagePlans:', resp);
+      const currentPlans = resp.data?.plans || [];
+      this.selectedPlanIds = currentPlans.map((p: any) => p.id);
+      console.log('4. Planes seleccionados IDs:', this.selectedPlanIds);
+
+      this.dialog.open(this.plansDialog, {
+        width: '560px',
+        disableClose: false,
+        autoFocus: false
+      });
+      console.log('5. Dialog abierto');
+    },
+    error: (err: any) => {
+      console.error('ERROR al obtener planes del paquete:', err);
+    }
+  });
+}
+
+togglePlanSelection(planId: number): void {
+  const index = this.selectedPlanIds.indexOf(planId);
+  if (index > -1) {
+    this.selectedPlanIds.splice(index, 1);
+  } else {
+    this.selectedPlanIds.push(planId);
   }
+}
 
+isPlanSelected(planId: number): boolean {
+  return this.selectedPlanIds.includes(planId);
+}
+
+savePackagePlans(): void {
+  if (!this.managingPackage) return;
+
+  this.savingPlans = true;
+  this.service.syncPackagePlans(this.managingPackage.id, this.selectedPlanIds).subscribe({
+    next: () => {
+      this.savingPlans = false;
+      this.dialog.closeAll();
+      this.getPackages();
+    },
+    error: (err: any) => {
+      console.error('Error al sincronizar planes:', err);
+      this.savingPlans = false;
+    }
+  });
+}
 
   // =========================================================
   // VER SUSCRIPCIONES
@@ -690,7 +806,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // VER PAGOS
   // =========================================================
@@ -703,7 +818,6 @@ export class ViewPackagesComponent implements OnInit {
     );
 
   }
-
 
   // =========================================================
   // ESTADÍSTICAS
@@ -729,7 +843,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // FORMATEAR PRECIO
   // =========================================================
@@ -751,7 +864,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // ESTADO
   // =========================================================
@@ -761,7 +873,6 @@ export class ViewPackagesComponent implements OnInit {
     return Number(pkg.is_active) === 1;
 
   }
-
 
   // =========================================================
   // DURACIÓN
@@ -777,7 +888,6 @@ export class ViewPackagesComponent implements OnInit {
 
   }
 
-
   // =========================================================
   // REFRESCAR
   // =========================================================
@@ -787,5 +897,4 @@ export class ViewPackagesComponent implements OnInit {
     this.getPackages();
 
   }
-
 }

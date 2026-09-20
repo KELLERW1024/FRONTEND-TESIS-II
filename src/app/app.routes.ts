@@ -34,6 +34,11 @@ export const routes: Routes = [
           import('./pages/pages.routes').then((m) => m.PagesRoutes),
       },
       {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/users/users.component').then((m) => m.UsersComponent),
+      },
+      {
         path: 'payment/:packageId',
         loadComponent: () =>
           import('./features/payment/payment.component').then((m) => m.PaymentComponent),
@@ -43,10 +48,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/diagnostic/diagnostic.component').then((m) => m.DiagnosticComponent),
       },
-       {
+      {
         path: 'packages',
         loadComponent: () =>
           import('./features/packages/view-packages/view-packages.component').then((m) => m.ViewPackagesComponent),
+      },
+      {
+        path: 'plans',
+        loadComponent: () =>
+          import('./features/plans/plan/plan.component').then((m) => m.PlansComponent),
       },
       {
         path: 'conversations',

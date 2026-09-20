@@ -47,10 +47,38 @@ export class DashboardService {
       return this.http.get<PackageResponse>( URL  ,
         {   headers
         });
+  }
+
+  createPackage(data: any) {
+
+      let URL = URL_SERVICIOS + "/packages";
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+      return this.http.post( URL, 
+        data, 
+        {   headers 
+        });
 
   }
 
-   
+  updatePackage(id: number, data: any) {
 
-  
+      let URL = URL_SERVICIOS + "/packages/" + id;
+      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+      return this.http.patch( URL, 
+        data, 
+        {   headers 
+        });
+  }
+
+  syncPackagePlans(packageId: number, planIds: number[]) {
+    let URL = URL_SERVICIOS + `/packages/${packageId}/plans`;
+    let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(URL, { plans: planIds }, { headers });
+  }
+
+  getPackagePlans(idPackage: number) {
+  let URL = URL_SERVICIOS + "/getpackageplans?idPackage=" + idPackage;
+  let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+  return this.http.get(URL, { headers });
+}
 }

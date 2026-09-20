@@ -1,1 +1,399 @@
-<p>plan works!</p>
+<!-- ========================================================= -->
+<!-- GESTIÓN DE PLANES -->
+<!-- ========================================================= -->
+
+<mat-card class="cardWithShadow theme-card">
+
+  <!-- HEADER -->
+  <div class="p-6">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <mat-card-title class="mb-1">
+          Gestión de planes
+        </mat-card-title>
+        <p class="text-sm text-muted">
+          Administra la información, límites y disponibilidad de los planes del sistema.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="getPlansList()">
+          <mat-icon class="mr-2">refresh</mat-icon>
+          Actualizar
+        </button>
+
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openCreateModal()">
+          <mat-icon class="mr-2">add</mat-icon>
+          Nuevo plan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <mat-card-content class="border-t border-border">
+
+    <!-- ===================================================== -->
+    <!-- FILTROS -->
+    <!-- ===================================================== -->
+    <div class="rounded-2xl border border-border bg-white p-5 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+        <!-- BUSCAR -->
+        <mat-form-field appearance="outline" class="w-full lg:col-span-2">
+          <mat-label>Buscar plan</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Nombre, código o descripción"
+            (keyup)="applyFilter($event)">
+        </mat-form-field>
+
+        <!-- ESTADO -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select
+            [value]="selectedStatus"
+            (selectionChange)="filterStatus($event.value)">
+            <mat-option value="all">Todos</mat-option>
+            <mat-option value="active">Activos</mat-option>
+            <mat-option value="inactive">Inactivos</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLA (SIN COLUMNA ÍNDICE/N°) -->
+    <!-- ===================================================== -->
+    <div class="overflow-x-auto rounded-2xl border border-border">
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        matSort
+        class="w-full">
+
+        <!-- PLAN / NOMBRE -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Plan </th>
+          <td mat-cell *matCellDef="let plan">
+            <div class="flex items-center gap-3 py-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                <mat-icon>layers</mat-icon>
+              </div>
+              <div>
+                <p class="font-semibold text-sm m-0 text-slate-800">
+                  {{ plan.name }}
+                </p>
+                <p *ngIf="plan.description" class="text-xs text-muted mt-1 m-0 max-w-xs truncate">
+                  {{ plan.description }}
+                </p>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- CÓDIGO -->
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+          <td mat-cell *matCellDef="let plan">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200">
+              {{ plan.code }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- PRECIO -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio </th>
+          <td mat-cell *matCellDef="let plan">
+            <p class="font-bold text-slate-800 m-0">
+              S/ {{ plan.price | number:'1.2-2' }}
+            </p>
+          </td>
+        </ng-container>
+
+        <!-- DURACIÓN -->
+        <ng-container matColumnDef="duration">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Duración </th>
+          <td mat-cell *matCellDef="let plan">
+            <span class="text-sm font-medium text-slate-700">
+              {{ plan.duration_days }} días
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- ESTADO -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let plan">
+            <span
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
+              [ngClass]="{
+                'bg-green-100 text-green-700': isPlanActive(plan),
+                'bg-slate-100 text-slate-600': !isPlanActive(plan)
+              }">
+              <span class="w-2 h-2 rounded-full bg-current"></span>
+              {{ isPlanActive(plan) ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+        </ng-container>
+
+<!-- ACCIONES / OPCIONES -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="text-right"> Opciones </th>
+          <td mat-cell *matCellDef="let plan" class="text-right">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="planMenu"
+              matTooltip="Más opciones">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #planMenu="matMenu">
+              <!-- VER DETALLE -->
+              <button mat-menu-item (click)="viewPlan(plan)">
+                <mat-icon>visibility</mat-icon>
+                <span>Ver detalle</span>
+              </button>
+
+              <!-- EDITAR -->
+              <button mat-menu-item (click)="editPlan(plan)">
+                <mat-icon>edit</mat-icon>
+                <span>Editar plan</span>
+              </button>
+
+              <!-- ACTIVAR / DESACTIVAR -->
+              <button mat-menu-item (click)="togglePlanStatus(plan)">
+                <mat-icon [ngClass]="isPlanActive(plan) ? 'text-red-600' : 'text-green-600'">
+                  {{ isPlanActive(plan) ? 'block' : 'check_circle' }}
+                </mat-icon>
+                <span [ngClass]="isPlanActive(plan) ? 'text-red-600' : 'text-green-600'">
+                  {{ isPlanActive(plan) ? 'Desactivar plan' : 'Activar plan' }}
+                </span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-slate-50 transition"></tr>
+
+        <!-- SIN RESULTADOS -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell text-center py-10" [attr.colspan]="displayedColumns.length">
+            <div class="flex flex-col items-center justify-center">
+              <mat-icon class="!text-5xl text-slate-300 mb-3">layers</mat-icon>
+              <p class="font-semibold text-slate-600 m-0">No se encontraron planes</p>
+              <p class="text-sm text-muted mt-1 m-0">Prueba ajustando los filtros o registra un nuevo plan.</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- PAGINADOR -->
+    <div class="mt-2">
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+  </mat-card-content>
+</mat-card>
+
+<!-- ========================================================= -->
+<!-- MODAL CREAR / EDITAR PLAN -->
+<!-- ========================================================= -->
+<ng-template #planDialog>
+  <div class="flex items-center justify-between p-4 border-b border-border">
+    <h2 mat-dialog-title class="text-xl font-bold m-0 flex items-center gap-2">
+      <mat-icon class="text-indigo-600">layers</mat-icon>
+      {{ isEdit ? 'Editar plan' : 'Crear nuevo plan' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="pt-4 pb-2">
+    <form [formGroup]="planForm" class="flex flex-col gap-4">
+      <div class="grid grid-cols-12 gap-4">
+
+        <!-- NOMBRE -->
+        <div class="col-span-12 md:col-span-6">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Nombre del Plan</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput formControlName="name" placeholder="Ej: Tesis Plan de Negocio" />
+            <mat-error *ngIf="planForm.get('name')?.hasError('required')">El nombre es obligatorio.</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- CÓDIGO -->
+        <div class="col-span-12 md:col-span-6">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Código</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput formControlName="code" placeholder="Ej: TESIS_NEGOCIO" />
+            <mat-error *ngIf="planForm.get('code')?.hasError('required')">El código es obligatorio.</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- PRECIO -->
+        <div class="col-span-12 md:col-span-6">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Precio (S/)</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput type="number" min="0" formControlName="price" />
+            <mat-error *ngIf="planForm.get('price')?.hasError('required')">El precio es obligatorio.</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- DURACIÓN DÍAS -->
+        <div class="col-span-12 md:col-span-6">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Duración (Días)</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput type="number" min="1" formControlName="duration_days" />
+            <mat-icon matSuffix>calendar_month</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- LÍMITES -->
+        <div class="col-span-12 md:col-span-4">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Capítulos Max</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput type="number" min="0" formControlName="max_sections" />
+          </mat-form-field>
+        </div>
+
+        <div class="col-span-12 md:col-span-4">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Mensajes IA Max</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput type="number" min="0" formControlName="max_messages" />
+          </mat-form-field>
+        </div>
+
+        <div class="col-span-12 md:col-span-4">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Exportaciones Max</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput type="number" min="0" formControlName="max_exports" />
+          </mat-form-field>
+        </div>
+
+        <!-- ESTADO -->
+        <div class="col-span-12">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Estado</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-select formControlName="is_active">
+              <mat-option [value]="1">Activo</mat-option>
+              <mat-option [value]="0">Inactivo</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div class="col-span-12">
+          <label class="text-sm font-semibold block mb-2 text-slate-700">Descripción</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <textarea matInput rows="2" formControlName="description" placeholder="Descripción del plan..."></textarea>
+          </mat-form-field>
+        </div>
+
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="p-4 border-t border-border">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="savePlan()"
+      [disabled]="saving || planForm.invalid">
+      <mat-icon class="mr-1">save</mat-icon>
+      {{ isEdit ? 'Actualizar' : 'Guardar plan' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>
+
+<!-- ========================================================= -->
+<!-- MODAL DETALLE DE PLAN -->
+<!-- ========================================================= -->
+<ng-template #detailDialog let-dialogRef="dialogRef">
+  <div class="p-6 max-w-lg w-full">
+    <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 m-0">
+        <mat-icon class="text-indigo-600">layers</mat-icon>
+        Detalle del Plan
+      </h2>
+      <button mat-icon-button (click)="dialogRef.close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div *ngIf="selectedPlan" class="py-4 space-y-4 text-sm">
+      <!-- NOMBRE Y CÓDIGO -->
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            {{ selectedPlan.code }}
+          </span>
+          <span
+            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+            [ngClass]="{
+              'bg-green-100 text-green-700': isPlanActive(selectedPlan),
+              'bg-slate-100 text-slate-600': !isPlanActive(selectedPlan)
+            }">
+            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+            {{ isPlanActive(selectedPlan) ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+        <p class="font-bold text-slate-800 text-base mt-2 m-0">{{ selectedPlan.name }}</p>
+        <p class="text-slate-600 text-xs mt-1 m-0">{{ selectedPlan.description || 'Sin descripción' }}</p>
+      </div>
+
+      <!-- PRECIO Y DURACIÓN -->
+      <div class="grid grid-cols-2 gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+        <div>
+          <p class="text-xs font-semibold text-slate-500 m-0">Precio</p>
+          <p class="font-bold text-slate-800 text-base mt-1 m-0">S/ {{ selectedPlan.price | number:'1.2-2' }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 m-0">Duración</p>
+          <p class="font-medium text-slate-800 text-base mt-1 m-0">{{ selectedPlan.duration_days }} días</p>
+        </div>
+      </div>
+
+      <!-- LÍMITES -->
+      <div>
+        <p class="text-xs uppercase font-semibold text-slate-500 mb-2">Límites del Plan</p>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="p-2 rounded-lg border border-slate-200 bg-white">
+            <p class="text-xs text-slate-500 m-0">Capítulos</p>
+            <p class="font-bold text-slate-800 text-sm mt-1 m-0">{{ selectedPlan.max_sections || 0 }}</p>
+          </div>
+          <div class="p-2 rounded-lg border border-slate-200 bg-white">
+            <p class="text-xs text-slate-500 m-0">Mensajes IA</p>
+            <p class="font-bold text-slate-800 text-sm mt-1 m-0">{{ selectedPlan.max_messages || 0 }}</p>
+          </div>
+          <div class="p-2 rounded-lg border border-slate-200 bg-white">
+            <p class="text-xs text-slate-500 m-0">Exportaciones</p>
+            <p class="font-bold text-slate-800 text-sm mt-1 m-0">{{ selectedPlan.max_exports || 0 }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end border-t border-gray-200 pt-4">
+      <button mat-flat-button color="primary" (click)="dialogRef.close()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</ng-template>

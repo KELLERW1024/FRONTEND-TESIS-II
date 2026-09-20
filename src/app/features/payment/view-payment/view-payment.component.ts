@@ -89,6 +89,9 @@ export class ViewPaymentComponent {
   @ViewChild(MatSort)
   sort!: MatSort;
 
+  @ViewChild('detailDialog') detailDialog!: TemplateRef<any>;
+  selectedConversation: any = null;
+
 
   // =====================================================
   // COLUMNAS
@@ -326,7 +329,7 @@ export class ViewPaymentComponent {
 
           matchesStatus =
             subscriptionStatus ===
-              this.selectedStatus ||
+            this.selectedStatus ||
             paymentStatus;
 
         }
@@ -457,7 +460,6 @@ export class ViewPaymentComponent {
 
   }
 
-
   // =====================================================
   // OBTENER PAGOS
   // =====================================================
@@ -526,7 +528,6 @@ export class ViewPaymentComponent {
 
   }
 
-
   // =====================================================
   // ACTUALIZAR
   // =====================================================
@@ -538,46 +539,78 @@ export class ViewPaymentComponent {
   }
 
   // Ver detalle del pago
-verDetalle(conversation: ConversationsPaymentsResponse): void {
-  console.log('Ver detalle:', conversation);
-}
+  verDetalle(conversation: ConversationsPaymentsResponse): void {
+    this.selectedConversation = conversation;
 
-
-// Ver comprobante
-verComprobante(conversation: ConversationsPaymentsResponse): void {
-  console.log('Ver comprobante:', conversation);
-
-  const payment: any = (conversation as any).payments?.[0];
-
-  const voucherPath =
-    payment?.voucher_path ||
-    (conversation as any).voucher_path;
-
-  if (voucherPath) {
-    window.open(voucherPath, '_blank');
-  } else {
-    console.warn('El pago no tiene comprobante.');
+    this.dialog.open(this.detailDialog, {
+      width: '500px',
+      disableClose: false,
+      autoFocus: false
+    });
   }
-}
+
+  // Ver comprobante
+  @ViewChild('voucherDialog') voucherDialog!: TemplateRef<any>;
+  selectedVoucherUrl: string | null = null;
+
+  verComprobante(conversation: ConversationsPaymentsResponse): void {
+    const data = conversation as any;
+    const lastPayment = data.payments?.[data.payments?.length - 1];
+
+    this.selectedVoucherUrl = data.voucher_url || lastPayment?.voucher_url || null;
+
+    console.log('URL Comprobante:', this.selectedVoucherUrl);
+
+    this.dialog.open(this.voucherDialog, {
+      width: '450px',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
 
 
-// Validar pago
-validarPago(conversation: ConversationsPaymentsResponse): void {
-  console.log('Validar pago:', conversation);
+  // Validar pago
+  validarPago(conversation: ConversationsPaymentsResponse): void {
+    const data = conversation as any;
+    const paymentsList = data.payments || [];
+    const lastPayment = paymentsList[paymentsList.length - 1];
+    const paymentId = lastPayment?.id;
 
-  // Aquí posteriormente conectarás el endpoint
-  // para cambiar el estado del pago a "completed"
-  // y activar la suscripción.
-}
+    if (!paymentId) {
+      console.warn('No se encontró el ID del pago para validar');
+      return;
+    }
 
+    this.paymentService.approvePayment(paymentId).subscribe({
+      next: () => {
+        this.refreshPayments();
+      },
+      error: (err: any) => {
+        console.error('Error al validar el pago:', err);
+      }
+    });
+  }
 
-// Rechazar pago
-rechazarPago(conversation: ConversationsPaymentsResponse): void {
-  console.log('Rechazar pago:', conversation);
+  // Rechazar pago
+  rechazarPago(conversation: ConversationsPaymentsResponse): void {
+    const data = conversation as any;
+    const paymentsList = data.payments || [];
+    const lastPayment = paymentsList[paymentsList.length - 1];
+    const paymentId = lastPayment?.id;
 
-  // Aquí posteriormente conectarás el endpoint
-  // para cambiar el estado del pago a "failed".
-}
+    if (!paymentId) {
+      console.warn('No se encontró el ID del pago para rechazar');
+      return;
+    }
 
+    this.paymentService.rejectPayment(paymentId).subscribe({
+      next: () => {
+        this.refreshPayments();
+      },
+      error: (err: any) => {
+        console.error('Error al rechazar el pago:', err);
+      }
+    });
+  }
 
 }

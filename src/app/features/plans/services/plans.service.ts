@@ -28,22 +28,20 @@ export class PlanService {
     }
 
     getPackagePlans( idPackage: number ){
-  
-        console.log("TOKEN get progres: " + this.authService.token )
-        let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
-        return this.http.get( URL_SERVICIOS + "/getpackageplans"     ,
-            {   headers,
-                params: { idPackage: idPackage } 
-            });
-
+    console.log("TOKEN get progres: " + this.authService.token )
+    let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+    return this.http.get( URL_SERVICIOS + "/getpackageplans",
+      {   headers,
+          params: { idPackage: idPackage } 
+      });
     }
 
     createPayment(paymentData: any): Observable<PaymentResponse> {
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
         return this.http.post<PaymentResponse>(
-            URL_SERVICIOS + `/payment`,
-            paymentData,
-            {headers}
+        URL_SERVICIOS + `/payment`,
+        paymentData,
+        {headers}
         );
     }
 
@@ -53,4 +51,24 @@ export class PlanService {
         return this.http.post(URL,data,{headers: headers});
     }
 
+
+    getPlans(): Observable<any> {
+        let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+        return this.http.get(this.url, { headers });
+    }
+
+    createPlan(data: any): Observable<any> {
+        let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+        return this.http.post(this.url, data, { headers });
+    }
+
+    updatePlan(id: number, data: any): Observable<any> {
+        let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+        return this.http.patch(`${this.url}/${id}`, data, { headers });
+    }
+
+    updatePlanStatus(id: number): Observable<any> {
+        let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
+        return this.http.patch(`${this.url}/${id}/status`, {}, { headers });
+    }
 }

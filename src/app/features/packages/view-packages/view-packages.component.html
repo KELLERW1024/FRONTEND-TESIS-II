@@ -515,31 +515,7 @@
 
               <!-- VER -->
 
-              <button
-                mat-icon-button
-                matTooltip="Ver detalle"
-                (click)="viewPackage(pkg)">
-
-                <mat-icon>
-                  visibility
-                </mat-icon>
-
-              </button>
-
-
-              <!-- EDITAR -->
-
-              <button
-                mat-icon-button
-                color="primary"
-                matTooltip="Editar paquete"
-                (click)="editPackage(pkg)">
-
-                <mat-icon>
-                  edit
-                </mat-icon>
-
-              </button>
+              
 
 
               <!-- MÁS -->
@@ -716,7 +692,6 @@
 
         </ng-container>
 
-
         <!-- ================================================= -->
         <!-- HEADER -->
         <!-- ================================================= -->
@@ -793,303 +768,514 @@
 </mat-card>
 
 
-<!-- ========================================================= -->
-<!-- FORMULARIO CREAR / EDITAR -->
-<!-- ========================================================= -->
+    <!-- ========================================================= -->
+    <!-- MODAL CREAR / EDITAR -->
+    <!-- ========================================================= -->
 
-<div
-  *ngIf="editingPackage || packageForm.dirty"
-  class="mt-6">
+    <ng-template #packageDialog let-dialogRef="dialogRef">
 
-  <mat-card class="cardWithShadow theme-card">
+      <div class="p-6 max-w-2xl w-full">
 
-    <div class="p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-200">
 
-      <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 m-0">
+              <mat-icon class="text-indigo-600">
+                inventory_2
+              </mat-icon>
+              {{ dialogTitle }}
+            </h2>
 
-        <div>
+            <p class="text-xs text-slate-500 mt-1">
+              Configura la información comercial del paquete.
+            </p>
+          </div>
 
-          <mat-card-title>
-            {{ dialogTitle }}
-          </mat-card-title>
-
-          <p class="text-sm text-muted mt-1">
-            Configura la información comercial del paquete.
-          </p>
-
-        </div>
-
-        <div
-          class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
-
-          <mat-icon>
-            inventory_2
-          </mat-icon>
+          <button mat-icon-button (click)="cancelForm()">
+            <mat-icon>close</mat-icon>
+          </button>
 
         </div>
+
+        <form
+          [formGroup]="packageForm"
+          (ngSubmit)="savePackage()"
+          class="pt-2">
+
+
+          <!-- ================================================= -->
+          <!-- INFORMACIÓN -->
+          <!-- ================================================= -->
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto pt-3.5 px-1">
+
+
+            <!-- NOMBRE -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full">
+
+              <mat-label>
+                Nombre del paquete
+              </mat-label>
+
+              <input
+                matInput
+                formControlName="name"
+                placeholder="Ej. Profesional Duo">
+
+              <mat-error
+                *ngIf="packageForm.get('name')?.hasError('required')">
+
+                El nombre es obligatorio.
+
+              </mat-error>
+
+            </mat-form-field>
+
+
+            <!-- DURACIÓN -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full">
+
+              <mat-label>
+                Duración en meses
+              </mat-label>
+
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="duration_months">
+
+              <mat-icon matSuffix>
+                calendar_month
+              </mat-icon>
+
+            </mat-form-field>
+
+
+            <!-- PRECIO LOCAL -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full">
+
+              <mat-label>
+                Precio Perú
+              </mat-label>
+
+              <input
+                matInput
+                type="number"
+                min="0"
+                formControlName="local_price">
+
+            </mat-form-field>
+
+
+            <!-- PRECIO INTERNACIONAL -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full">
+
+              <mat-label>
+                Precio internacional
+              </mat-label>
+
+              <input
+                matInput
+                type="number"
+                min="0"
+                formControlName="international_price">
+
+            </mat-form-field>
+
+
+            <!-- PRECIO UNITARIO -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full">
+
+              <mat-label>
+                Precio por proyecto
+              </mat-label>
+
+              <input
+                matInput
+                type="number"
+                min="0"
+                formControlName="unit_price">
+
+            </mat-form-field>
+
+
+            <!-- PROYECTOS -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full">
+
+              <mat-label>
+                Número de proyectos
+              </mat-label>
+
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="num_plans">
+
+              <mat-icon matSuffix>
+                folder_copy
+              </mat-icon>
+
+            </mat-form-field>
+
+
+            <!-- ESTADO -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full lg:col-span-2">
+
+              <mat-label>
+                Estado
+              </mat-label>
+
+              <mat-select formControlName="is_active">
+
+                <mat-option [value]="1">
+                  Activo
+                </mat-option>
+
+                <mat-option [value]="0">
+                  Inactivo
+                </mat-option>
+
+              </mat-select>
+
+            </mat-form-field>
+
+
+            <!-- DESCRIPCIÓN -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full lg:col-span-2">
+
+              <mat-label>
+                Descripción
+              </mat-label>
+
+              <textarea
+                matInput
+                rows="3"
+                formControlName="description"
+                placeholder="Describe el paquete...">
+              </textarea>
+
+            </mat-form-field>
+
+
+            <!-- BENEFICIOS -->
+
+            <mat-form-field
+              appearance="outline"
+              class="w-full lg:col-span-2">
+
+              <mat-label>
+                Beneficios
+              </mat-label>
+
+              <textarea
+                matInput
+                rows="4"
+                formControlName="benefits"
+                placeholder="Ej. Acceso completo a proyectos de tesis...">
+              </textarea>
+
+            </mat-form-field>
+
+          </div>
+
+
+          <!-- ================================================= -->
+          <!-- ACCIONES -->
+          <!-- ================================================= -->
+
+          <div
+            class="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+
+            <button
+              type="button"
+              mat-stroked-button
+              color="basic"
+              (click)="cancelForm()">
+
+              Cancelar
+
+            </button>
+
+            <button
+              type="submit"
+              mat-flat-button
+              color="primary"
+              [disabled]="saving || packageForm.invalid">
+
+              <mat-icon class="mr-2">
+                save
+              </mat-icon>
+
+              {{ editingPackage ? 'Guardar cambios' : 'Crear paquete' }}
+
+            </button>
+
+          </div>
+
+        </form>
 
       </div>
 
+    </ng-template>
+
+  <!-- ========================================================= -->
+  <!-- MODAL DE CREACIÓN / EDICIÓN -->
+  <!-- ========================================================= -->
+  <ng-template #packageDialog>
+    <div class="flex items-center justify-between p-4 border-b border-border">
+      <h2 mat-dialog-title class="text-xl font-bold m-0 flex items-center gap-2">
+        <mat-icon class="text-indigo-600">inventory_2</mat-icon>
+        {{ isEdit ? 'Editar paquete' : 'Crear nuevo paquete' }}
+      </h2>
+      <button mat-icon-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
-
-
-    <mat-card-content class="border-t border-border">
-
-      <form
-        [formGroup]="packageForm"
-        (ngSubmit)="savePackage()">
-
-
-        <!-- ================================================= -->
-        <!-- INFORMACIÓN -->
-        <!-- ================================================= -->
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
+    <mat-dialog-content>
+      <form [formGroup]="packageForm" class="pt-4 pb-2">
+        <div class="grid grid-cols-12 gap-x-4 gap-y-2">
 
           <!-- NOMBRE -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full">
-
-            <mat-label>
-              Nombre del paquete
-            </mat-label>
-
-            <input
-              matInput
-              formControlName="name"
-              placeholder="Ej. Profesional Duo">
-
-            <mat-error
-              *ngIf="packageForm.get('name')?.hasError('required')">
-
-              El nombre es obligatorio.
-
-            </mat-error>
-
-          </mat-form-field>
-
+          <div class="col-span-12">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nombre del paquete</mat-label>
+              <input matInput formControlName="name" placeholder="Ej: Profesional Duo" />
+              <mat-error *ngIf="packageForm.get('name')?.hasError('required')">
+                El nombre es obligatorio.
+              </mat-error>
+            </mat-form-field>
+          </div>
 
           <!-- DURACIÓN -->
+          <div class="col-span-12 md:col-span-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Duración en meses</mat-label>
+              <input matInput type="number" min="1" formControlName="duration_months" />
+              <mat-icon matSuffix>calendar_month</mat-icon>
+            </mat-form-field>
+          </div>
 
-          <mat-form-field
-            appearance="outline"
-            class="w-full">
+          <!-- NÚMERO DE PROYECTOS -->
+          <div class="col-span-12 md:col-span-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Número de proyectos</mat-label>
+              <input matInput type="number" min="1" formControlName="num_plans" />
+              <mat-icon matSuffix>folder_copy</mat-icon>
+            </mat-form-field>
+          </div>
 
-            <mat-label>
-              Duración en meses
-            </mat-label>
-
-            <input
-              matInput
-              type="number"
-              min="1"
-              formControlName="duration_months">
-
-            <mat-icon matSuffix>
-              calendar_month
-            </mat-icon>
-
-          </mat-form-field>
-
-
-          <!-- PRECIO LOCAL -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full">
-
-            <mat-label>
-              Precio Perú
-            </mat-label>
-
-            <span matPrefix class="mr-2">
-              S/
-            </span>
-
-            <input
-              matInput
-              type="number"
-              min="0"
-              formControlName="local_price">
-
-          </mat-form-field>
-
+          <!-- PRECIO PERÚ -->
+          <div class="col-span-12 md:col-span-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Precio Perú</mat-label>
+              <input matInput type="number" min="0" formControlName="local_price" />
+            </mat-form-field>
+          </div>
 
           <!-- PRECIO INTERNACIONAL -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full">
-
-            <mat-label>
-              Precio internacional
-            </mat-label>
-
-            <span matPrefix class="mr-2">
-              $
-            </span>
-
-            <input
-              matInput
-              type="number"
-              min="0"
-              formControlName="international_price">
-
-          </mat-form-field>
-
+          <div class="col-span-12 md:col-span-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Precio internacional</mat-label>
+              <input matInput type="number" min="0" formControlName="international_price" />
+            </mat-form-field>
+          </div>
 
           <!-- PRECIO UNITARIO -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full">
-
-            <mat-label>
-              Precio por proyecto
-            </mat-label>
-
-            <span matPrefix class="mr-2">
-              S/
-            </span>
-
-            <input
-              matInput
-              type="number"
-              min="0"
-              formControlName="unit_price">
-
-          </mat-form-field>
-
-
-          <!-- PROYECTOS -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full">
-
-            <mat-label>
-              Número de proyectos
-            </mat-label>
-
-            <input
-              matInput
-              type="number"
-              min="1"
-              formControlName="num_plans">
-
-            <mat-icon matSuffix>
-              folder_copy
-            </mat-icon>
-
-          </mat-form-field>
-
+          <div class="col-span-12 md:col-span-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Precio por proyecto</mat-label>
+              <input matInput type="number" min="0" formControlName="unit_price" />
+            </mat-form-field>
+          </div>
 
           <!-- ESTADO -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full lg:col-span-2">
-
-            <mat-label>
-              Estado
-            </mat-label>
-
-            <mat-select formControlName="is_active">
-
-              <mat-option [value]="1">
-                Activo
-              </mat-option>
-
-              <mat-option [value]="0">
-                Inactivo
-              </mat-option>
-
-            </mat-select>
-
-          </mat-form-field>
-
+          <div class="col-span-12 md:col-span-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Estado</mat-label>
+              <mat-select formControlName="is_active">
+                <mat-option [value]="1">Activo</mat-option>
+                <mat-option [value]="0">Inactivo</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
 
           <!-- DESCRIPCIÓN -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full lg:col-span-2">
-
-            <mat-label>
-              Descripción
-            </mat-label>
-
-            <textarea
-              matInput
-              rows="3"
-              formControlName="description"
-              placeholder="Describe el paquete...">
-            </textarea>
-
-          </mat-form-field>
-
+          <div class="col-span-12">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Descripción</mat-label>
+              <textarea matInput rows="2" formControlName="description" placeholder="Describe brevemente el paquete..."></textarea>
+            </mat-form-field>
+          </div>
 
           <!-- BENEFICIOS -->
-
-          <mat-form-field
-            appearance="outline"
-            class="w-full lg:col-span-2">
-
-            <mat-label>
-              Beneficios
-            </mat-label>
-
-            <textarea
-              matInput
-              rows="4"
-              formControlName="benefits"
-              placeholder="Ej. Acceso completo a proyectos de tesis...">
-            </textarea>
-
-          </mat-form-field>
+          <div class="col-span-12">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Beneficios</mat-label>
+              <textarea matInput rows="3" formControlName="benefits" placeholder="Ej: Acceso completo a proyectos..."></textarea>
+            </mat-form-field>
+          </div>
 
         </div>
-
-
-        <!-- ================================================= -->
-        <!-- ACCIONES -->
-        <!-- ================================================= -->
-
-        <div
-          class="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-5 border-t border-border">
-
-          <button
-            type="button"
-            mat-stroked-button
-            color="basic">
-
-            Cancelar
-
-          </button>
-
-          <button
-            type="submit"
-            mat-flat-button
-            color="primary"
-            [disabled]="saving || packageForm.invalid">
-
-            <mat-icon class="mr-2">
-              save
-            </mat-icon>
-
-            {{ editingPackage ? 'Guardar cambios' : 'Crear paquete' }}
-
-          </button>
-
-        </div>
-
       </form>
+    </mat-dialog-content>
 
-    </mat-card-content>
+    <mat-dialog-actions align="end" class="p-4 border-t border-border">
+      <button mat-button mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="savePackage()"
+        [disabled]="saving || packageForm.invalid">
+        <mat-icon class="mr-1">save</mat-icon>
+        {{ isEdit ? 'Actualizar' : 'Guardar paquete' }}
+      </button>
+    </mat-dialog-actions>
+  </ng-template>
 
-  </mat-card>
+  <!-- ========================================================= -->
+  <!-- MODAL DETALLE DE PAQUETE -->
+  <!-- ========================================================= -->
+  <ng-template #detailDialog let-dialogRef="dialogRef">
+    <div class="p-6 max-w-lg w-full">
+      <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 m-0">
+          <mat-icon class="text-indigo-600">inventory_2</mat-icon>
+          Detalle del Paquete
+        </h2>
+        <button mat-icon-button (click)="dialogRef.close()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-</div>
+      <div *ngIf="selectedPackage" class="py-4 space-y-4 text-sm">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <p class="text-xs uppercase font-semibold text-slate-500 mb-1">Nombre</p>
+          <p class="font-bold text-slate-800 text-base">{{ selectedPackage.name }}</p>
+          <p class="text-slate-600 text-xs mt-1">{{ selectedPackage.description || 'Sin descripción' }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs font-semibold text-slate-500">Duración</p>
+            <p class="font-medium text-slate-800 mt-1">{{ getDurationLabel(selectedPackage.duration_months) }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500">Proyectos / Planes</p>
+            <p class="font-medium text-slate-800 mt-1">{{ selectedPackage.num_plans }} proyecto(s)</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <div>
+            <p class="text-xs font-semibold text-slate-500">Precio Local</p>
+            <p class="font-bold text-slate-800 mt-1">{{ formatPrice(selectedPackage.local_price, 'PEN') }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500">Internacional</p>
+            <p class="font-bold text-slate-800 mt-1">{{ formatPrice(selectedPackage.international_price, 'USD') }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500">Unitario</p>
+            <p class="font-bold text-indigo-600 mt-1">{{ formatPrice(selectedPackage.unit_price, 'PEN') }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="selectedPackage.benefits" class="border-t border-slate-200 pt-3">
+          <p class="text-xs uppercase font-semibold text-slate-500 mb-1">Beneficios</p>
+          <p class="text-xs text-slate-700 whitespace-pre-line">{{ selectedPackage.benefits }}</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end border-t border-gray-200 pt-4">
+        <button mat-flat-button color="primary" (click)="dialogRef.close()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ========================================================= -->
+  <!-- MODAL GESTIONAR PLANES DE UN PAQUETE -->
+  <!-- ========================================================= -->
+  <ng-template #plansDialog let-dialogRef="dialogRef">
+    <div class="flex items-center justify-between p-4 border-b border-border">
+      <div>
+        <h2 mat-dialog-title class="text-xl font-bold m-0 flex items-center gap-2">
+          <mat-icon class="text-indigo-600">account_tree</mat-icon>
+          Gestionar Planes
+        </h2>
+        <p class="text-xs text-muted mt-1" *ngIf="managingPackage">
+          Selecciona los planes incluidos en: <b>{{ managingPackage.name }}</b>
+        </p>
+      </div>
+      <button mat-icon-button (click)="dialogRef.close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content class="pt-4 max-h-[60vh] overflow-y-auto">
+      <div class="space-y-2">
+        <div 
+          *ngFor="let plan of allPlans" 
+          class="flex items-start gap-3 p-3 rounded-xl border border-border hover:bg-slate-50 transition cursor-pointer"
+          (click)="togglePlanSelection(plan.id)">
+          <mat-checkbox 
+            [checked]="isPlanSelected(plan.id)" 
+            (change)="togglePlanSelection(plan.id)"
+            (click)="$event.stopPropagation()"
+            color="primary">
+          </mat-checkbox>
+          <div class="flex-1">
+            <p class="text-sm font-semibold text-slate-800 m-0 leading-tight">
+              {{ plan.name }}
+            </p>
+            <p class="text-xs text-muted mt-1 m-0 line-clamp-1" *ngIf="plan.description">
+              {{ plan.description }}
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="allPlans.length === 0" class="text-center py-8 text-muted text-sm">
+          No hay planes registrados en el sistema.
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="p-4 border-t border-border">
+      <button mat-button (click)="dialogRef.close()">Cancelar</button>
+      <button 
+        mat-flat-button 
+        color="primary" 
+        (click)="savePackagePlans()" 
+        [disabled]="savingPlans">
+        <mat-icon class="mr-1">save</mat-icon>
+        Guardar asignación
+      </button>
+    </mat-dialog-actions>
+  </ng-template>

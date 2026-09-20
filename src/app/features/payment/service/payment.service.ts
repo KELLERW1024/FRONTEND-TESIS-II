@@ -51,14 +51,25 @@ export class PaymentService {
   }
 
   getPayments(){
-
     let URL = this.url + "/getpayments";
     console.log("TOKEN get progres: " + this.authService.token )
     let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
     return this.http.get<ConversationsPaymentsResponse>( URL  ,
       {   headers
       });
-
   }
-  
+
+  approvePayment(paymentId: number) {
+  let URL = this.url + `/${paymentId}/approve`;
+  let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+
+  return this.http.post(URL, {}, { headers });
+  }
+
+  rejectPayment(paymentId: number) {
+    let URL = this.url + `/${paymentId}/reject`;
+    let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+
+    return this.http.post(URL, {}, { headers });
+  }
 }
