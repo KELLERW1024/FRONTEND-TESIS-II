@@ -95,7 +95,6 @@ export class ViewPackagesComponent implements OnInit {
     managingPackage: Package | null = null;
     savingPlans: boolean = false;
 
-
   // =========================================================
   // FORMULARIO
   // =========================================================
@@ -105,7 +104,6 @@ export class ViewPackagesComponent implements OnInit {
   editingPackage: Package | null = null;
 
   dialogTitle = 'Crear paquete';
-
 
   // =========================================================
   // FILTROS
@@ -119,7 +117,6 @@ export class ViewPackagesComponent implements OnInit {
 
   typeFilter = 'all';
 
-
   // =========================================================
   // ESTADÍSTICAS
   // =========================================================
@@ -131,7 +128,6 @@ export class ViewPackagesComponent implements OnInit {
   inactivePackages = 0;
 
   totalProjects = 0;
-
 
   // =========================================================
   // ESTADOS
@@ -222,7 +218,9 @@ export class ViewPackagesComponent implements OnInit {
   loadAllPlans(): void {
   this.service.getPlans().subscribe({
     next: (resp: any) => {
-      this.allPlans = resp.data || resp || [];
+      const rawPlans = resp.data || resp || [];
+      // Solo los planes activos
+      this.allPlans = rawPlans.filter((plan: any) => Number(plan.is_active) === 1);
     },
     error: (err: any) => console.error('Error al cargar planes:', err)
   });
@@ -681,41 +679,6 @@ export class ViewPackagesComponent implements OnInit {
         console.error('Error al desactivar el paquete:', err);
       }
     });
-  }
-
-  // =========================================================
-  // DUPLICAR
-  // =========================================================
-
-  duplicatePackage(pkg: Package): void {
-
-    const duplicated: Package = {
-
-      ...pkg,
-
-      id: Date.now(),
-
-      name: `${pkg.name} - Copia`,
-
-      is_active: 0,
-
-      created_at: new Date().toISOString(),
-
-      updated_at: new Date().toISOString()
-
-    };
-
-    this.packages = [
-      ...this.packages,
-      duplicated
-    ];
-
-    this.dataSource.data = this.packages;
-
-    this.updateStatistics();
-
-    this.applyFilters();
-
   }
 
   // =========================================================

@@ -76,9 +76,11 @@ export class PriceComponent {
 
   getPackages(){
     this.service.getPackages( ).subscribe ({
-      next: (resp: any) => {
-      this.packages = resp.data;
-      console.log("PAckages => {} ",  this.packages )
+      next: (resp: any) => {  
+        const rawList = resp.data || [];
+        // Filtro: solo paquetes activos
+        this.packages = rawList.filter((pkg: Package) => Number(pkg.is_active) === 1); 
+        console.log("PAckages => {} ",  this.packages )
      
       },
       error: (err: any) => {

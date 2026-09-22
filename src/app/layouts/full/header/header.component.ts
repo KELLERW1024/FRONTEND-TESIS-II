@@ -16,6 +16,7 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 interface notifications {
   id: number;
@@ -58,7 +59,9 @@ export class HeaderComponent {
     private settings: CoreService,
     private vsidenav: CoreService,
     public dialog: MatDialog,
-    private translate: TranslateService, private router: Router
+    private translate: TranslateService, 
+    private router: Router,
+    private authService: AuthService
   ) {
     translate.setDefaultLang('en');
   }
@@ -133,4 +136,19 @@ export class HeaderComponent {
       link: '/',
     },
   ];
+
+  irAPerfil(): void {
+    this.router.navigate(['/profile']);
+  }
+  
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/authentication/login']);
+      },
+      error: () => {
+        this.router.navigate(['/authentication/login']);
+      }
+    });
+  }
 }

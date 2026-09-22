@@ -66,21 +66,17 @@
     <img src="/assets/images/profile/user-1.jpg" class="rounded-full object-cover size-9! profile-dd" />
   </button>
   <mat-menu #profilemenu="matMenu" class="cardWithShadow">
-    <button mat-menu-item>
-      <mat-icon class="flex items-center"><i data-icon="solar:shield-user-line-duotone"
-          class="iconify size-5.5!"></i></mat-icon>My Profile
-    </button>
-    <button mat-menu-item>
-      <mat-icon class="flex items-center"><i data-icon="solar:user-id-line-duotone"
-          class="iconify size-5.5!"></i></mat-icon>My Account
-    </button>
-    <button mat-menu-item>
-      <mat-icon class="flex items-center"><i data-icon="solar:checklist-minimalistic-line-duotone"
-          class="iconify size-5.5!"></i> </mat-icon>My Task
+    <button mat-menu-item (click)="irAPerfil()">
+      <mat-icon class="flex items-center">
+        <i data-icon="solar:shield-user-line-duotone" class="iconify size-5.5!"></i>
+      </mat-icon>Mi Perfil
     </button>
 
-    <div class="px-3 mt-3">
-      <a [routerLink]="['/authentication/login']" mat-stroked-button class="w-full">Logout</a>
-    </div>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon class="flex items-center">
+        <i data-icon="solar:logout-2-line-duotone" class="iconify size-5.5!"></i>
+      </mat-icon>Cerrar sesión
+    </button>
+
   </mat-menu>
 </mat-toolbar>

@@ -39,9 +39,12 @@ export class DashboardService {
 
   }
 
-  getPackages(){
-
+  getPackages(activeOnly: boolean = false){
       let URL = URL_SERVICIOS + "/packages";
+        if(activeOnly){
+          URL = URL + "?active_only=true";
+        }
+
       console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<PackageResponse>( URL  ,

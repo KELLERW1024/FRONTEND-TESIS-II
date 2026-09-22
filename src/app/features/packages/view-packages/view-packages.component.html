@@ -574,7 +574,6 @@
 
               </button>
 
-
               <!-- PLANES -->
 
               <button
@@ -590,66 +589,6 @@
                 </span>
 
               </button>
-
-
-              <mat-divider>
-              </mat-divider>
-
-
-              <!-- SUSCRIPCIONES -->
-
-              <button
-                mat-menu-item
-                (click)="viewSubscriptions(pkg)">
-
-                <mat-icon>
-                  people
-                </mat-icon>
-
-                <span>
-                  Ver suscripciones
-                </span>
-
-              </button>
-
-
-              <!-- PAGOS -->
-
-              <button
-                mat-menu-item
-                (click)="viewPayments(pkg)">
-
-                <mat-icon>
-                  payments
-                </mat-icon>
-
-                <span>
-                  Ver pagos
-                </span>
-
-              </button>
-
-
-              <mat-divider>
-              </mat-divider>
-
-
-              <!-- DUPLICAR -->
-
-              <button
-                mat-menu-item
-                (click)="duplicatePackage(pkg)">
-
-                <mat-icon>
-                  content_copy
-                </mat-icon>
-
-                <span>
-                  Duplicar paquete
-                </span>
-
-              </button>
-
 
               <!-- ACTIVAR -->
 
@@ -667,7 +606,6 @@
                 </span>
 
               </button>
-
 
               <!-- DESACTIVAR -->
 
@@ -701,7 +639,6 @@
           *matHeaderRowDef="displayedColumns">
         </tr>
 
-
         <!-- ================================================= -->
         <!-- ROW -->
         <!-- ================================================= -->
@@ -711,7 +648,6 @@
           *matRowDef="let row; columns: displayedColumns;"
           class="hover:bg-slate-50 transition">
         </tr>
-
 
         <!-- ================================================= -->
         <!-- SIN RESULTADOS -->
@@ -749,7 +685,6 @@
 
     </div>
 
-
     <!-- ===================================================== -->
     <!-- PAGINADOR -->
     <!-- ===================================================== -->
@@ -766,7 +701,6 @@
   </mat-card-content>
 
 </mat-card>
-
 
     <!-- ========================================================= -->
     <!-- MODAL CREAR / EDITAR -->
@@ -802,18 +736,17 @@
           (ngSubmit)="savePackage()"
           class="pt-2">
 
-
           <!-- ================================================= -->
           <!-- INFORMACIÓN -->
           <!-- ================================================= -->
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto pt-3.5 px-1">
 
-
             <!-- NOMBRE -->
 
             <mat-form-field
               appearance="outline"
+              floatLabel="always"
               class="w-full">
 
               <mat-label>
@@ -825,15 +758,7 @@
                 formControlName="name"
                 placeholder="Ej. Profesional Duo">
 
-              <mat-error
-                *ngIf="packageForm.get('name')?.hasError('required')">
-
-                El nombre es obligatorio.
-
-              </mat-error>
-
             </mat-form-field>
-
 
             <!-- DURACIÓN -->
 
@@ -857,7 +782,6 @@
 
             </mat-form-field>
 
-
             <!-- PRECIO LOCAL -->
 
             <mat-form-field
@@ -875,7 +799,6 @@
                 formControlName="local_price">
 
             </mat-form-field>
-
 
             <!-- PRECIO INTERNACIONAL -->
 
@@ -895,7 +818,6 @@
 
             </mat-form-field>
 
-
             <!-- PRECIO UNITARIO -->
 
             <mat-form-field
@@ -913,7 +835,6 @@
                 formControlName="unit_price">
 
             </mat-form-field>
-
 
             <!-- PROYECTOS -->
 
@@ -936,7 +857,6 @@
               </mat-icon>
 
             </mat-form-field>
-
 
             <!-- ESTADO -->
 
@@ -962,7 +882,6 @@
 
             </mat-form-field>
 
-
             <!-- DESCRIPCIÓN -->
 
             <mat-form-field
@@ -981,7 +900,6 @@
               </textarea>
 
             </mat-form-field>
-
 
             <!-- BENEFICIOS -->
 
@@ -1003,7 +921,6 @@
             </mat-form-field>
 
           </div>
-
 
           <!-- ================================================= -->
           <!-- ACCIONES -->
@@ -1066,9 +983,6 @@
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Nombre del paquete</mat-label>
               <input matInput formControlName="name" placeholder="Ej: Profesional Duo" />
-              <mat-error *ngIf="packageForm.get('name')?.hasError('required')">
-                El nombre es obligatorio.
-              </mat-error>
             </mat-form-field>
           </div>
 

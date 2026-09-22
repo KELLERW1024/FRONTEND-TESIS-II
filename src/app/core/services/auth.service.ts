@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { URL_SERVICIOS } from 'src/app/config/config';
-import { BehaviorSubject, catchError, map, of, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, of, throwError, Observable } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +13,6 @@ export class AuthService {
   url = URL_SERVICIOS;
   private loggedIn = new BehaviorSubject<boolean>(false);
   isLoggedIn$ = this.loggedIn.asObservable();
-
-  
 
   private emailRecovery: string = '';
 
@@ -153,7 +153,7 @@ export class AuthService {
     }
   }
 
-  logout() {
+  clearSession() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('authenticated');
@@ -161,4 +161,33 @@ export class AuthService {
     this.loggedIn.next(false);
   }
 
+  logout(): Observable<any> {
+    return this.http.post(`${this.url}/auth/logout`, {}).pipe(
+      finalize(() => {
+        this.clearSession();
+      }),
+      catchError((error) => {
+        console.error('Error al revocar token en backend:', error);
+        return of(null);
+      })
+    );
+  }
+
+  getProfile() {
+    const token = this.token; 
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get(`${this.url}/profile`, { headers });
+  }
+
+  updateProfile(data: any) {
+    const token = this.token;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post(`${this.url}/profile`, data, { headers });
+  }
 }
