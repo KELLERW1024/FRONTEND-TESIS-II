@@ -1,171 +1,241 @@
-  <div class="bg-light-secondary rounded-sm py-2 px-6 mb-4 overflow-hidden ng-star-inserted">
-    <div class="grid grid-cols-12">
-      <div class="col-span-12 sm:col-span-8">
-        <h4 class="page-title text-xl font-semibold"> Conversaciones <small> -> Lista </small> </h4>
-        <div class="flex items-center overflow-hidden">
-          <ul class="breadcrumb">
-           
-          </ul>
-        </div>
+
+<mat-card class="cardWithShadow theme-card">
+
+  <!-- ======================================================= -->
+  <!-- HEADER -->
+  <!-- ======================================================= -->
+  <div class="p-6">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <mat-card-title class="mb-1">
+          Conversaciones
+        </mat-card-title>
+        <p class="text-sm text-muted">
+          Monitorea los proyectos, planes asignados y estado de interacciones con la IA.
+        </p>
       </div>
-      <div class="col-span-12 sm:col-span-4 text-right rtl:text-left relative hidden sm:block">
-        <div class="breadcrumb-icon absolute -top-6.5 right-0  rtl:left-0 rtl:right-auto"><img
-            src="/assets/images/backgrounds/customer-support-img.png" alt="breadcrumb"
-            class=" w-full object-contain">
-        </div>
-      </div>
+
     </div>
   </div>
 
-<mat-card class="cardWithShadow theme-card">
-  <!-- <div class="p-6">
-    <mat-card-title class="mb-0">Interacciones IA</mat-card-title>
-  </div> -->
-
+  <!-- ======================================================= -->
+  <!-- CONTENIDO -->
+  <!-- ======================================================= -->
   <mat-card-content class="border-t border-border">
-    <div class="relative overflow-auto">
-      <table mat-table [dataSource]="dataSource1" class="min-w-full">
-        <!-- Position Column -->
+
+    <!-- ===================================================== -->
+    <!-- FILTROS -->
+    <!-- ===================================================== -->
+    <div class="rounded-2xl border border-border bg-white p-5 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+        <!-- BUSCADOR -->
+        <mat-form-field appearance="outline" class="w-full lg:col-span-2">
+          <mat-label>Buscar conversación</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Tema, paquete o plan"
+            (keyup)="applyFilter($event)">
+        </mat-form-field>
+
+        <!-- FILTRO ESTADO (ACTIVO / INACTIVO) -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select
+            [value]="statusFilter"
+            (selectionChange)="filterByStatus($event.value)">
+            <mat-option value="all">Todos</mat-option>
+            <mat-option value="active">Activo</mat-option>
+            <mat-option value="inactive">Inactivo</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- FILTRO STATUS PAGO -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado de pago</mat-label>
+          <mat-select
+            [value]="paymentStatusFilter"
+            (selectionChange)="filterByPaymentStatus($event.value)">
+            <mat-option value="all">Todos</mat-option>
+            <mat-option value="completed">Completado</mat-option>
+            <mat-option value="failed">Rechazado</mat-option>
+            <mat-option value="pending">Pendiente</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLA -->
+    <!-- ===================================================== -->
+    <div class="overflow-x-auto rounded-2xl border border-border">
+      <table
+        mat-table
+        [dataSource]="dataSource1"
+        class="w-full">
+
+        <!-- PAQUETE -->
         <ng-container matColumnDef="paquete">
-          <th mat-header-cell *matHeaderCellDef class="font-semibold text-base">
-            Paquete
-          </th>
-          <td mat-cell *matCellDef="let element" class="pl-0! whitespace-nowrap">
-            <div class="flex items-center gap-4">
-              <span class="text-sm">
-                {{ element.package_name }}
+          <th mat-header-cell *matHeaderCellDef> Paquete </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="flex items-center gap-3 py-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                <mat-icon>inventory_2</mat-icon>
+              </div>
+              <span class="font-semibold text-sm text-slate-800">
+                {{ element.package_name || 'Sin paquete' }}
               </span>
             </div>
           </td>
         </ng-container>
+
+        <!-- PLAN -->
         <ng-container matColumnDef="plan">
-          <th mat-header-cell *matHeaderCellDef class="font-semibold text-base">
-            Plan
-          </th>
-          <td mat-cell *matCellDef="let element" class="pl-0! whitespace-nowrap">
-            <div class="flex items-center gap-4">
-              <span class="text-sm font-semibold">
-                {{ element.plan_name }}
-              </span>
-            </div>
+          <th mat-header-cell *matHeaderCellDef> Plan </th>
+          <td mat-cell *matCellDef="let element">
+            <span class="font-medium text-sm text-slate-700">
+              {{ element.plan_name || 'Sin plan' }}
+            </span>
           </td>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- TEMA -->
         <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef class="font-semibold text-base ">
-            Tema 
-          </th>
-          <td mat-cell *matCellDef="let element" class="whitespace-nowrap">
-              <span class="text-dark text-sm">
-                {{ element.title }}
-              </span>
-
-
+          <th mat-header-cell *matHeaderCellDef> Tema </th>
+          <td mat-cell *matCellDef="let element">
+            <p class="font-medium text-sm text-slate-800 m-0">
+              {{ element.title }}
+            </p>
           </td>
         </ng-container>
 
-        <!-- Weight Column -->
+        <!-- STATUS CONVERSACIÓN -->
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef class="text-base font-semibold">
-            Status
-          </th>
-          <td mat-cell *matCellDef="let element" class="text-center! whitespace-nowrap">
-
-            @if(element.status == 'active') {
-
-            <span class="bg-light-success text-success rounded font-semibold p-6 py-1 text-xs">
-              Activo
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let element">
+            <span
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
+              [ngClass]="{
+                'bg-green-100 text-green-700': element.package_is_active,
+                'bg-slate-100 text-slate-600': !element.package_is_active
+              }">
+              <span class="w-2 h-2 rounded-full bg-current"></span>
+              {{ element.package_is_active ? 'Activo' : 'Inactivo' }}
             </span>
-
-            }
-
-            @if(element.status == 'completed') {
-
-            <span class="bg-light-primary text-primary rounded font-semibold p-6 py-1 text-xs">
-              Completado
-            </span>
-
-            }
-
-            @if(element.status == 'archived') {
-
-            <span class="bg-light-warning text-warning rounded font-semibold p-6 py-1 text-xs">
-              Archivado
-            </span>
-
-            }
-
           </td>
         </ng-container>
 
-         <!-- Name Column -->
+        <!-- STATUS PAGO -->
         <ng-container matColumnDef="paymentstatus">
-          <th mat-header-cell *matHeaderCellDef class="font-semibold text-base ">
-            Status pago
-          </th>
-          <td mat-cell *matCellDef="let element" class="whitespace-nowrap">
-              <span class="text-dark text-sm">
-                {{ element.payment_status }}
-              </span>
+          <th mat-header-cell *matHeaderCellDef> Estado de pago </th>
+          <td mat-cell *matCellDef="let element">
+            <span
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold"
+              [ngClass]="{
+                'bg-emerald-50 text-emerald-700 border border-emerald-200': element.payment_status === 'completed' || element.payment_status === 'paid',
+                'bg-rose-50 text-rose-700 border border-rose-200': element.payment_status === 'failed',
+                'bg-amber-50 text-amber-700 border border-amber-200': element.payment_status === 'pending'
+              }">
+              
+              <ng-container [ngSwitch]="element.payment_status">
+                <span *ngSwitchCase="'completed'">Completado</span>
+                <span *ngSwitchCase="'paid'">Completado</span>
+                <span *ngSwitchCase="'failed'">Rechazado</span>
+                <span *ngSwitchCase="'pending'">Pendiente</span>
+                <span *ngSwitchDefault>{{ element.payment_status }}</span>
+              </ng-container>
 
-
+            </span>
           </td>
         </ng-container>
 
-        <!-- Symbol Column -->
+        <!--OPCIONES -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="font-semibold text-sm"></th>
-          <td mat-cell *matCellDef="let element" class="text-end! whitespace-nowrap">
-            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+          <th mat-header-cell *matHeaderCellDef class="text-right"> Opciones </th>
+          <td mat-cell *matCellDef="let element" class="text-right">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              [disabled]="!isPaymentApproved(element)"
+              matTooltip="Más opciones">
               <mat-icon>more_vert</mat-icon>
             </button>
+
             <mat-menu #menu="matMenu">
               <button mat-menu-item [routerLink]="['/conversations/view', element.id]">
-                <mat-icon>add</mat-icon>
-                <span>Ver</span>
+                <mat-icon>visibility</mat-icon>
+                <span>Ver conversación</span>
               </button>
+
               <button mat-menu-item (click)="openEditNameConversation(element)">
                 <mat-icon>edit</mat-icon>
-                <span>Editar nombre plan</span>
+                <span>Editar nombre</span>
               </button>
-              <button mat-menu-item (click)="editConversation(element.id)" >
-                <mat-icon><span class="material-symbols-outlined">
-                    edit_square
-                  </span></mat-icon>
-                <span> Continuar trabajando en el plan</span>
+
+              <button mat-menu-item (click)="editConversation(element.id)">
+                <mat-icon>edit_note</mat-icon>
+                <span>Continuar trabajando</span>
               </button>
-              <!-- <button mat-menu-item>
-                <mat-icon>delete</mat-icon>
-                <span>Eliminar</span>
-              </button> -->
             </mat-menu>
+
           </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns1"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns1" class="hover:bg-slate-50 transition"></tr>
+
+        <!-- SIN RESULTADOS -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell text-center py-10" [attr.colspan]="displayedColumns1.length">
+            <div class="flex flex-col items-center justify-center">
+              <mat-icon class="!text-5xl text-slate-300 mb-3">forum</mat-icon>
+              <p class="font-semibold text-slate-600 m-0">No se encontraron conversaciones</p>
+              <p class="text-sm text-muted mt-1 m-0">Prueba ajustando el filtro de búsqueda o el estado.</p>
+            </div>
+          </td>
+        </tr>
+
       </table>
     </div>
+
+    <!-- PAGINADOR -->
+    <div class="mt-2">
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
   </mat-card-content>
 </mat-card>
 
+<!-- ========================================================= -->
+<!-- MODAL EDITAR NOMBRE -->
+<!-- ========================================================= -->
 <ng-template #editDialog>
-  <h2 mat-dialog-title>Editar nombre</h2>
+  <div class="flex items-center justify-between p-4 border-b border-border">
+    <h2 mat-dialog-title class="text-xl font-bold m-0 flex items-center gap-2">
+      <mat-icon class="text-indigo-600">edit</mat-icon>
+      Editar nombre
+    </h2>
+    <button mat-icon-button (click)="dialog.closeAll()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-  <mat-dialog-content>
-    <mat-form-field class="w-100">
-      <mat-label>Nombre</mat-label>
-      <input matInput [(ngModel)]="newTitle" placeholder="Nombre de la conversación">
+  <mat-dialog-content class="pt-4 pb-2">
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Nombre de la conversación</mat-label>
+      <input matInput [(ngModel)]="newTitle" placeholder="Ej: Tesis de Grado">
     </mat-form-field>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-button (click)="dialog.closeAll()">
-      Cancelar
-    </button>
-
+  <mat-dialog-actions align="end" class="p-4 border-t border-border">
+    <button mat-button (click)="dialog.closeAll()">Cancelar</button>
     <button mat-flat-button color="primary" (click)="updateNameConversation()">
+      <mat-icon class="mr-1">save</mat-icon>
       Guardar
     </button>
   </mat-dialog-actions>

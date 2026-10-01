@@ -50,7 +50,7 @@ export class UsersComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['id', 'user', 'email', 'role', 'status', 'created_at', 'acciones'];
+  displayedColumns: string[] = ['user', 'email', 'role', 'status', 'created_at', 'acciones'];
   dataSource = new MatTableDataSource<User>([]);
   allUsers: User[] = []; 
   
@@ -94,10 +94,9 @@ export class UsersComponent implements OnInit {
     this.dataSource.filterPredicate = (data: User, filter: string) => {
       const fullName = `${data.name || ''} ${data.last_name || ''}`.toLowerCase();
       const email = (data.email || '').toLowerCase();
-      const id = data.id ? data.id.toString() : '';
       const search = filter.trim().toLowerCase();
 
-      return fullName.includes(search) || email.includes(search) || id.includes(search);
+      return fullName.includes(search) || email.includes(search);
     };
   }
 

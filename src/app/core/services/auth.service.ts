@@ -162,7 +162,13 @@ export class AuthService {
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${this.url}/auth/logout`, {}).pipe(
+
+    const token = this.token;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post(`${this.url}/auth/logout`, {}, { headers }).pipe(
       finalize(() => {
         this.clearSession();
       }),
@@ -190,4 +196,18 @@ export class AuthService {
 
     return this.http.post(`${this.url}/profile`, data, { headers });
   }
+
+  sendResetCode(email: string) {
+  return this.http.post<any>(`${this.url}/auth/forgot-password-code`, { email });
+  }
+
+  verifyResetCode(email: string, code: string) {
+    return this.http.post<any>(`${this.url}/auth/verify-code`, { email, code });
+  }
+
+  resetPasswordWithCode(data: { email: string; code: string; password: string }) {
+    return this.http.post<any>(`${this.url}/auth/reset-password-code`, data);
+  }
+
+  
 }

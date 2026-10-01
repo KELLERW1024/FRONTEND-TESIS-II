@@ -24,7 +24,8 @@ import { NodeDialogComponent } from '../dialogs/node-dialog/node-dialog.componen
 import { MoveNodeDialogComponent } from '../dialogs/move-node-dialog/move-node-dialog.component';
 import { EditNodeDialogComponent } from '../dialogs/edit-node-dialog/edit-node-dialog.component';
 import { DeleteNodeDialogComponent } from '../dialogs/delete-node-dialog/delete-node-dialog.component';
-
+import { DialogComponent } from 'src/app/components/dialog/dialog.component';
+import { LoaderComponent } from 'src/app/components/loader/loader.component';
 
 @Component({
   selector: 'app-structure',
@@ -42,7 +43,8 @@ import { DeleteNodeDialogComponent } from '../dialogs/delete-node-dialog/delete-
     FormsModule,
     MatExpansionModule,
     TablerIconsModule,
-    MatDividerModule
+    MatDividerModule,
+    LoaderComponent
   ],
   templateUrl: './structure.component.html',
   styleUrl: './structure.component.scss',
@@ -50,12 +52,28 @@ import { DeleteNodeDialogComponent } from '../dialogs/delete-node-dialog/delete-
 export class StructureComponent implements OnInit {
 
   idSuscriptionConversation!: number;
-
-
   plan!: Plan;
-
-
   planNode: PlanNode[] = [];
+  
+  isStructureLocked: boolean = false;
+
+  isLoading: boolean = false;
+
+  showDialog(
+    type: 'success' | 'error' | 'info',
+    message: string,
+    title = 'Aviso'
+  ) {
+    this.dialog.open(DialogComponent, {
+      width: '400px',
+      data: {
+        type,
+        title,
+        message,
+        confirmText: 'Aceptar'
+      }
+    });
+  }
 
   // sections: Section[] = [];
 
@@ -71,9 +89,7 @@ export class StructureComponent implements OnInit {
 
 
   ngOnInit(): void {
-
     this.route.params.subscribe(params => {
-
       this.idSuscriptionConversation = Number(params['id']);
 
       console.log(
@@ -81,10 +97,9 @@ export class StructureComponent implements OnInit {
         this.idSuscriptionConversation
       );
 
+      // Se ejecuta aquí para garantizar que this.idSuscriptionConversation ya tiene el ID
       this.obtenerDataConversation();
-
     });
-
   }
 
   /**
@@ -131,6 +146,10 @@ export class StructureComponent implements OnInit {
             resp
           );
 
+          // Si el endpoint devuelve el objeto del plan asignado
+          if (resp.plan) {
+            this.plan = resp.plan;
+          }
           /**
            * La API devuelve los nodos.
            *
@@ -142,6 +161,8 @@ export class StructureComponent implements OnInit {
            *
            * PlanNode[] con children
            */
+
+          this.isStructureLocked = Number(resp.status_structure) === 1;
           this.planNode = this.buildTree(resp.data);
 
           console.log(
@@ -773,15 +794,29 @@ editNode(node: PlanNode): void {
 }
 
 
-  closeStructura(){
+  closeStructura(): void{
 
+    this.isLoading = true;
+    
     this.structureService.closeStructura(this.idSuscriptionConversation)
       .subscribe({
-
         next: (resp: any) => {
-          console.log(  'Conversation => ',  resp  );
-
+          console.log('Respuesta closeStructura => ', resp);
+          this.isLoading = false;
+          if (resp.success) {
+            this.router.navigate(['/conversations/edit', this.idSuscriptionConversation]);
+          } else {
+            console.warn('No se pudo cerrar la estructura:', resp.message);
+          }
         },
+        error: (err: any) => {
+          this.isLoading = false;
+          console.error('Error en closeStructura:', err);
+        }
+      });
+  }
+
+        /*},
         error: (err: any) => {
           console.error(  'Error obteniendo estructura:', err );
 
@@ -790,7 +825,5 @@ editNode(node: PlanNode): void {
           console.log( 'Completado' );
         }
 
-      });
-  }
-
+      });*/
 }

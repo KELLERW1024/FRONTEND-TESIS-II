@@ -234,8 +234,7 @@
 
           <th
             mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header>
+            *matHeaderCellDef>
 
             Paquete
 
@@ -284,19 +283,9 @@
         <!-- ================================================= -->
 
         <ng-container matColumnDef="projects">
+          <th mat-header-cell *matHeaderCellDef> Proyectos </th>
 
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header>
-
-            Proyectos
-
-          </th>
-
-          <td
-            mat-cell
-            *matCellDef="let pkg">
+          <td mat-cell *matCellDef="let pkg">
 
             <div class="flex items-center gap-2">
 
@@ -323,8 +312,7 @@
 
           <th
             mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header>
+            *matHeaderCellDef>
 
             Duración
 
@@ -353,8 +341,7 @@
 
           <th
             mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header>
+            *matHeaderCellDef>
 
             Precio Perú
 
@@ -391,8 +378,7 @@
 
           <th
             mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header>
+            *matHeaderCellDef>
 
             Internacional
 
@@ -429,8 +415,7 @@
 
           <th
             mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header>
+            *matHeaderCellDef>
 
             Precio / proyecto
 

@@ -39,6 +39,9 @@ import { ConversationPlanResponse } from 'src/app/core/models/ConversationPlanRe
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConversationFormService } from '../service/conversation-form.service';
 
+import { AssistantModalComponent } from '../assistant-modal/assistant-modal.component';
+import { LoaderComponent } from 'src/app/components/loader/loader.component';
+
 
 @Component({
   selector: 'app-edit-conversation',
@@ -53,7 +56,9 @@ import { ConversationFormService } from '../service/conversation-form.service';
     RouterLink,
     ReactiveFormsModule,
     FormsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    AssistantModalComponent,
+    LoaderComponent
   ],
   templateUrl: './edit-conversation.component.html',
   styleUrl: './edit-conversation.component.scss',
@@ -88,6 +93,8 @@ export class EditConversationComponent {
   finalizado: boolean = false;
 
   questionsDiagnostic: any = [];
+
+  isStructureLocked: boolean = false;
 
 
   // ============================================================
@@ -189,16 +196,8 @@ export class EditConversationComponent {
     this.finalizado = false;
 
     this.route.params.subscribe(params => {
-
       this.idSuscriptionConversation = params['id'];
-
-      //this.addConversation();
-
     });
-
-    console.log(
-      "ONIT => " + this.idSuscriptionConversation
-    );
 
     this.obtenerDataConversation();
   }
@@ -209,6 +208,9 @@ export class EditConversationComponent {
   // ============================================================
 
   viewStructure() {
+    if (this.isStructureLocked) {
+      return;
+    }
 
     this.router.navigate([
       '/conversations/structure',
@@ -1007,7 +1009,7 @@ export class EditConversationComponent {
         },
 
         error: (err: any) => {
-
+          this.isLoading = false; 
           console.error(err);
 
           return this.showDialog(
@@ -1589,6 +1591,29 @@ descargarImagen(url: string): void {
       this.displayedTableColumns = [];
 
       this.dialog.closeAll();
+  }
+
+  // ABRIR MODAL 
+  abrirAsistenteIA(): void {
+    if (!this.dataCurrentQuestion?.question) return;
+
+    const dialogRef = this.dialog.open(AssistantModalComponent, {
+      width: '92vw',
+      maxWidth: '1300px',
+      height: '85vh',
+      disableClose: false,
+      data: {
+        idConversation: this.idSuscriptionConversation,
+        question: this.dataCurrentQuestion.question,
+        parentNode: this.dataCurrentQuestion.parent_node
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((resultText: string) => {
+      if (resultText && resultText.trim()) {
+        this.form.get('answer')?.setValue(resultText.trim());
+      }
+    });
   }
 
 

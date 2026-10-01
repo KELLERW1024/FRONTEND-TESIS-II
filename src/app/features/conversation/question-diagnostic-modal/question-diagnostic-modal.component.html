@@ -2,13 +2,18 @@
 
     <!-- HEADER -->
     <div class="p-6 flex justify-between items-center">
-
         <div class="text-lg font-medium">
             <strong>Diagnóstico inicial</strong>
         </div>
-
+        
     </div>
-
+    
+<div class="mt-4 flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-sm">
+        <mat-icon class="text-blue-600 scale-90 shrink-0">info</mat-icon>
+        <div class="leading-relaxed">
+            Este diagnóstico nos permite identificar el <strong>rubro y enfoque principal</strong> de tu negocio. Con base en tus respuestas, la IA estructurará y adaptará los capítulos de tu plan de forma precisa.
+        </div>
+    </div>
 
     <!-- CONTENT -->
     <mat-card-content class="border-t border-border pt-6">
@@ -35,7 +40,6 @@
 
                         </div>
 
-
                         <!-- DETALLE -->
                         <small
                             class="italic cursor-pointer ml-6 text-primary"
@@ -49,7 +53,7 @@
 
                     </div>
 
-
+                    
                     <!-- RESPUESTA -->
                     <div class="w-full">
 
@@ -83,6 +87,7 @@
                         mat-flat-button
                         class="bg-secondary text-white!"
                         type="button"
+                        [disabled]="isLoading"
                         (click)="guardarInformacion()">
 
                         Guardar información
@@ -152,3 +157,10 @@
     </div>
 
 </div>
+
+<!-- PANTALLA DE CARGA -->
+<app-loader 
+  [isLoading]="isLoading" 
+  title="Generando plan" 
+  description="Estamos procesando tus respuestas. Esto tomará unos segundos...">
+</app-loader>

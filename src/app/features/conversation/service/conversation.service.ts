@@ -116,6 +116,20 @@ export class ConversationService {
 
     }*/
 
+  assistantChat(payload: {
+    idConversation: number;
+    idQuestion: number;
+    messages: { role: string; content: string }[];
+    user_message?: string;
+  }): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + this.authService.token
+    });
+    return this.http.post(`${this.url}/assistant-chat`, payload, { headers });
+  }
+
+        
+
     getDocument(idConversation: number ){
 
       let URL = URL_SERVICIOS + "/download";

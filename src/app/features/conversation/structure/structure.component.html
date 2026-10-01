@@ -2,7 +2,7 @@
 <!-- BOTÓN REGRESAR -->
 <!-- ============================================ -->
 
-<div class="mb-5">
+<div class="mb-5" *ngIf="isStructureLocked">
 
     <button
         mat-stroked-button
@@ -49,10 +49,21 @@
             {{ plan?.name }}
         </h1>
 
+        <div *ngIf="!isStructureLocked" class="mt-2 flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm max-w-2xl">
+            <mat-icon class="text-amber-600 scale-90 shrink-0">info</mat-icon>
+            <div>
+                <strong class="font-semibold">Personalización inicial única:</strong>
+                <span class="text-amber-700 ml-1">
+                    Puedes ajustar los capítulos y secciones según tus requerimientos. Ten en cuenta que al hacer clic en <strong>Guardar estructura</strong>, esta quedará bloqueada y no podrá ser modificada nuevamente durante el desarrollo del plan.
+                </span>
+            </div>
+        </div>
+
     </div>
 
     <!-- BOTÓN -->
     <button
+        *ngIf="!isStructureLocked"
         mat-raised-button
         color="primary "
         class="structure-button"
@@ -160,6 +171,7 @@
 
 
             <button
+                *ngIf="!isStructureLocked"
                 mat-icon-button
                 [matMenuTriggerFor]="nodeMenu"
                 [matMenuTriggerData]="{ node: node }"
@@ -206,6 +218,7 @@
 
 
             <button
+                *ngIf="!isStructureLocked"
                 mat-icon-button
                 class="subchapter-menu-button"
                 [matMenuTriggerFor]="nodeMenu"
@@ -385,3 +398,10 @@
     </mat-card-content>
 
 </mat-card>
+
+<!-- PANTALLA DE CARGA -->
+<app-loader 
+  [isLoading]="isLoading" 
+  [title]="'Guardando estructura'" 
+  [description]="'Estamos preparando los capítulos y preguntas de tu plan, por favor espera...'">
+</app-loader>

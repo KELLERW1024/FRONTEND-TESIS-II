@@ -9,7 +9,7 @@
   <!-- Botones derecha -->
   <div class="flex items-center gap-2">
 
-    <button mat-flat-button  aria-label="Capítulos" (click)="viewStructure()">
+    <button mat-flat-button [disabled]="isStructureLocked" aria-label="Capítulos" (click)="viewStructure()">
       <mat-icon>menu</mat-icon>
        Estructura del plan
     </button>
@@ -98,6 +98,14 @@
                                                 (click)="verDetalle(dataCurrentQuestion?.question)">
                                                 <strong> Indicaciones</strong>
                                             </small>
+                                            
+                                            <!-- BOTÓN ASISTENTE IA -->
+                                           <!-- <button mat-stroked-button type="button" 
+                                                    class="border border-blue-500! text-blue-600! text-xs font-semibold py-0 h-7"
+                                                    (click)="abrirAsistenteIA()">
+                                                <mat-icon class="text-sm mr-1">auto_awesome</mat-icon>
+                                                💡 Ayúdame a responder
+                                            </button> -->
                                         </mat-label>
 
                                         <!-- <button type="button"
@@ -685,7 +693,7 @@
 
 </ng-template>
 
- <!-- Loading -->
+    <!-- 
     <div 
         *ngIf="isLoading"
         class="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
@@ -701,3 +709,10 @@
         </div>
 
     </div>
+    -->
+  
+    <app-loader 
+        [isLoading]="isLoading" 
+        title="Validando información" 
+        description="Nuestro asesor metodológico está analizando y estructurando tu respuesta. Esto tomará unos segundos...">
+    </app-loader>

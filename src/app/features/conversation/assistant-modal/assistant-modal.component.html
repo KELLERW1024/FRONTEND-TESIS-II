@@ -1,0 +1,100 @@
+<div class="flex flex-col h-[85vh] max-h-[85vh] bg-white rounded-xl overflow-hidden">
+  
+  <!-- CABECERA -->
+  <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/70">
+    <div class="flex items-center gap-3">
+      <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+        💡 Asistente de Redacción IA
+      </span>
+      <h3 class="font-semibold text-slate-800 text-base mb-0">
+        {{ data.parentNode?.titulo }}
+      </h3>
+    </div>
+    <button mat-icon-button mat-dialog-close class="text-slate-400 hover:text-slate-700">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- CONTEXTO DE LA PREGUNTA -->
+  <div class="bg-slate-100/70 px-6 py-2.5 border-b border-slate-200 text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
+    <div><strong>Pregunta:</strong> {{ data.question?.question_text }}</div>
+    <div *ngIf="data.parentNode?.objective">| <strong>Objetivo:</strong> {{ data.parentNode?.objective }}</div>
+  </div>
+
+  <!-- CUERPO -->
+  <div class="flex-1 grid grid-cols-12 overflow-hidden min-h-0">
+    
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="col-span-7 flex flex-col border-r border-slate-200 h-full overflow-hidden bg-slate-50/30">
+      
+      <!-- HISTORIAL MENSAJES -->
+      <div #chatScrollContainer class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div *ngFor="let msg of messages" class="flex gap-2.5" [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+          <div *ngIf="msg.role === 'assistant'" class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 text-sm">
+            🤖
+          </div>
+          <div [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm shadow-xs'"
+               class="max-w-[82%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line">
+            {{ msg.content }}
+          </div>
+        </div>
+
+        <div *ngIf="isLoading" class="flex items-center gap-2 text-slate-400 text-xs py-2">
+          <mat-spinner diameter="18"></mat-spinner>
+          <span>El asistente está analizando y redactando...</span>
+        </div>
+      </div>
+
+      <!-- INPUT DIÁLOGO -->
+      <div class="p-3 border-t border-slate-200 bg-white flex gap-2 items-center">
+        <input type="text"
+               [(ngModel)]="userInput"
+               (keyup.enter)="sendMessage()"
+               [disabled]="isLoading"
+               placeholder="Escribe tu respuesta o duda aquí..."
+               class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <button mat-flat-button color="primary" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="col-span-5 flex flex-col h-full overflow-hidden bg-white p-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <span class="font-medium text-slate-800 text-sm flex items-center gap-1.5">
+          📄 Propuesta Académica Generada
+        </span>
+        <span *ngIf="isComplete" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+          ● Listo para usar (100%)
+        </span>
+        <span *ngIf="!isComplete" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+          ● En construcción ({{ progressPercentage }}%)
+        </span>
+      </div>
+
+      <!-- TEXTAREA -->
+      <div class="flex-1 py-3 flex flex-col min-h-0">
+        <textarea [(ngModel)]="draftText"
+                  placeholder="La redacción formal de tu respuesta aparecerá aquí conforme interactúes con el asistente..."
+                  class="flex-1 w-full border border-slate-200 rounded-lg p-3 text-sm leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-blue-400 text-slate-700 bg-slate-50/20"></textarea>
+      </div>
+
+      <!-- MÉTRICAS RESUMIDAS -->
+      <div *ngIf="metricsSummary" class="bg-slate-100 text-slate-700 text-xs px-3 py-2 rounded-md mb-3 flex items-center gap-2">
+        <span class="font-bold">•</span> {{ metricsSummary }}
+      </div>
+
+      <!-- ACCIONES DERECHA -->
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+        <button mat-stroked-button (click)="recalculate()" [disabled]="isLoading" class="text-slate-600 text-xs">
+          <mat-icon class="text-sm">restart_alt</mat-icon> Reiniciar
+        </button>
+        <button mat-flat-button color="primary" (click)="useAnswer()" [disabled]="!draftText.trim()">
+          <mat-icon>check</mat-icon> Usar esta respuesta en mi plan
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

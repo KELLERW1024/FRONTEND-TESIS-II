@@ -15,6 +15,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MaterialModule } from 'src/app/material.module';
 import { DialogComponent } from 'src/app/components/dialog/dialog.component';
+import { LoaderComponent } from 'src/app/components/loader/loader.component';
+
 
 @Component({
   selector: 'app-question-diagnostic-modal',
@@ -25,6 +27,7 @@ import { DialogComponent } from 'src/app/components/dialog/dialog.component';
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
+    LoaderComponent,
     RouterLink, ReactiveFormsModule ,   FormsModule, MatProgressSpinnerModule],
   templateUrl: './question-diagnostic-modal.component.html',
   styleUrl: './question-diagnostic-modal.component.scss',
@@ -37,10 +40,12 @@ export class QuestionDiagnosticComponent {
   showModal = false;
   selectedQuestion: any = null;
 
+  isLoading: boolean = false;
+
   constructor(
     // private dialogRef: MatDialogRef<QuestionDiagnosticModalComponent>,
     // @Inject(MAT_DIALOG_DATA) public question: any
-      private sanitizer: DomSanitizer, 
+    private sanitizer: DomSanitizer, 
     private conversationService: ConversationService,
     private router: Router , 
     private route: ActivatedRoute, 
@@ -58,15 +63,13 @@ export class QuestionDiagnosticComponent {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.idConversation = params['id'];
-      //this.addConversation();
     });
     this.obtenerDataDiagnostic();
   }
+        
 
   obtenerDataDiagnostic(){
-
     console.log("Suscription => obtenerDataConversation "   )
-
     this.conversationService.getQuestionsDiagnostic( this.idConversation ).subscribe ({
       next: (resp: any) => {
 
@@ -119,41 +122,40 @@ export class QuestionDiagnosticComponent {
 
     console.log('DATA A ENVIAR:', data);
 
+    // Activar loader
+    this.isLoading = true;
+
     // Aquí posteriormente puedes llamar a tu servicio
     this.conversationService.saveAnswerDiagnostic( data ).subscribe ({
       next: (resp: any) => {
-
+          this.isLoading = false;
           console.log(" saveAnswerDiagnostic => " , resp )
            if ( resp.success ) {
-
-             
-
+        
                 setTimeout(() => {
-                  this.router.navigate(['/conversations/edit', this.idConversation ]);
-                }, 2000);
+                  this.router.navigate(['/conversations/structure', this.idConversation ]);
+                }, 1500);
 
                 return  this.showDialog(
                   'success',
                   'El diagnóstico fue guardado correctamente.',
                   'Éxito'
                 );;
-
             }
-
       },
       error: (error) => {
+
+        this.isLoading = false;
 
         console.error('Error al guardar diagnóstico:', error);
 
         this.showDialog(
           'error',
-          'Ocurrió un error al guardar el diagnóstico.',
+          'Ocurrió un error al guardar el diagnóstico. Por favor, intenta guardar nuevamente.',
           'Error'
         );
-
       }
     })
-
   }
 
   showDialog(
@@ -176,9 +178,9 @@ export class QuestionDiagnosticComponent {
     this.selectedQuestion = question;
     this.showModal = true;
   }
+  
 
   cerrarModal() {
     this.showModal = false;
   }
-
 }

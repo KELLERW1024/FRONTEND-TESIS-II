@@ -7,6 +7,7 @@ import { DeleteCapituloConversationComponent } from "./delete-capitulo-conversat
 import { StructureComponent } from "./structure/structure.component";
 import { DiagnosticComponent } from "../diagnostic/diagnostic.component";
 import { QuestionDiagnosticComponent } from "./question-diagnostic-modal/question-diagnostic.component";
+import { conversationStepGuard } from "src/app/guard/conversation-step.guard";
 
 export const ConversationRoutes: Routes = [
    {
@@ -22,6 +23,8 @@ export const ConversationRoutes: Routes = [
   {
    path: 'edit/:id',
    component: EditConversationComponent,
+   canActivate: [conversationStepGuard],
+   data: { step: 'edit' }
   },
   {
    path: 'edit-capitulo-conversation/:id',
@@ -34,11 +37,14 @@ export const ConversationRoutes: Routes = [
   {
    path: 'structure/:id',
    component: StructureComponent,
+   canActivate: [conversationStepGuard],
+   data: { step: 'structure' }
   },
   {
    path: 'question-diagnostic-type/:id',
    component: QuestionDiagnosticComponent,
+   canActivate: [conversationStepGuard],
+   data: { step: 'diagnostic' }
   }
-
-
+  
 ];
