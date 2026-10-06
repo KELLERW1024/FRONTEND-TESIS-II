@@ -22,7 +22,7 @@ export class ConversationService {
 
    obtienerDataPlan(idPlan : number ){
       // this.url 
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/obtenercapitulosplan" ,
         {   headers,
@@ -42,7 +42,7 @@ export class ConversationService {
     }
 
     getVerficationDiagnosticExist( idConversation : number ){
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/verficationdiagnosticexist" ,
         {   headers,
@@ -51,7 +51,7 @@ export class ConversationService {
     }
 
     getQuestionsDiagnostic( idConversation : number ){
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/diagnosticplan" ,
         {   headers,
@@ -107,7 +107,7 @@ export class ConversationService {
     /*getProgress(idConversation: number ){
 
       let URL = URL_SERVICIOS + "/conversation/conversationprogress";
-      console.log("TOKEN get progres: " + this.authService.token )
+      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<ProgressResponse>( URL  ,
         {   headers,
@@ -133,41 +133,41 @@ export class ConversationService {
     getDocument(idConversation: number ){
 
       let URL = URL_SERVICIOS + "/download";
-      console.log("TOKEN get progres: " + this.authService.token )
+      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( URL  ,
         {   headers,
             params: { idConversation: idConversation } ,
             responseType: 'blob'
         });
-
     }
 
     getSuscriptions(){
 
       let URL = URL_SERVICIOS + "/conversation/conversationsUser";
-      console.log("TOKEN get progres: " + this.authService.token )
+      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<ApiResponse>( URL  ,
         {   headers
         });
-
     }
 
-    getDataConversation(idConversation: number ){
+    getDataConversation(idConversation: number, triggerAi: boolean = false){
       // this.url 
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<ConversationPlanResponse>( this.url + "/conversationPlan" ,
         {   headers,
-            params: { idConversation: idConversation } 
-        });
-     
+            params: {
+               idConversation: idConversation,
+               trigger_ai: triggerAi ? 1 : 0 
+            }
+        }); 
     }
 
     getConversationPlanUser(idConversation: number ){
       // this.url 
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/conversationplanuser" ,
         {   headers,
@@ -178,7 +178,7 @@ export class ConversationService {
 
     getViewConversationPlanUser(idConversation: number ){
       // this.url 
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/viewconversationplanuser" ,
         {   headers,
@@ -204,9 +204,5 @@ export class ConversationService {
 
       return this.http.get(url, { headers });
      
-    }
-
-    
-
-  
+    }  
 }

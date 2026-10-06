@@ -23,7 +23,7 @@ export class AuthService {
   }
   /*getLocalStorage(){
     this.token = localStorage.getItem("token");
-    console.log("TOKEN getLocal: " + this.token)
+    //console.log("TOKEN getLocal: " + this.token)
     if(localStorage.getItem("token") && localStorage.getItem("user")){
       let USER = localStorage.getItem("user");
       //this.user = JSON.parse(USER ? USER : '');

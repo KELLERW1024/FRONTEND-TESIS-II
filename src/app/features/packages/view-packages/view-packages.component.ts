@@ -253,7 +253,7 @@ export class ViewPackagesComponent implements OnInit {
      this.service.getPackages( ).subscribe ({
       next: (resp: any) => {
       this.packages = resp.data;
-      console.log("PAckages => {} ",  this.packages )
+      //console.log("PAckages => {} ",  this.packages )
       this.dataSource.data= this.packages;
      
       },

@@ -59,6 +59,11 @@ export const navItems: NavItem[] = [
     iconName: 'solar:danger-circle-line-duotone',
     route: '/documents',
   },
+  {
+    displayName: 'Elige tu plan',
+    iconName: 'solar:danger-circle-line-duotone',
+    route: '/documents',
+  },
    {
     displayName: 'Ver uso IA',
     iconName: 'solar:login-2-linear',
@@ -77,7 +82,7 @@ export const navItems: NavItem[] = [
     ]
   },
 //===================================
-  {
+ /* {
     navCap: 'Ui Components',
   },
   {
@@ -1118,6 +1123,6 @@ export const navItems: NavItem[] = [
     chip: true,
     chipClass: 'bg-light-secondary text-secondary',
     chipContent: 'Pro',
-  },
+  },*/
 
 ];

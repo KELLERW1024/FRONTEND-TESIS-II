@@ -87,28 +87,29 @@
                             <div class="grid grid-cols-8 gap-x-4 text-sm">
 
                                 <div class="col-span-8 ">
-                                   <div class="flex justify-between items-center">
+                                    <div class="flex justify-between items-center gap-4 mb-2">
 
-                                        <mat-label class="font-semibold mb-2 block">
-                                             {{ dataCurrentQuestion?.question?.question_text }} = >
-
+                                        <div class="font-semibold text-sm">
+                                            <span>{{ dataCurrentQuestion?.question?.question_text }}</span>
+                                            <span class="mx-1 text-gray-400">=></span>
                                             <small 
-                                                class=" italic cursor-pointer" 
+                                                class="italic cursor-pointer text-blue-600 hover:underline" 
                                                 title="Ver detalle"
                                                 (click)="verDetalle(dataCurrentQuestion?.question)">
-                                                <strong> Indicaciones</strong>
+                                                <strong>Indicaciones</strong>
                                             </small>
-                                            
-                                            <!-- BOTÓN ASISTENTE IA -->
-                                           <!-- <button mat-stroked-button type="button" 
-                                                    class="border border-blue-500! text-blue-600! text-xs font-semibold py-0 h-7"
-                                                    (click)="abrirAsistenteIA()">
-                                                <mat-icon class="text-sm mr-1">auto_awesome</mat-icon>
-                                                💡 Ayúdame a responder
-                                            </button> -->
-                                        </mat-label>
+                                        </div>
 
-                                        <!-- <button type="button"
+                                        <!-- LADO DERECHO: Acciones auxiliares -->
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <button mat-stroked-button type="button" 
+                                                class="border border-blue-500! text-blue-600! text-xs font-semibold py-0 h-8"
+                                                (click)="abrirAsistenteIA()">
+                                                
+                                                💡 Ayúdame a responder
+                                            </button>
+
+                                         <!-- <button type="button"
                                             class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
                                             title="Adjuntar archivo" (click)="fileInput.click()">
 
@@ -121,12 +122,12 @@
                                                 <path fill="currentColor"
                                                     d="M12 11a.75.75 0 0 1 .75.75V13H14a.75.75 0 0 1 0 1.5h-1.25v1.25a.75.75 0 0 1-1.5 0V14.5H10a.75.75 0 0 1 0-1.5h1.25v-1.25A.75.75 0 0 1 12 11" />
                                             </svg>
-                                        </button> -->
+                                         </button> -->
                                         
 
-                                        <!-- <input type="file" #fileInput multiple style="display: none"
+                                         <!-- <input type="file" #fileInput multiple style="display: none"
                                             (change)="onFileSelected($event)" />
-                                        <div *ngIf="selectedFiles.length > 0" class="mt-1">
+                                         <div *ngIf="selectedFiles.length > 0" class="mt-1">
                                             <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se
                                                     permite max. una imagen y un documento)</small> </p>
 
@@ -142,14 +143,17 @@
                                                     </button>
                                                 </li>
                                             </ul>
-                                        </div> -->
+                                         </div> -->
 
 
-                                        <button mat-stroked-button type="button" class="border border-secondary! text-secondary" (click)="mostrarSeccion()">
-                                            Agregar archivo como respuesta => {{ mostrarDiv ? 'Ocultar' : 'Mostrar' }}
-                                        </button>
-
+                                            <button mat-stroked-button type="button" 
+                                            class="border border-secondary! text-secondary text-xs h-8" 
+                                            (click)="mostrarSeccion()">
+                                             Agregar archivo como respuesta => {{ mostrarDiv ? 'Ocultar' : 'Mostrar' }}
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <mat-label class="font-semibold mb-2 block">
 
                                             <div [hidden]="!mostrarDiv"
@@ -217,7 +221,7 @@
                                     <!-- </p> -->
                                     <!-- <p>
                                     <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
-                                </p> -->
+                                    </p> -->
                                 </div>
 
                             </div>
@@ -714,5 +718,5 @@
     <app-loader 
         [isLoading]="isLoading" 
         title="Validando información" 
-        description="Nuestro asesor metodológico está analizando y estructurando tu respuesta. Esto tomará unos segundos...">
+        description="Analizando y estructurando tu respuesta. Esto tomará unos segundos...">
     </app-loader>

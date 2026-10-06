@@ -92,10 +92,10 @@ export class StructureComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.idSuscriptionConversation = Number(params['id']);
 
-      console.log(
-        'ONINIT => idSuscriptionConversation:',
-        this.idSuscriptionConversation
-      );
+      //console.log(
+        //'ONINIT => idSuscriptionConversation:',
+        //this.idSuscriptionConversation
+      //);
 
       // Se ejecuta aquí para garantizar que this.idSuscriptionConversation ya tiene el ID
       this.obtenerDataConversation();
@@ -131,9 +131,9 @@ export class StructureComponent implements OnInit {
    */
   obtenerDataConversation(): void {
 
-    console.log(
-      'Suscription => obtenerDataConversation'
-    );
+    //console.log(
+      //'Suscription => obtenerDataConversation'
+    //);
 
     this.conversationService
       .getConversationPlanUser(this.idSuscriptionConversation)
@@ -165,10 +165,10 @@ export class StructureComponent implements OnInit {
           this.isStructureLocked = Number(resp.status_structure) === 1;
           this.planNode = this.buildTree(resp.data);
 
-          console.log(
-            'ÁRBOL => ',
-            this.planNode
-          );
+          //console.log(
+           // 'ÁRBOL => ',
+           // this.planNode
+         // );
 
         },
 
@@ -315,18 +315,45 @@ export class StructureComponent implements OnInit {
     return roots;
   }
 
-
+normalize(texto: string): string {
+  return (texto || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
 
 getNodeCode(
   node: PlanNode,
   parentCode: string = ''
 ): string {
 
-  const code = parentCode
-    ? `${parentCode}.${node.orden}`
-    : `${node.orden}`;
+  const titulo = this.normalize(node.titulo);
+  if(
+      titulo.includes('conclusion') || 
+      titulo.includes('recomendacion') ||
+      titulo.includes('anexos')
+    ) {
+    return '';
+  }
 
-  return code;
+  // Si es nivel 1, calcula el número según su posición en la lista
+  if (node.nivel === 1) {
+    const capitulos = this.planNode.filter(n => {
+      const t = this.normalize(n.titulo);
+      return (
+        !t.includes('conclusion') && 
+        !t.includes('recomendacion') &&
+        !t.includes('anexo')
+      );
+    });
+
+    const index = capitulos.findIndex(n => n.id === node.id);
+    return index !== -1 ? `${index + 1}` : `${node.orden}`;
+  }
+
+  // Para los subnodos
+  return parentCode ? `${parentCode}.${node.orden}` : `${node.orden}`;
 }
 
 
@@ -398,16 +425,16 @@ getNodeCode(
 
         };
 
-        console.log('CREANDO HERMANO:', data);
+       //console.log('CREANDO HERMANO:', data);
 
         this.structureService.createNode(data).subscribe({
 
           next: (resp) => {
 
-            console.log(
-              'Nodo creado correctamente:',
-              resp
-            );
+            //console.log(
+              //'Nodo creado correctamente:',
+             //resp
+            //);
 
             this.obtenerDataConversation();
 
@@ -489,16 +516,16 @@ getNodeCode(
 
     };
 
-    console.log('CREANDO HIJO:', data);
+    //console.log('CREANDO HIJO:', data);
 
     this.structureService.createNode(data).subscribe({
 
       next: (resp: any) => {
 
-        console.log(
-          'Hijo creado correctamente:',
-          resp
-        );
+        //console.log(
+          //'Hijo creado correctamente:',
+          //resp
+        //);
 
         this.obtenerDataConversation();
 
@@ -534,7 +561,7 @@ getNodeCode(
 moveNode(node: PlanNode): void {
 
   console.log('========== MOVE NODE ==========');
-  console.log('NODO SELECCIONADO:', node);
+  //console.log('NODO SELECCIONADO:', node);
 
   const siblings = this.findSiblings(
     node,

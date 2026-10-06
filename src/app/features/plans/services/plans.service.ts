@@ -18,7 +18,7 @@ export class PlanService {
 
     getPlanId( idPlan: number ){
   
-        console.log("TOKEN get progres: " + this.authService.token )
+        //console.log("TOKEN get progres: " + this.authService.token )
         let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
         return this.http.get( this.url + "/getplanid" ,
             {   headers,
@@ -28,7 +28,7 @@ export class PlanService {
     }
 
     getPackagePlans( idPackage: number ){
-    console.log("TOKEN get progres: " + this.authService.token )
+    //console.log("TOKEN get progres: " + this.authService.token )
     let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
     return this.http.get( URL_SERVICIOS + "/getpackageplans",
       {   headers,

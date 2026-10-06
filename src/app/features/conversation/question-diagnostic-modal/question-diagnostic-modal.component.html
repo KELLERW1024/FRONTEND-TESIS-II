@@ -1,19 +1,19 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow theme-card">
 
     <!-- HEADER -->
-    <div class="p-6 flex justify-between items-center">
+    <div class="p-6">
         <div class="text-lg font-medium">
             <strong>Diagnóstico inicial</strong>
         </div>
         
-    </div>
-    
-<div class="mt-4 flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-sm">
-        <mat-icon class="text-blue-600 scale-90 shrink-0">info</mat-icon>
-        <div class="leading-relaxed">
-            Este diagnóstico nos permite identificar el <strong>rubro y enfoque principal</strong> de tu negocio. Con base en tus respuestas, la IA estructurará y adaptará los capítulos de tu plan de forma precisa.
+        <div class="mt-4 flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-sm">
+            <mat-icon class="text-blue-600 scale-90 shrink-0">info</mat-icon>
+            <div class="leading-relaxed">
+                Este diagnóstico nos permite identificar el <strong>rubro y enfoque principal</strong> de tu negocio. Con base en tus respuestas, la IA estructurará y adaptará los capítulos de tu plan de forma precisa.
+            </div>
         </div>
     </div>
+
 
     <!-- CONTENT -->
     <mat-card-content class="border-t border-border pt-6">
@@ -42,7 +42,7 @@
 
                         <!-- DETALLE -->
                         <small
-                            class="italic cursor-pointer ml-6 text-primary"
+                            class="italic cursor-pointer ml-6 text-blue-800"
                             title="Ver detalle" (click)="verDetalle(question)" >
 
                             <strong>
@@ -99,7 +99,7 @@
                         mat-stroked-button
                         class="border border-warning! text-warning"
                         type="button"
-                        >
+                        (click)="limpiar()">
 
                         Limpiar
 

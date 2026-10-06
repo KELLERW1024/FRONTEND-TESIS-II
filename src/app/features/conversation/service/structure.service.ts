@@ -22,7 +22,7 @@ export class StructureService {
    */
   createNode(data: any): Observable<any> {
 
-    console.log("TOKEN: " + this.authService.token )
+    //console.log("TOKEN: " + this.authService.token )
     let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
 
     return this.http.post<any>(
@@ -90,7 +90,7 @@ deleteNode(id: number): Observable<any> {
 
     getDataConversation(idConversation: number ){
       // this.url 
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/conversationPlan" ,
         {   headers,
@@ -101,7 +101,7 @@ deleteNode(id: number): Observable<any> {
 
     getConversationPlanUser(idConversation: number ){
       // this.url 
-      console.log("TOKEN: " + this.authService.token )
+      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/conversationplanuser" ,
         {   headers,

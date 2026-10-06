@@ -172,7 +172,7 @@ export class PaymentComponent implements OnInit {
       this.paymentService.validateCoupon(code, this.idPackage)
       .subscribe({
           next: (response) => {
-            console.log("RESPONSE : ", response)
+            //console.log("RESPONSE : ", response)
 
                 this.couponApplied = response.coupon;
                 this.discountAmount = response.discount_amount;
@@ -337,7 +337,7 @@ export class PaymentComponent implements OnInit {
 
   obtenerFree() {
 
-    console.log("planes sep;ccionados" + this.selectedPlans.length );
+    //console.log("planes sep;ccionados" + this.selectedPlans.length );
 
     if (this.selectedPlans.some(planId => !planId)) {
       this.showDialog(
@@ -468,7 +468,7 @@ export class PaymentComponent implements OnInit {
   }
 
   openCouponModal() {
-    console.log("ID PLANS SLECTS {} " , this.selectedPlans);
+    //console.log("ID PLANS SLECTS {} " , this.selectedPlans);
 
     this.dialog.open(this.couponDialog, {
       width: '300px',

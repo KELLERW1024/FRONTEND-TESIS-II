@@ -148,7 +148,7 @@ export class AddCouponsComponent {
     this.service.getPlans( ).subscribe ({
       next: (resp: any) => {
       this.plans = resp.data;
-      console.log("PLANS => {} ", resp.data)
+      //console.log("PLANS => {} ", resp.data)
      
       },
       error: (err: any) => {
@@ -168,7 +168,7 @@ export class AddCouponsComponent {
     this.couponService.getCoupons( ).subscribe ({
       next: (resp: any) => {
       this.tableData = resp.data;
-      console.log("COUPONS => {} ", resp.data)
+      //console.log("COUPONS => {} ", resp.data)
 
        this.dataSource.data = this.tableData;
      

@@ -61,7 +61,7 @@ export class PriceComponent {
     this.service.getPlans( ).subscribe ({
       next: (resp: any) => {
       this.plans = resp.data;
-      console.log("PLANS => {} ", resp.data)
+      //console.log("PLANS => {} ", resp.data)
      
       },
       error: (err: any) => {
@@ -80,7 +80,7 @@ export class PriceComponent {
         const rawList = resp.data || [];
         // Filtro: solo paquetes activos
         this.packages = rawList.filter((pkg: Package) => Number(pkg.is_active) === 1); 
-        console.log("PAckages => {} ",  this.packages )
+        //console.log("PAckages => {} ",  this.packages )
      
       },
       error: (err: any) => {

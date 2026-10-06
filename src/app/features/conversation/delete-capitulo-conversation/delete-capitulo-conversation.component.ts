@@ -75,7 +75,7 @@ export class DeleteCapituloConversationComponent {
 
   obtenerDataConversation(){
 
-    console.log("Suscription => obtenerDataConversation "   )
+    //console.log("Suscription => obtenerDataConversation "   )
 
     this.conversationService.getConversationPlanUser ( this.idSuscriptionConversation ).subscribe ({
       next: (resp: any) => {

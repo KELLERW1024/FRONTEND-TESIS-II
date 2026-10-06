@@ -270,14 +270,14 @@ export class EditConversationComponent {
   // DATOS DE LA CONVERSACIÓN
   // ============================================================
 
-  obtenerDataConversation() {
+  obtenerDataConversation(triggerAi: boolean = false) {
 
     console.log(
       "Suscription => obtenerDataConversation "
     );
 
     this.conversationService
-      .getDataConversation(this.idSuscriptionConversation)
+      .getDataConversation(this.idSuscriptionConversation, triggerAi)
       .subscribe({
 
         next: (resp: ConversationPlanResponse) => {
@@ -1055,7 +1055,7 @@ export class EditConversationComponent {
 
       case 'validate':
 
-        formData.append(  'description',  this.dataCurrentQuestion  ?.parent_node ?.titulo ?? '' );
+        formData.append(  'description',  this.dataCurrentQuestion  ?.parent_node ?.titulo || this.dataCurrentQuestion?.node?.titulo || 'General');
 
         formData.append( 'question', this.dataCurrentQuestion  ?.question ?.question_text ?? ''  );
 
@@ -1172,7 +1172,7 @@ export class EditConversationComponent {
 
       } else {
 
-        console.log(  pair[0],  pair[1]  );
+        //console.log(  pair[0],  pair[1]  );
 
       }
 
@@ -1198,7 +1198,7 @@ export class EditConversationComponent {
 
           console.log(  "Estado Guaradar Respuesta {} ",  resp  );
 
-          this.obtenerDataConversation();
+          this.obtenerDataConversation(true);
 
           this.reply = '';
 
@@ -1212,6 +1212,9 @@ export class EditConversationComponent {
           this.iaImageResponse = null;
 
           this.selectedFilesAddDoc = [];
+
+          this.tablaGenerada = null;
+          this.displayedTableColumns = [];
 
           /*
           this.form.reset({
@@ -1601,7 +1604,7 @@ descargarImagen(url: string): void {
       width: '92vw',
       maxWidth: '1300px',
       height: '85vh',
-      disableClose: false,
+      disableClose: true,
       data: {
         idConversation: this.idSuscriptionConversation,
         question: this.dataCurrentQuestion.question,
@@ -1611,7 +1614,10 @@ descargarImagen(url: string): void {
 
     dialogRef.afterClosed().subscribe((resultText: string) => {
       if (resultText && resultText.trim()) {
-        this.form.get('answer')?.setValue(resultText.trim());
+        this.reply = resultText.trim();
+
+        //limpia la caja superior
+        this.form.get('answer')?.setValue('');
       }
     });
   }

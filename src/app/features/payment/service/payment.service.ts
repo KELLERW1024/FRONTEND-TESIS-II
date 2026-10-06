@@ -52,7 +52,7 @@ export class PaymentService {
 
   getPayments(){
     let URL = this.url + "/getpayments";
-    console.log("TOKEN get progres: " + this.authService.token )
+    //console.log("TOKEN get progres: " + this.authService.token )
     let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
     return this.http.get<ConversationsPaymentsResponse>( URL  ,
       {   headers

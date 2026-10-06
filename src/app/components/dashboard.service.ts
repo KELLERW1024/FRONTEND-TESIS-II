@@ -31,7 +31,7 @@ export class DashboardService {
   getPlans(){
 
       let URL = URL_SERVICIOS + "/plans";
-      console.log("TOKEN get progres: " + this.authService.token )
+      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( URL  ,
         {   headers
@@ -45,7 +45,7 @@ export class DashboardService {
           URL = URL + "?active_only=true";
         }
 
-      console.log("TOKEN get progres: " + this.authService.token )
+      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<PackageResponse>( URL  ,
         {   headers

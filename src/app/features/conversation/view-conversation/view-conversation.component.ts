@@ -56,7 +56,7 @@ export class ViewConversationComponent {
       //this.addConversation();
     });
 
-    console.log("ONIT => " + this.idSuscriptionConversation)
+    //console.log("ONIT => " + this.idSuscriptionConversation)
     
     this.obtenerDataConversation();
     // this.addConversation();
@@ -69,7 +69,7 @@ export class ViewConversationComponent {
 
   obtenerDataConversation(){
 
-    console.log("Suscription => obtenerDataConversation "   )
+    //console.log("Suscription => obtenerDataConversation "   )
 
     this.conversationService.getViewConversationPlanUser ( this.idSuscriptionConversation ).subscribe ({
       next: (resp: any) => {

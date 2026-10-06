@@ -69,11 +69,11 @@ export class QuestionDiagnosticComponent {
         
 
   obtenerDataDiagnostic(){
-    console.log("Suscription => obtenerDataConversation "   )
+    //console.log("Suscription => obtenerDataConversation "   )
     this.conversationService.getQuestionsDiagnostic( this.idConversation ).subscribe ({
       next: (resp: any) => {
 
-          console.log(" Questions Diagnostic => " , resp )
+          //console.log(" Questions Diagnostic => " , resp )
           if (resp.status === 200) {
 
               this.questions = resp.questions.map((question: any) => ({
@@ -129,7 +129,7 @@ export class QuestionDiagnosticComponent {
     this.conversationService.saveAnswerDiagnostic( data ).subscribe ({
       next: (resp: any) => {
           this.isLoading = false;
-          console.log(" saveAnswerDiagnostic => " , resp )
+          //console.log(" saveAnswerDiagnostic => " , resp )
            if ( resp.success ) {
         
                 setTimeout(() => {
@@ -182,5 +182,11 @@ export class QuestionDiagnosticComponent {
 
   cerrarModal() {
     this.showModal = false;
+  }
+
+  limpiar(): void {
+    this.questions.forEach(question => {
+      question.answer = '';
+    });
   }
 }

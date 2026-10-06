@@ -22,7 +22,7 @@ export class CouponService {
    getCoupons(){
 
       let URL = URL_SERVICIOS + "/coupons";
-      console.log("TOKEN get progres: " + this.authService.token )
+      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( URL  ,
         {   headers
