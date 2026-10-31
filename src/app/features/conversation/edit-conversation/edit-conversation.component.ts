@@ -84,6 +84,11 @@ export class EditConversationComponent {
   idPlan!: number;
   idConversation!: number;
 
+  // Variables para el modal de respuesta automática de la IA
+  showAutoAnswerModal = false;
+  autoSuggestedAnswer = '';
+  autoSuggestedQuestion: any = null;
+
   dataCurrentQuestion!: ConversationPlanResponse;
 
   answers: string[] = [];
@@ -271,54 +276,82 @@ export class EditConversationComponent {
   // ============================================================
 
   obtenerDataConversation(triggerAi: boolean = false) {
-
-    console.log(
-      "Suscription => obtenerDataConversation "
-    );
+    console.log("Suscription => obtenerDataConversation ");
 
     this.conversationService
       .getDataConversation(this.idSuscriptionConversation, triggerAi)
       .subscribe({
-
-        next: (resp: ConversationPlanResponse) => {
-
-          // this.plan = resp.data.plan;
-
+        next: (resp: any) => {
           this.dataCurrentQuestion = resp;
+          console.log('Data Question Ultimate => ', resp);
 
-          console.log(
-            'Data Question Ultimate => ',
-            resp
-          );
-
-          // this.sections = this.plan.sections;
-
-          // console.log(
-          //   " QUESTION CURRENT => {}",
-          //   this.currentQuestion
-          // );
-
-          // this.finalizado =
-          //   this.sections.every(
-          //     (s: any) => !!s.answer
-          //   );
-
+          // VERIFICAR SI LA IA PROPUSO UNA RESPUESTA AUTOMÁTICA PARA MOSTRAR EL MODAL
+          if (resp && resp.auto_generated) {
+            this.autoSuggestedAnswer = resp.suggested_answer || '';
+            this.autoSuggestedQuestion = resp.question || resp.data?.question;
+            this.showAutoAnswerModal = true; // Abrir modal
+          } else {
+            this.showAutoAnswerModal = false;
+          }
         },
-
         error: (err: any) => {
-
           console.error(err);
-
         },
-
         complete: () => {
-
           console.log('Completado');
-
         }
-
       });
+  }
 
+  // 1. CONFIRMAR: Guarda automáticamente la respuesta sugerida y continúa
+  confirmarRespuestaAutomatica() {
+    if (!this.autoSuggestedAnswer || !this.dataCurrentQuestion?.question) return;
+
+    this.isLoading = true;
+    const conversationId = this.idSuscriptionConversation;
+    const questionId = this.dataCurrentQuestion.question.id;
+    const reply = this.autoSuggestedAnswer;
+
+    // servicio para guardar directamente la respuesta automática
+    this.conversationService.guardarRespuestas({
+      idConversation: conversationId,
+      idQuestion: questionId,
+      reply: reply
+    }).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.showAutoAnswerModal = false;
+        this.autoSuggestedAnswer = '';
+        // Continuar con la siguiente pregunta disparando la IA nuevamente
+        this.obtenerDataConversation(true);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error(err);
+        this.showDialog('error', 'Error al guardar la respuesta automática.', 'Error');
+      }
+    });
+  }
+
+  // 2. EDITAR: Cierra el modal y pasa la pregunta/respuesta al primer textarea principal
+  editarRespuestaAutomatica() {
+    if (!this.autoSuggestedAnswer) return;
+
+    // Asignar al formulario principal (primer textarea)
+    this.form.patchValue({
+      answer: this.autoSuggestedAnswer
+    });
+
+    this.form.get('answer')?.markAsDirty();
+    this.form.get('answer')?.updateValueAndValidity();
+
+    // Cerrar modal
+    this.showAutoAnswerModal = false;
+    this.autoSuggestedAnswer = '';
+  }
+
+  cerrarModalAutoRespuesta() {
+    this.showAutoAnswerModal = false;
   }
 
 
@@ -1601,9 +1634,9 @@ descargarImagen(url: string): void {
     if (!this.dataCurrentQuestion?.question) return;
 
     const dialogRef = this.dialog.open(AssistantModalComponent, {
-      width: '92vw',
-      maxWidth: '1300px',
-      height: '85vh',
+      width: '84vw',
+      maxWidth: '88vw',
+      height: '88vh',
       disableClose: true,
       data: {
         idConversation: this.idSuscriptionConversation,
@@ -1614,171 +1647,17 @@ descargarImagen(url: string): void {
 
     dialogRef.afterClosed().subscribe((resultText: string) => {
       if (resultText && resultText.trim()) {
-        this.reply = resultText.trim();
+        const text = resultText.trim();
 
-        //limpia la caja superior
-        this.form.get('answer')?.setValue('');
+        this.form.patchValue({ answer: text });
+        
+        this.form.get('answer')?.markAsDirty();
+        this.form.get('answer')?.updateValueAndValidity();
+
+        // 3. Limpiar el segundo textarea
+        this.reply = '';
       }
     });
   }
-
-
-
-  // ============================================================
-  // CÓDIGO ANTERIOR / COMENTADO
-  // ============================================================
-
-  // onFileSelectedAdd(event: any) : void {
-
-  //   const files: FileList = event.target.files;
-
-  //   const readers = Array.from(files).map(file => {
-
-  //     return new Promise<any>((resolve) => {
-
-  //       const reader = new FileReader();
-
-  //       reader.onload = () => {
-
-  //         resolve({
-  //           file: file,
-  //           preview: reader.result,
-  //           description: '',
-  //           fuente: ''
-  //         });
-
-  //       };
-
-  //       reader.readAsDataURL(file);
-
-  //     });
-
-  //   });
-
-  //   Promise.all(readers).then(results => {
-
-  //     this.selectedFilesAdd = [
-  //       ...this.selectedFilesAdd,
-  //       ...results
-  //     ];
-
-  //   });
-
-  //   event.target.value = '';
-
-  // }
-
-
-  // obtenerSectionsPlanSuscription(){
-
-  //   console.log(
-  //     "obtenerSectionPlan1 => " +
-  //     this.idSuscriptionConversation
-  //   );
-
-  //   this.conversationService
-  //     .getDataConversation(
-  //       this.idSuscriptionConversation
-  //     )
-  //     .subscribe({
-
-  //       next: (resp: any) => {
-
-  //         this.plan = resp.data;
-
-  //         console.log(
-  //           'PLAN RESP ',
-  //           resp.data
-  //         );
-
-  //         console.log(
-  //           'PLAN ',
-  //           this.plan.name
-  //         );
-
-  //         this.sections =
-  //           resp.data.sections;
-
-  //         console.log(
-  //           'SectionS => ',
-  //           this.sections
-  //         );
-
-  //         this.sectionProgress =
-  //           this.sections.find(
-  //             s =>
-  //               s.progress?.status !==
-  //               "completed"
-  //           ) ?? null;
-
-  //         this.questions =
-  //           this.sectionProgress
-  //             ?.questions ?? [];
-
-  //         const lastSection =
-  //           this.sections[
-  //             this.sections.length - 1
-  //           ] ?? null;
-
-  //         if (
-  //           lastSection?.progress?.status ===
-  //           "completed"
-  //         ) {
-
-  //           this.finalizado = true;
-
-  //           console.log(
-  //             "Finalizado : {} ",
-  //             this.finalizado
-  //           );
-
-  //         }
-
-  //         console.log(
-  //           'Section => ',
-  //           this.sectionProgress
-  //         );
-
-  //         console.log(resp);
-
-  //         console.log(
-  //           "obtenerSectionPlan2 => " +
-  //           this.idPlan
-  //         );
-
-  //       },
-
-  //       error: (err: any) => {
-
-  //         console.error(err);
-
-  //       },
-
-  //       complete: () => {
-
-  //         console.log(
-  //           'Completado'
-  //         );
-
-  //       }
-
-  //     });
-
-  // }
-
-
-  // validarRespuestasDeInputs(): boolean {
-
-  //   if (!this.sectionActual?.questions) {
-  //     return false;
-  //   }
-
-  //   return this.sectionActual.questions.every(
-  //     (_, i) =>
-  //       this.answers[i] &&
-  //       this.answers[i].trim().length > 0
-  //   );
-
-  // }
 
 }

@@ -128,24 +128,35 @@
       <!-- QUESTIONS -->
       <!-- =============================================== -->
 
-      <ng-container
-        *ngFor="let question of node.questions"
-      >
-
+      <ng-container *ngFor="let question of node.questions">
 
         <!-- ============================================= -->
         <!-- RESPUESTA -->
         <!-- ============================================= -->
 
-        <div
-          *ngIf="question.answer?.answer_text"
-          class="mt-4 mb-6 text-gray-700 whitespace-pre-line leading-7"
-        >
+        <div *ngIf="question.answer?.answer_text" class="mt-4 mb-6">
 
-          {{ question.answer?.answer_text }}
+          <div class="text-gray-700 whitespace-pre-line leading-7">
+            {{ question.answer?.answer_text }}
+          </div>
 
-        </div>
+          <!-- Acordeón-->
+          <div class="mt-2 max-w-md">
+            <mat-expansion-panel class="!shadow-none !border !border-slate-200/80 !rounded-lg !bg-slate-50/70">
+              <mat-expansion-panel-header class="!text-xs !h-8 !px-3">
+                <mat-panel-title class="!text-sm !text-slate-500 flex items-center gap-1.5 font-medium">
+                  Ver pregunta de origen
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              
+              <div class="text-sm text-slate-600 pt-1 pb-2 px-1">
+                <span class="font-semibold text-slate-700">Pregunta:</span> 
+                <span class="italic text-slate-600 ml-1">{{ question.question_text }}</span>
+              </div>
+            </mat-expansion-panel>
+          </div>
 
+        </div>  
 
         <!-- ============================================= -->
         <!-- IMÁGENES -->
@@ -195,8 +206,6 @@
             </div>
           </div>
         </div>
-
-
 
         <!-- ============================================= -->
         <!-- TABLAS -->
@@ -260,8 +269,6 @@
 
           </div>
         </div>
-
-
 
       </ng-container>
 

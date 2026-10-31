@@ -13,9 +13,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConversationService } from 'src/app/features/conversation/service/conversation.service';
 import { Package, PackageResponse } from 'src/app/core/models/PackageResponse';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { ApexNonAxisChartSeries, ApexResponsive, ApexChart } from "ng-apexcharts";
+
+export type ChartOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  responsive: ApexResponsive[];
+  labels: any;
+  colors: string[];
+};
 
 @Component({
   selector: 'app-price',
+  standalone: true, 
   imports: [
     MatTableModule,
     CommonModule,
@@ -25,11 +37,14 @@ import { Package, PackageResponse } from 'src/app/core/models/PackageResponse';
     MatMenuModule,
     MatButtonModule,
     TablerIconsModule,
+    NgApexchartsModule 
   ],
   templateUrl: './price.component.html',
   styleUrl: './price.component.scss',
 })
 export class PriceComponent {
+
+  isLoading: boolean = true;
 
   @ViewChild('pricesModal')
   pricesModal!: TemplateRef<any>;
@@ -42,17 +57,82 @@ export class PriceComponent {
 
   selectedPlan: any = null;
 
+
+  totalRevenue: number = 10590;
+  totalSales: number = 1320;
+  conversionRate: number = 4.38;
+  refundRate: number = 1.2;
+
+  public packageChartOptions!: Partial<ChartOptions>; 
+
    constructor(
     private service: DashboardService, private conversationService: ConversationService , 
+    public authService: AuthService,
     private router: Router , 
     private route: ActivatedRoute,
   private dialog: MatDialog
   ) {}
   
-  ngOnInit() {
-    
-    // this.getPlans();
-    this.getPackages();
+ngOnInit() {
+  this.getPackages();
+  this.loadAdminStats();
+
+  // Configuración inicial del Gráfico de Dona
+  this.packageChartOptions = {
+    series: [45, 25, 20], 
+    chart: {
+      type: "donut",
+      height: 320,
+      fontFamily: 'inherit'
+    },
+    labels: ["Profesional", "Asesor Senior", "Valiplan Junior"],
+    colors: ['#5D87FF', '#49BEFF', '#13DEB9',], 
+    responsive: [
+      {
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: "bottom"
+          }
+        }
+      }
+    ]
+  };
+}
+
+  get isAdmin(): boolean {
+  return this.authService.isAdmin();
+  }
+
+  // Y creamos este método nuevo abajo:
+  loadAdminStats() {
+    this.service.getAdminStats().subscribe({
+      next: (resp: any) => {
+        const data = resp.data || resp;
+        
+        // 1. Actualizamos las tarjetas superiores
+        this.totalRevenue = data.total_revenue ?? 0;
+        this.totalSales = data.total_sales ?? 0;
+        this.conversionRate = data.conversion_rate ?? 0;
+        this.refundRate = data.refund_rate ?? 0;
+
+        // 2. Actualizamos el Gráfico de Dona con los datos reales del backend
+        if (data.chart_paquetes) {
+          this.packageChartOptions = {
+            ...this.packageChartOptions, 
+            series: data.chart_paquetes.series,
+            labels: data.chart_paquetes.labels
+          };
+        }
+      },
+      error: (err: any) => {
+        console.error("Error al cargar estadísticas:", err);
+        // ... (tu código de error)
+      }
+    });
   }
 
 
@@ -61,7 +141,7 @@ export class PriceComponent {
     this.service.getPlans( ).subscribe ({
       next: (resp: any) => {
       this.plans = resp.data;
-      //console.log("PLANS => {} ", resp.data)
+
      
       },
       error: (err: any) => {

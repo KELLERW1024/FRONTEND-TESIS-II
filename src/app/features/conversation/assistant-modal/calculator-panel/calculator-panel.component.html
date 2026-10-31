@@ -1,0 +1,560 @@
+<div class="flex flex-col h-full bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+  
+  <!-- 1. CABECERA-->
+  <div class="flex border-b border-slate-200 bg-slate-50 shrink-0">
+    <button (click)="cambiarTab('estadistica')" [class.border-blue-500]="activeTab === 'estadistica'" [class.text-blue-700]="activeTab === 'estadistica'" [class.bg-white]="activeTab === 'estadistica'" class="flex-1 py-2.5 text-[11px] font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-colors uppercase tracking-wider">
+      Estadística
+    </button>
+    <button (click)="cambiarTab('finanzas')" [class.border-blue-500]="activeTab === 'finanzas'" [class.text-blue-700]="activeTab === 'finanzas'" [class.bg-white]="activeTab === 'finanzas'" class="flex-1 py-2.5 text-[11px] font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-colors uppercase tracking-wider">
+      Finanzas
+    </button>
+    <button (click)="cambiarTab('operaciones')" [class.border-blue-500]="activeTab === 'operaciones'" [class.text-blue-700]="activeTab === 'operaciones'" [class.bg-white]="activeTab === 'operaciones'" class="flex-1 py-2.5 text-[11px] font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-colors uppercase tracking-wider">
+      Operaciones
+    </button>
+  </div>
+
+  <!-- 2.HERRAMIENTAS-->
+  <div class="bg-white border-b border-slate-100 p-3 shrink-0">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Selecciona una herramienta:</span>
+    </div>
+    
+    <div class="flex flex-wrap gap-2">
+      <button *ngFor="let h of herramientasActuales" 
+              (click)="cambiarHerramienta(h.id)"
+              [ngClass]="activeToolId === h.id ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+              class="px-3 py-1.5 text-[11px] rounded-full font-bold transition-colors border flex items-center gap-1">
+        <span *ngIf="h.recomendada" class="text-amber-500 text-[12px] leading-none">⭐</span>
+        {{ h.nombre }}
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. ÁREA DE TRABAJO-->
+  <div class="flex-1 overflow-y-auto p-5 bg-slate-50/50 flex flex-col items-center">
+
+    <ng-container [ngSwitch]="activeToolId">
+
+      <!-- ============================================== -->
+      <!-- ESTADSTICA: TAMAÑO DE MUESTRA ('muestra') -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'muestra'" class="w-full max-w-3xl animate-fade-in">
+        
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Tamaño de Muestra</h3>
+          <p class="text-[11px] text-slate-500">Calcula a cuántas personas debes encuestar para que tu estudio tenga validez estadística.</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap md:flex-nowrap items-start justify-between gap-4">
+          
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Población (Opcional)</label>
+            <p class="text-[9px] text-slate-400 text-center mb-2 leading-tight">Déjalo en blanco si no conoces el total exacto.</p>
+            <input type="number" [(ngModel)]="muestraPoblacion" placeholder="Ej. 10000" 
+                   class="w-full border border-slate-300 rounded-lg py-2 px-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+          </div>
+
+          <div class="hidden md:block w-px h-16 bg-slate-200 mt-2"></div>
+
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Nivel de Confianza</label>
+            <p class="text-[9px] text-slate-400 text-center mb-2 leading-tight">Estándar académico: 95%.</p>
+            <select [(ngModel)]="muestraConfianza" 
+                    class="w-full border border-slate-300 rounded-lg py-2 px-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer">
+              <option [ngValue]="1.645">90% (Menos preciso)</option>
+              <option [ngValue]="1.96">95% (Recomendado)</option>
+              <option [ngValue]="2.576">99% (Muy riguroso)</option>
+            </select>
+          </div>
+
+          <div class="hidden md:block w-px h-16 bg-slate-200 mt-2"></div>
+
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Margen de Error (%)</label>
+            <p class="text-[9px] text-slate-400 text-center mb-2 leading-tight">Aceptable entre 3% y 5%.</p>
+            <div class="relative">
+              <input type="number" [(ngModel)]="muestraError" placeholder="5" 
+                     class="w-full border border-slate-300 rounded-lg py-2 pr-7 pl-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+              <span class="absolute right-3 top-2 text-sm text-slate-400 font-bold">%</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- ESTADSTICA: PROYECCIÓN DE DEMANDA ('demanda') -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'demanda'" class="w-full max-w-3xl animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Proyección de Demanda</h3>
+          <p class="text-[11px] text-slate-500">Estima tu crecimiento a futuro usando la tasa de crecimiento anual.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Demanda Base (Actual)</label>
+            <input type="number" [(ngModel)]="demBase" placeholder="Ej. 500" class="w-full border border-slate-300 rounded-lg py-2 px-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+          <div class="text-slate-300 font-extrabold text-xl mt-4 hidden md:block">×</div>
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Tasa de Crecimiento Anual</label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="demTasa" placeholder="Ej. 3.5" class="w-full border border-slate-300 rounded-lg py-2 pr-7 pl-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+              <span class="absolute right-3 top-2 text-sm text-slate-400 font-bold">%</span>
+            </div>
+          </div>
+          <div class="hidden md:block w-px h-10 bg-slate-200 mt-2"></div>
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Años a proyectar</label>
+            <input type="number" [(ngModel)]="demAnios" placeholder="Ej. 3" class="w-full border border-slate-300 rounded-lg py-2 px-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- ESTADSTICA: MERCADO TAM/SAM/SOM ('mercado')   -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'mercado'" class="w-full max-w-3xl animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Mercado TAM / SAM / SOM</h3>
+          <p class="text-[11px] text-slate-500">Calcula tu mercado Total, Disponible y Objetivo (Embudo de ventas).</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex-1 w-full bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <label class="text-[10px] font-bold text-blue-600 uppercase block text-center mb-1">TAM (Universo Total)</label>
+            <p class="text-[9px] text-slate-400 text-center mb-2 leading-tight">Ej. Todos los usuarios en Iquitos.</p>
+            <input type="number" [(ngModel)]="tamUniverso" placeholder="10000" class="w-full border border-slate-300 rounded py-1.5 px-2 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+          <mat-icon class="text-slate-300 rotate-90 md:rotate-0">arrow_forward</mat-icon>
+          <div class="flex-1 w-full bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <label class="text-[10px] font-bold text-emerald-600 uppercase block text-center mb-1">SAM (% del TAM)</label>
+            <p class="text-[9px] text-slate-400 text-center mb-2 leading-tight">Ej. Los que puedes atender.</p>
+            <div class="relative">
+              <input type="number" [(ngModel)]="samPorcentaje" placeholder="40" class="w-full border border-slate-300 rounded py-1.5 pr-6 pl-2 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+              <span class="absolute right-2 top-1.5 text-xs text-slate-400 font-bold">%</span>
+            </div>
+          </div>
+          <mat-icon class="text-slate-300 rotate-90 md:rotate-0">arrow_forward</mat-icon>
+          <div class="flex-1 w-full bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <label class="text-[10px] font-bold text-amber-600 uppercase block text-center mb-1">SOM (% del SAM)</label>
+            <p class="text-[9px] text-slate-400 text-center mb-2 leading-tight">Tu meta real a capturar.</p>
+            <div class="relative">
+              <input type="number" [(ngModel)]="somPorcentaje" placeholder="10" class="w-full border border-slate-300 rounded py-1.5 pr-6 pl-2 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+              <span class="absolute right-2 top-1.5 text-xs text-slate-400 font-bold">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- ESTADSTICA: TICKET PROMEDIO ('ticket')        -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'ticket'" class="w-full max-w-sm animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Ticket Promedio</h3>
+          <p class="text-[11px] text-slate-500">Lo que gasta un cliente en promedio.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Ingresos Totales (S/)</label>
+            <input type="number" [(ngModel)]="tickIngresos" placeholder="Ej. 5000" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+          <div class="border-t-2 border-slate-200 w-full relative my-4">
+            <div class="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-white px-3"><mat-icon class="text-[16px] w-4 h-4 text-slate-300">horizontal_rule</mat-icon></div>
+          </div>
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">N° Clientes / Atenciones</label>
+            <input type="number" [(ngModel)]="tickClientes" placeholder="Ej. 150" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- ESTADSTICA: MEDIA Y DESVIACIÓN ('desviacion') -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'desviacion'" class="w-full max-w-xl animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Promedio de Escenarios</h3>
+          <p class="text-[11px] text-slate-500">Calcula la media simple a partir de tres estimaciones.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between gap-3">
+          <div class="flex-1"><label class="text-[10px] font-bold text-slate-500 block text-center mb-1">Valor 1</label><input type="number" [(ngModel)]="medVal1" class="w-full border border-slate-300 rounded py-2 text-center font-bold outline-none focus:border-blue-500"></div>
+          <div class="text-slate-300 font-bold">+</div>
+          <div class="flex-1"><label class="text-[10px] font-bold text-slate-500 block text-center mb-1">Valor 2</label><input type="number" [(ngModel)]="medVal2" class="w-full border border-slate-300 rounded py-2 text-center font-bold outline-none focus:border-blue-500"></div>
+          <div class="text-slate-300 font-bold">+</div>
+          <div class="flex-1"><label class="text-[10px] font-bold text-slate-500 block text-center mb-1">Valor 3</label><input type="number" [(ngModel)]="medVal3" class="w-full border border-slate-300 rounded py-2 text-center font-bold outline-none focus:border-blue-500"></div>
+        </div>
+      </div>
+  
+
+      <!-- ========================================== -->
+      <!-- FINANZAS: PUNTO DE EQUILIBRIO ('pe') -->
+      <!-- ========================================== -->
+      <div *ngSwitchCase="'pe'" class="w-full max-w-lg animate-fade-in">
+        
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Punto de Equilibrio</h3>
+          <p class="text-[11px] text-slate-500">Calcula las unidades necesarias para cubrir todos tus costos operativos.</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          
+          <!-- Numerador -->
+          <div class="flex justify-center mb-3">
+            <div class="w-2/3">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Costos Fijos Totales</label>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-sm text-slate-400 font-bold">S/</span>
+                <input type="number" [(ngModel)]="peCostosFijos" placeholder="0.00" 
+                       class="w-full border border-slate-300 rounded-lg py-2 pl-8 pr-2 text-base text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+              </div>
+            </div>
+          </div>
+
+          <!-- Divisor -->
+          <div class="border-t-2 border-slate-200 relative my-4">
+            <div class="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-white px-3">
+              <mat-icon class="text-[16px] w-4 h-4 text-slate-300">horizontal_rule</mat-icon>
+            </div>
+          </div>
+
+          <!-- Denominador -->
+          <div class="flex items-end justify-center gap-3 mt-4">
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Precio Unitario</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-sm text-slate-400 font-bold">S/</span>
+                <input type="number" [(ngModel)]="pePrecioVenta" placeholder="0.00" 
+                       class="w-full border border-slate-300 rounded-lg py-2 pl-7 pr-2 text-base text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+              </div>
+            </div>
+            
+            <div class="pb-2.5 text-slate-400 font-extrabold text-xl leading-none">-</div>
+            
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Costo Variable (Uni)</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-sm text-slate-400 font-bold">S/</span>
+                <input type="number" [(ngModel)]="peCostoVariable" placeholder="0.00" 
+                       class="w-full border border-slate-300 rounded-lg py-2 pl-7 pr-2 text-base text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =================================================== -->
+      <!-- FINANZAS: FIJACIÓN DE PRECIO ('fijacion_precio') -->
+      <!-- =================================================== -->
+      <div *ngSwitchCase="'fijacion_precio'" class="w-full max-w-sm animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Fijación de Precio</h3>
+          <p class="text-[11px] text-slate-500">Calcula el precio de venta basado en tu margen de ganancia deseado.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Costo Variable Unitario (S/)</label>
+            <input type="number" [(ngModel)]="fpCostoUnitario" placeholder="Ej. 15.00" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+          <div class="border-t-2 border-slate-200 w-full relative my-4">
+            <div class="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-white px-3"><mat-icon class="text-[16px] w-4 h-4 text-slate-300">horizontal_rule</mat-icon></div>
+          </div>
+          <div class="w-full relative">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Margen de Ganancia (Ej. 30%)</label>
+            <input type="number" [(ngModel)]="fpMargenDeseado" placeholder="30" class="w-full border border-slate-300 rounded-lg py-2 pr-7 pl-3 text-base text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+            <span class="absolute right-3 top-7 text-sm text-slate-400 font-bold">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- FINANZAS: FLUJO DE CAJA ('flujo')           -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'flujo'" class="w-full max-w-lg animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Flujo de Caja Simple</h3>
+          <p class="text-[11px] text-slate-500">Calcula la liquidez restando tus salidas a tus entradas de dinero.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-end justify-center gap-3">
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Total Ingresos (S/)</label>
+            <input type="number" [(ngModel)]="fcIngresos" placeholder="10000" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-emerald-700 bg-emerald-50/30 focus:border-emerald-500 outline-none">
+          </div>
+          <div class="pb-2 text-slate-400 font-extrabold text-xl leading-none">-</div>
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Total Egresos (S/)</label>
+            <input type="number" [(ngModel)]="fcEgresos" placeholder="6000" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-rose-700 bg-rose-50/30 focus:border-rose-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- FINANZAS: CUOTA DE PRÉSTAMO ('cuota')       -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'cuota'" class="w-full max-w-3xl animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Cuota de Préstamo Bancario</h3>
+          <p class="text-[11px] text-slate-500">Calcula tu pago mensual usando el sistema de amortización francés.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap md:flex-nowrap items-start justify-between gap-4">
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Monto del Préstamo (S/)</label>
+            <input type="number" [(ngModel)]="cpCapital" placeholder="Ej. 20000" class="w-full border border-slate-300 rounded-lg py-2 px-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+          <div class="hidden md:block w-px h-12 bg-slate-200 mt-2"></div>
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Tasa Efectiva Anual (TEA %)</label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="cpTasaAnual" placeholder="Ej. 18.5" class="w-full border border-slate-300 rounded-lg py-2 pr-7 pl-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+              <span class="absolute right-3 top-2 text-sm text-slate-400 font-bold">%</span>
+            </div>
+          </div>
+          <div class="hidden md:block w-px h-12 bg-slate-200 mt-2"></div>
+          <div class="flex-1 w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Plazo en Meses</label>
+            <input type="number" [(ngModel)]="cpMeses" placeholder="Ej. 24" class="w-full border border-slate-300 rounded-lg py-2 px-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- FINANZAS: TIR Y VAN ('tir_van')             -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'tir_van'" class="w-full max-w-2xl animate-fade-in">
+        <div class="mb-4 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">TIR y VAN</h3>
+          <p class="text-[11px] text-slate-500">Mide la rentabilidad real de tu inversión descontando los flujos.</p>
+        </div>
+        
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-4">
+          <!-- Inversión, Tasa y Selector de Años -->
+          <div class="flex flex-wrap md:flex-nowrap gap-4 items-end">
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Inversión (S/)</label>
+              <input type="number" [(ngModel)]="vanInversion" placeholder="Ej. 50000" class="w-full border border-slate-300 rounded py-1.5 px-3 text-sm text-center font-bold text-rose-700 bg-rose-50 focus:border-blue-500 outline-none">
+            </div>
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Tasa (COK %)</label>
+              <div class="relative">
+                <input type="number" [(ngModel)]="vanTasaDescuento" placeholder="Ej. 12" class="w-full border border-slate-300 rounded py-1.5 pr-7 pl-3 text-sm text-center font-bold text-slate-800 focus:border-blue-500 outline-none">
+                <span class="absolute right-3 top-1.5 text-xs text-slate-400 font-bold">%</span>
+              </div>
+            </div>
+            <div class="w-24">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Años</label>
+              <input type="number" [(ngModel)]="vanAnios" (change)="actualizarAniosVan()" min="1" max="10" class="w-full border border-slate-300 rounded py-1.5 text-sm text-center font-bold focus:border-blue-500 outline-none">
+            </div>
+          </div>
+          
+          <div class="border-t border-slate-100"></div>
+          
+          <!-- Flujos Dinámicos -->
+          <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+            <div *ngFor="let flujo of vanFlujos; let i = index" class="min-w-[100px] flex-1">
+              <label class="text-[9px] font-bold text-slate-400 uppercase block text-center mb-1">Año {{ i + 1 }}</label>
+              <input type="number" [(ngModel)]="vanFlujos[i]" placeholder="0.00" class="w-full border border-slate-300 rounded py-1.5 text-sm text-center font-semibold focus:border-blue-500 outline-none">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================= -->
+      <!-- OPERACIONES: CAPACIDAD MÁXIMA INSTALADA ('cap_maxima') -->
+      <!-- ======================================================= -->
+      <div *ngSwitchCase="'cap_maxima'" class="w-full max-w-2xl animate-fade-in">
+        
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Capacidad Máxima Instalada</h3>
+          <p class="text-[11px] text-slate-500">Calcula el volumen máximo de producción o servicio que puedes alcanzar al mes.</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between gap-2">
+          
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">
+              N° Equipos / Estaciones 
+              <span *ngIf="capEquipos" class="text-blue-500" title="Autocompletado">🤖</span>
+            </label>
+            <input type="number" [(ngModel)]="capEquipos" placeholder="Ej. 6" 
+                   class="w-full border border-slate-300 rounded-lg py-2.5 px-3 text-lg text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+          </div>
+
+          <div class="text-slate-300 font-extrabold text-xl mt-4">×</div>
+
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Unidades/Atenciones al día</label>
+            <input type="number" [(ngModel)]="capProduccionPorTurno" placeholder="Ej. 3" 
+                   class="w-full border border-slate-300 rounded-lg py-2.5 px-3 text-lg text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+          </div>
+
+          <div class="text-slate-300 font-extrabold text-xl mt-4">×</div>
+
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">
+              Días Laborables al mes
+              <span *ngIf="capDiasLaborables" class="text-blue-500" title="Autocompletado">🤖</span>
+            </label>
+            <input type="number" [(ngModel)]="capDiasLaborables" placeholder="Ej. 26" 
+                   class="w-full border border-slate-300 rounded-lg py-2.5 px-3 text-lg text-center font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- OPERACIONES: DEPRECIACIÓN ('depreciacion')     -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'depreciacion'" class="w-full max-w-lg animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Depreciación Lineal</h3>
+          <p class="text-[11px] text-slate-500">Calcula la pérdida de valor anual de un activo o equipo.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Valor Activo (S/)</label>
+              <input type="number" [(ngModel)]="depValor" placeholder="Ej. 5000" class="w-full border border-slate-300 rounded-lg py-2 text-sm text-center font-bold focus:border-blue-500 outline-none">
+            </div>
+            <div class="text-slate-400 font-extrabold text-xl mt-4">-</div>
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Valor Residual (S/)</label>
+              <input type="number" [(ngModel)]="depResidual" placeholder="Ej. 0" class="w-full border border-slate-300 rounded-lg py-2 text-sm text-center font-bold focus:border-blue-500 outline-none">
+            </div>
+          </div>
+          <div class="border-t-2 border-slate-200 relative my-4">
+            <div class="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-white px-3"><mat-icon class="text-[16px] w-4 h-4 text-slate-300">horizontal_rule</mat-icon></div>
+          </div>
+          <div class="w-1/2 mx-auto mt-2">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Vida Útil (Años)</label>
+            <input type="number" [(ngModel)]="depVidaUtil" placeholder="Ej. 5" class="w-full border border-slate-300 rounded-lg py-2 text-sm text-center font-bold focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- OPERACIONES: TIEMPOS DE CICLO ('tiempos')      -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'tiempos'" class="w-full max-w-sm animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Tiempo de Ciclo</h3>
+          <p class="text-[11px] text-slate-500">¿Cuánto tiempo promedio toma una unidad/servicio?</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Tiempo Total Invertido</label>
+            <input type="number" [(ngModel)]="tcTiempoTotal" placeholder="Ej. 120 (minutos)" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold focus:border-blue-500 outline-none">
+          </div>
+          <div class="border-t-2 border-slate-200 w-full relative my-4">
+            <div class="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-white px-3"><mat-icon class="text-[16px] w-4 h-4 text-slate-300">horizontal_rule</mat-icon></div>
+          </div>
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Unidades o Atenciones</label>
+            <input type="number" [(ngModel)]="tcUnidades" placeholder="Ej. 10" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- OPERACIONES: CÁLCULO DE MERMAS ('mermas')      -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'mermas'" class="w-full max-w-lg animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Porcentaje de Mermas</h3>
+          <p class="text-[11px] text-slate-500">Calcula la pérdida física entre lo que entra y lo que sale.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-end justify-center gap-4">
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Materia Prima que Entra</label>
+            <input type="number" [(ngModel)]="merMateriaPrima" placeholder="Ej. 100 kg" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-slate-700 bg-slate-50 focus:border-blue-500 outline-none">
+          </div>
+          <mat-icon class="text-slate-300 mb-2">arrow_forward</mat-icon>
+          <div class="flex-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Productos que Salen</label>
+            <input type="number" [(ngModel)]="merProductoTerminado" placeholder="Ej. 92 kg" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold text-emerald-700 bg-emerald-50 focus:border-emerald-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- OPERACIONES: PRODUCTIVIDAD ('productividad')   -->
+      <!-- ============================================== -->
+      <div *ngSwitchCase="'productividad'" class="w-full max-w-sm animate-fade-in">
+        <div class="mb-5 text-center">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Productividad Laboral</h3>
+          <p class="text-[11px] text-slate-500">Mide la eficiencia del personal.</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Unidades Producidas</label>
+            <input type="number" [(ngModel)]="prodUnidades" placeholder="Ej. 500" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold focus:border-blue-500 outline-none">
+          </div>
+          <div class="border-t-2 border-slate-200 w-full relative my-4">
+            <div class="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-white px-3"><mat-icon class="text-[16px] w-4 h-4 text-slate-300">horizontal_rule</mat-icon></div>
+          </div>
+          <div class="w-full">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block text-center mb-1">Horas-Hombre Invertidas</label>
+            <input type="number" [(ngModel)]="prodHorasHombre" placeholder="Ej. 40" class="w-full border border-slate-300 rounded-lg py-2 text-base text-center font-bold focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+
+  <!-- 4. FOOTER: RESULTADO INLINE Y BOTONES -->
+  <div class="bg-white border-t border-slate-200 p-4 shrink-0">
+    <div class="flex items-center justify-between gap-4">
+      
+      <!-- Resultado Compacto Dinámico -->
+      <div class="flex-1">
+               
+        <!-- Vistas Estadística -->
+        <ng-container *ngIf="activeToolId === 'muestra'"><div *ngIf="tamanoMuestraResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Muestra Requerida</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ tamanoMuestraResultado | number }} <span class="text-[11px] font-bold text-emerald-600/70 uppercase">encuestas</span></span></div><div *ngIf="tamanoMuestraResultado === null" class="text-xs text-slate-400 italic">Ingresa un margen de error...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'demanda'"><div *ngIf="demandaResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Demanda (Año {{demAnios}})</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ demandaResultado | number }} <span class="text-[11px] font-bold text-emerald-600/70 uppercase">usuarios</span></span></div><div *ngIf="demandaResultado === null" class="text-xs text-slate-400 italic">Ingresa tasa y años...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'mercado'"><div *ngIf="mercadoResultados !== null" class="flex items-center gap-4"><div><span class="text-[9px] text-blue-600 font-bold uppercase">TAM</span><p class="text-sm font-extrabold text-blue-700">{{ mercadoResultados.tam | number }}</p></div><div><span class="text-[9px] text-emerald-600 font-bold uppercase">SAM</span><p class="text-sm font-extrabold text-emerald-700">{{ mercadoResultados.sam | number }}</p></div><div><span class="text-[9px] text-amber-600 font-bold uppercase">SOM Objetivo</span><p class="text-lg font-extrabold text-amber-700">{{ mercadoResultados.som | number }}</p></div></div><div *ngIf="mercadoResultados === null" class="text-xs text-slate-400 italic">Llena el embudo...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'ticket'"><div *ngIf="ticketResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Ticket Promedio</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">S/ {{ ticketResultado | number:'1.2-2' }}</span></div><div *ngIf="ticketResultado === null" class="text-xs text-slate-400 italic">Divide ingresos...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'desviacion'"><div *ngIf="mediaResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Promedio</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ mediaResultado }}</span></div><div *ngIf="mediaResultado === null" class="text-xs text-slate-400 italic">Ingresa 3 valores...</div></ng-container>
+
+        <!-- Vistas Finanzas -->
+        <ng-container *ngIf="activeToolId === 'pe'"><div *ngIf="puntoEquilibrioResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Resultado (P.E)</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ puntoEquilibrioResultado }} <span class="text-[11px] font-bold text-emerald-600/70 uppercase">unidades</span></span></div><div *ngIf="puntoEquilibrioResultado === null" class="text-xs text-slate-400 italic">Ingresa los valores en la fórmula...</div></ng-container>        
+        <ng-container *ngIf="activeToolId === 'fijacion_precio'"><div *ngIf="fijacionPrecioResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Precio Sugerido</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">S/ {{ fijacionPrecioResultado | number:'1.2-2' }}</span></div><div *ngIf="fijacionPrecioResultado === null" class="text-xs text-slate-400 italic">Ingresa costo y margen...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'flujo'"><div *ngIf="flujoCajaResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Flujo Neto</span><span class="text-xl font-extrabold leading-none mt-0.5" [ngClass]="flujoCajaResultado >= 0 ? 'text-emerald-700' : 'text-rose-700'">S/ {{ flujoCajaResultado | number:'1.2-2' }}</span></div><div *ngIf="flujoCajaResultado === null" class="text-xs text-slate-400 italic">Calcula ingresos menos egresos...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'cuota'"><div *ngIf="cuotaPrestamoResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Cuota Mensual</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">S/ {{ cuotaPrestamoResultado | number:'1.2-2' }}</span></div><div *ngIf="cuotaPrestamoResultado === null" class="text-xs text-slate-400 italic">Ingresa capital y tasa...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'tir_van'"><div *ngIf="vanResultado !== null" class="flex gap-4 animate-fade-in"><div class="flex flex-col"><span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="vanResultado > 0 ? 'text-emerald-600' : 'text-rose-600'">VAN ({{vanResultado > 0 ? 'Viable' : 'No Viable'}})</span><span class="text-xl font-extrabold leading-none mt-0.5" [ngClass]="vanResultado > 0 ? 'text-emerald-700' : 'text-rose-700'">S/ {{ vanResultado | number:'1.2-2' }}</span></div><div class="w-px h-8 bg-slate-200 mt-1"></div><div class="flex flex-col" *ngIf="tirResultado"><span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">TIR</span><span class="text-xl font-extrabold text-blue-700 leading-none mt-0.5">{{ tirResultado }}%</span></div></div><div *ngIf="vanResultado === null" class="text-xs text-slate-400 italic">Ingresa inversión, tasa y flujos...</div></ng-container>
+        <!-- Vistas Operaciones -->
+        <ng-container *ngIf="activeToolId === 'cap_maxima'"><div *ngIf="capacidadMaximaResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Capacidad Máxima</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ capacidadMaximaResultado | number }} <span class="text-[11px] font-bold text-emerald-600/70 uppercase">unidades/mes</span></span></div><div *ngIf="capacidadMaximaResultado === null" class="text-xs text-slate-400 italic">Multiplica tus factores...</div></ng-container>    
+        <ng-container *ngIf="activeToolId === 'depreciacion'"><div *ngIf="depreciacionResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Depreciación Anual</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">S/ {{ depreciacionResultado | number:'1.2-2' }}</span></div><div *ngIf="depreciacionResultado === null" class="text-xs text-slate-400 italic">Ingresa valor y vida útil...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'tiempos'"><div *ngIf="tiemposResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Tiempo Medio por Unidad</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ tiemposResultado | number:'1.2-2' }}</span></div><div *ngIf="tiemposResultado === null" class="text-xs text-slate-400 italic">Divide tiempo entre unidades...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'mermas'"><div *ngIf="mermasResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Merma Calculada</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ mermasResultado | number:'1.2-2' }} <span class="text-[11px] font-bold text-emerald-600/70 uppercase">%</span></span></div><div *ngIf="mermasResultado === null" class="text-xs text-slate-400 italic">Ingresa entrada y salida...</div></ng-container>
+        <ng-container *ngIf="activeToolId === 'productividad'"><div *ngIf="productividadResultado !== null" class="flex flex-col"><span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Ratio de Productividad</span><span class="text-xl font-extrabold text-emerald-700 leading-none mt-0.5">{{ productividadResultado | number:'1.2-2' }} <span class="text-[11px] font-bold text-emerald-600/70 uppercase">unid/HH</span></span></div><div *ngIf="productividadResultado === null" class="text-xs text-slate-400 italic">Calcula ratio...</div></ng-container>
+
+      </div>
+
+      <!-- Botones de Acción Inline -->
+      <div class="flex gap-2 shrink-0">
+        <button (click)="cancelar()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg text-xs font-bold transition-colors">Cerrar</button>
+        <button (click)="inyectar()" 
+                [disabled]="(activeToolId === 'muestra' && !tamanoMuestraResultado) || 
+                            (activeToolId === 'demanda' && !demandaResultado) || 
+                            (activeToolId === 'mercado' && !mercadoResultados) || 
+                            (activeToolId === 'ticket' && !ticketResultado) || 
+                            (activeToolId === 'desviacion' && !mediaResultado) || 
+                            (activeToolId === 'pe' && !puntoEquilibrioResultado) ||
+                            (activeToolId === 'fijacion_precio' && !fijacionPrecioResultado) || 
+                            (activeToolId === 'flujo' && flujoCajaResultado === null) || 
+                            (activeToolId === 'cuota' && !cuotaPrestamoResultado) || 
+                            (activeToolId === 'tir_van' && vanResultado === null) || 
+                            (activeToolId === 'cap_maxima' && !capacidadMaximaResultado) ||
+                            (activeToolId === 'depreciacion' && !depreciacionResultado) || 
+                            (activeToolId === 'tiempos' && !tiemposResultado) || 
+                            (activeToolId === 'mermas' && mermasResultado === null) || 
+                            (activeToolId === 'productividad' && !productividadResultado) || 
+                            (!['muestra', 'demanda', 'mercado', 'ticket', 'desviacion', 'pe', 'fijacion_precio', 'flujo', 'cuota', 'tir_van', 'cap_maxima', 'depreciacion', 'tiempos', 'mermas', 'productividad'].includes(activeToolId))" 
+                class="flex items-center gap-1 px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold shadow-sm">
+          <mat-icon class="text-[16px] w-4 h-4">check_circle</mat-icon> Usar en análisis
+        </button>
+      </div>
+
+    </div>
+  </div>

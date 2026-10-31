@@ -17,10 +17,7 @@ export class ConversationService {
 
   constructor( private http: HttpClient, public authService: AuthService) { }
 
-  
-    
-
-   obtienerDataPlan(idPlan : number ){
+    obtienerDataPlan(idPlan : number ){
       // this.url 
       //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
@@ -28,21 +25,9 @@ export class ConversationService {
         {   headers,
             params: { idPlan: idPlan } 
         });
-      /*return this.http.get(this.url +"/section/obtenercapitulosplan",{ params: { idPlan: idPlan } }).pipe(
-        map((auth:any) => {
-          console.log(auth);
-          //this.saveTokenLocalStorage(auth);
-          return auth;
-        }),
-        catchError((error:any) => {
-          console.log(error);
-          return throwError(() => error);
-        })
-      );*/
     }
 
     getVerficationDiagnosticExist( idConversation : number ){
-      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/verficationdiagnosticexist" ,
         {   headers,
@@ -51,7 +36,6 @@ export class ConversationService {
     }
 
     getQuestionsDiagnostic( idConversation : number ){
-      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/diagnosticplan" ,
         {   headers,
@@ -71,6 +55,7 @@ export class ConversationService {
             { headers: headers }
         );
     }
+    
     enviarContextoRespuestas( data: any ){
         let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
         let URL = URL_SERVICIOS+"/conversation/validateAnswerResponse";
@@ -104,18 +89,6 @@ export class ConversationService {
         return this.http.post(URL,data,{headers: headers});
     }
 
-    /*getProgress(idConversation: number ){
-
-      let URL = URL_SERVICIOS + "/conversation/conversationprogress";
-      //console.log("TOKEN get progres: " + this.authService.token )
-      let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
-      return this.http.get<ProgressResponse>( URL  ,
-        {   headers,
-            params: { idConversation: idConversation } 
-        });
-
-    }*/
-
   assistantChat(payload: {
     idConversation: number;
     idQuestion: number;
@@ -128,12 +101,9 @@ export class ConversationService {
     return this.http.post(`${this.url}/assistant-chat`, payload, { headers });
   }
 
-        
-
     getDocument(idConversation: number ){
 
       let URL = URL_SERVICIOS + "/download";
-      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( URL  ,
         {   headers,
@@ -145,7 +115,6 @@ export class ConversationService {
     getSuscriptions(){
 
       let URL = URL_SERVICIOS + "/conversation/conversationsUser";
-      //console.log("TOKEN get progres: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<ApiResponse>( URL  ,
         {   headers
@@ -153,8 +122,6 @@ export class ConversationService {
     }
 
     getDataConversation(idConversation: number, triggerAi: boolean = false){
-      // this.url 
-      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get<ConversationPlanResponse>( this.url + "/conversationPlan" ,
         {   headers,
@@ -166,8 +133,6 @@ export class ConversationService {
     }
 
     getConversationPlanUser(idConversation: number ){
-      // this.url 
-      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/conversationplanuser" ,
         {   headers,
@@ -177,14 +142,11 @@ export class ConversationService {
     }
 
     getViewConversationPlanUser(idConversation: number ){
-      // this.url 
-      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/viewconversationplanuser" ,
         {   headers,
             params: { idConversation: idConversation } 
         });
-     
     }
 
     updateTitleConversation( data: any ){
@@ -204,5 +166,15 @@ export class ConversationService {
 
       return this.http.get(url, { headers });
      
-    }  
+    }
+    
+    deleteChaptersAnswers(idConversation: number, startChapterId: number): Observable<any> {
+      const headers = new HttpHeaders({
+        'Authorization': 'Bearer ' + this.authService.token
+      });
+      return this.http.post(`${this.url}/delete-chapters-answers`, {
+        idConversation,
+        startChapterId
+      }, { headers });
+    }
 }

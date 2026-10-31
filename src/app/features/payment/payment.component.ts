@@ -442,11 +442,15 @@ export class PaymentComponent implements OnInit {
 
           this.dialog.closeAll();
 
-          this.showDialog(
+          const dialogRef = this.showDialog(
             'success',
             'Tu pago fue registrado correctamente. Será validado dentro de las próximas horas.',
             'Pago registrado'
           );
+
+          dialogRef.afterClosed().subscribe(() => {
+            this.router.navigate(['/conversations']);
+          });
 
         },
         error: (err) => {
@@ -519,7 +523,7 @@ export class PaymentComponent implements OnInit {
       message: string,
       title = 'Aviso'
     ) {
-      this.dialog.open(DialogComponent, {
+      return this.dialog.open(DialogComponent, {
         width: '400px',
         data: {
           type,

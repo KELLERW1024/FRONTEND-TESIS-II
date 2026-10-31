@@ -29,7 +29,7 @@ export class RegisterComponent {
       email: ['kwilliamdesarollo@outlook.com', [Validators.required, Validators.email]],
       password: ['12345678', [Validators.required,  Validators.maxLength(50), Validators.minLength(6)] ],
       password_confirmation: ['12345678', Validators.required],
-      role_id: ['2']
+      role_id: ['1']
     }, {
       validators: this.passwordsMatchValidator
     });
@@ -55,9 +55,7 @@ export class RegisterComponent {
             setTimeout(() => {
               return
             }, 1500);
-
-        }
-        else if( res ){           
+        } else if( res ){           
           this.errorMessage = '';
           this.successMessage = 'Registro exitoso, redirigiendo...';
 
@@ -65,11 +63,10 @@ export class RegisterComponent {
             this.router.navigate(['/login']);
           }, 1500);
 
-        }else {
+        } else{
           this.errorMessage = 'No se pudo realizar el registro intente más tarde';
           console.log('Registro fallido: respuesta inválida')
         }
-        
       },
       error: (err) => {
 
@@ -79,9 +76,7 @@ export class RegisterComponent {
           this.errorMessage = 'No se pudo realizar el registro, intente más tarde';
         }
         console.error('Registro fallido:', err);
-
       },
     });
   }
-
 }

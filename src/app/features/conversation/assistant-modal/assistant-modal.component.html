@@ -1,100 +1,240 @@
-<div class="flex flex-col h-[85vh] max-h-[85vh] bg-white rounded-xl overflow-hidden">
+<div class="flex flex-col h-full max-h-full bg-slate-50 rounded-xl overflow-hidden shadow-2xl w-full">
   
-  <!-- CABECERA -->
-  <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/70">
+  <!-- CABECERA PRINCIPAL -->
+  <div class="px-6 py-3 border-b border-slate-200 flex justify-between items-center bg-white">
     <div class="flex items-center gap-3">
-      <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
-        Asistente de Redacción
+      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+       Agente IA
       </span>
       <h3 class="font-semibold text-slate-800 text-base mb-0">
         {{ data.parentNode?.titulo }}
       </h3>
     </div>
+    
+    <!-- PASOS DE PROGRESO -->
+    <div class="hidden md:flex items-center gap-4 text-xs font-medium text-slate-500">
+      <span class="text-blue-600 flex items-center gap-1"><mat-icon class="text-[16px] w-4 h-4">check_circle</mat-icon> 1. Brechas</span>
+      <mat-icon class="text-[14px] w-4 h-4 text-slate-300">chevron_right</mat-icon>
+      <span class="text-blue-600 flex items-center gap-1"><mat-icon class="text-[16px] w-4 h-4">calculate</mat-icon> 2. Calcular</span>
+      <mat-icon class="text-[14px] w-4 h-4 text-slate-300">chevron_right</mat-icon>
+      <span [ngClass]="isComplete ? 'text-blue-600' : ''" class="flex items-center gap-1">3. Validar</span>
+      <mat-icon class="text-[14px] w-4 h-4 text-slate-300">chevron_right</mat-icon>
+      <span>4. Integrar</span>
+    </div>
+
     <button mat-icon-button mat-dialog-close class="text-slate-400 hover:text-slate-700">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <!-- CONTEXTO DE LA PREGUNTA -->
-  <div class="bg-slate-100/70 px-6 py-2.5 border-b border-slate-200 text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
-    <div><strong>Pregunta:</strong> {{ data.question?.question_text }}</div>
-    <div *ngIf="data.parentNode?.objective">| <strong>Objetivo:</strong> {{ data.parentNode?.objective }}</div>
-  </div>
-
-  <!-- CUERPO -->
+  <!-- CUERPO DE 3 COLUMNAS -->
   <div class="flex-1 grid grid-cols-12 overflow-hidden min-h-0">
     
-    <!-- COLUMNA IZQUIERDA -->
-    <div class="col-span-7 flex flex-col border-r border-slate-200 h-full overflow-hidden bg-slate-50/30">
+    <!-- ========================================== -->
+    <!-- COLUMNA 1: CONTEXTO Y BRECHAS (3/12)       -->
+    <!-- ========================================== -->
+    <div class="col-span-3 flex flex-col border-r border-slate-200 h-full overflow-y-auto bg-white p-5">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">1. Tu Contexto y Brechas</h4>
       
-      <!-- HISTORIAL MENSAJES -->
-      <div #chatScrollContainer class="flex-1 overflow-y-auto p-4 space-y-4">
-        <div *ngFor="let msg of messages" class="flex gap-2.5" [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">
-          
-         <!-- <div *ngIf="msg.role === 'assistant'" class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 text-sm">
-            🤖
-          </div> -->
-          
-          <div [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm shadow-xs'"
-               class="max-w-[82%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line">
-            {{ msg.content }}
-          </div>
-        </div>
-
-        <div *ngIf="isLoading" class="flex items-center gap-2 text-slate-400 text-xs py-2">
-          <mat-spinner diameter="18"></mat-spinner>
-          <span>El asistente está analizando y redactando...</span>
-        </div>
+      <!-- PREGUNTA ACTIVA -->
+      <div class="mb-5">
+        <h5 class="text-[11px] font-bold text-blue-600 uppercase mb-2">Pregunta Activa</h5>
+        <p class="text-[13px] font-medium text-slate-700 leading-relaxed bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+          {{ data.question?.question_text }}
+        </p>
       </div>
 
-      <!-- INPUT DIÁLOGO -->
-      <div class="p-3 border-t border-slate-200 bg-white flex gap-2 items-center">
-        <input type="text"
-               autofocus
-               [(ngModel)]="userInput"
-               (keyup.enter)="sendMessage()"
-               
-               placeholder="Escribe tu respuesta o duda aquí..."
-               class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-        <button mat-flat-button color="primary" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">
-          <mat-icon>send</mat-icon>
-        </button>
+      <!-- BRECHAS DETECTADAS -->
+      <div class="mb-5">
+        <h5 class="text-[11px] font-bold text-yellow-600 uppercase mb-3 flex items-center gap-1">
+          <mat-icon class="text-[14px] w-4 h-4">warning_amber</mat-icon> Brechas Detectadas
+        </h5>
+
+        <!-- ESQUELETO DE CARGA (Se muestra mientras isLoading es true) -->
+        <div *ngIf="isLoading" class="flex flex-col gap-2 animate-pulse">
+          <div class="h-[42px] bg-slate-200 rounded-lg w-full"></div>
+          <div class="h-[42px] bg-slate-200 rounded-lg w-[85%]"></div>
+        </div>
+
+        <!-- CONTENIDO REAL (Se muestra cuando termina de cargar) -->
+        <div *ngIf="!isLoading">
+          <!-- Estado vacío: No hay brechas -->
+          <div *ngIf="brechas.length === 0" class="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-lg border border-slate-100">
+            No se han detectado datos faltantes para esta pregunta.
+          </div>
+          
+          <!-- Lista de brechas hiper-específicas -->
+          <div *ngIf="brechas.length > 0" class="flex flex-col gap-2">
+            <div *ngFor="let brecha of brechas" class="flex items-center justify-between text-[13px] p-2.5 rounded-lg border border-slate-200 bg-white shadow-sm">
+              <span class="font-medium text-slate-700 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="{'bg-red-500': brecha.criticidad === 'Crítica', 'bg-orange-500': brecha.criticidad === 'Importante', 'bg-yellow-400': brecha.criticidad === 'Recomendable', 'bg-slate-400': brecha.criticidad === 'Opcional'}"></span>
+                {{ brecha.dato }}
+              </span>
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider" [ngClass]="{'bg-red-50 text-red-600 border border-red-100': brecha.criticidad === 'Crítica', 'bg-orange-50 text-orange-600 border border-orange-100': brecha.criticidad === 'Importante', 'bg-yellow-50 text-yellow-700 border border-yellow-100': brecha.criticidad === 'Recomendable', 'bg-slate-50 text-slate-500 border border-slate-200': brecha.criticidad === 'Opcional'}">
+                {{ brecha.criticidad }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>  
+
+      <!-- DATOS YA CONOCIDOS -->
+      <div *ngIf="datosConocidos.length > 0" class="mb-5">
+        <h5 class="text-[11px] font-bold text-emerald-600 uppercase mb-3 flex items-center gap-1">
+          <mat-icon class="text-[14px] w-4 h-4">check_circle</mat-icon> Datos ya conocidos
+        </h5>
+        <div class="flex flex-col gap-2">
+          <div *ngFor="let dato of datosConocidos" class="flex flex-col text-sm p-2.5 rounded-lg bg-emerald-50/40 border border-emerald-100">
+            <span class="text-[10px] font-bold text-emerald-600 capitalize uppercase mb-1">{{ dato.nombre }}</span>
+            <span class="font-semibold text-slate-700 text-[12px] leading-tight">{{ dato.valor }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA -->
-    <div class="col-span-5 flex flex-col h-full overflow-hidden bg-white p-4">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <span class="font-medium text-slate-800 text-sm flex items-center gap-1.5">
-         Propuesta Académica Generada
-        </span>
-        <span *ngIf="isComplete" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-          ● Listo para usar (100%)
-        </span>
-        <span *ngIf="!isComplete" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-          ● En construcción ({{ progressPercentage }}%)
-        </span>
+    <!-- ========================================== -->
+    <!-- COLUMNA 2: CHAT INTERACTIVO -->
+    <!-- ========================================== -->
+    <div class="col-span-5 flex flex-col border-r border-slate-200 h-full overflow-hidden bg-slate-50/50">
+      
+      <!-- VISTA 1: CHAT INTERACTIVO (Se oculta al abrir la calculadora) -->
+      <div *ngIf="!mostrarCalculadoraPanel" class="flex flex-col h-full overflow-hidden w-full">
+        
+        <div class="p-4 border-b border-slate-200 bg-white">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">2. Construimos y calculamos contigo</h4>
+        </div>
+        
+        <!-- HISTORIAL MENSAJES -->
+        <div #chatScrollContainer class="flex-1 overflow-y-auto p-5 space-y-5">
+          <div *ngFor="let msg of messages" class="flex gap-3" [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+            
+            <div *ngIf="msg.role === 'assistant'" class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200 shadow-sm">
+              <mat-icon class="text-[18px] w-5 h-5 flex items-center justify-center">smart_toy</mat-icon>
+            </div>
+            
+            <div [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm shadow-md' : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm shadow-sm'"
+                 class="max-w-[85%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line">
+              {{ msg.content }}
+            </div>
+          </div>
+
+          <div *ngIf="isLoading" class="flex items-center gap-3 text-slate-500 text-sm py-2 px-2">
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>El asistente está analizando y calculando...</span>
+          </div>
+        </div>
+
+        <!-- ACCIONES RÁPIDAS Y CHAT INPUT -->
+        <div class="p-4 bg-white border-t border-slate-200">
+          
+          <div class="flex gap-2 mb-3">
+            <button (click)="abrirCalculadora()" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded text-[11px] font-semibold text-indigo-600 transition-colors">
+              <mat-icon class="text-[14px] w-4 h-4">calculate</mat-icon> Operaciones
+            </button>
+            <button (click)="subirArchivo()" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded text-[11px] font-semibold text-emerald-600 transition-colors">
+              <mat-icon class="text-[14px] w-4 h-4">upload_file</mat-icon> Subir archivo
+            </button>
+            <button (click)="actionEstimarIA()" class="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-medium rounded border border-amber-200 transition-colors">
+              <mat-icon class="text-[14px] w-4 h-4">auto_awesome</mat-icon> Estimar con IA
+            </button>
+          </div>
+
+          <div class="flex gap-2 items-center">
+            <input type="text" autofocus [(ngModel)]="userInput" (keyup.enter)="sendMessage()"
+                   placeholder="Escribe tu respuesta, dato numérico o pide un ajuste..."
+                   class="flex-1 border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+            <button mat-flat-button color="primary" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()" class="h-[42px] min-w-[50px] rounded-lg">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <!-- TEXTAREA -->
-      <div class="flex-1 py-3 flex flex-col min-h-0">
+      <!-- VISTA 2: PANEL DE LA CALCULADORA (Se muestra al dar clic en el botón) -->
+      <div *ngIf="mostrarCalculadoraPanel" class="flex flex-col h-full overflow-hidden p-5">
+        <app-calculator-panel 
+            [datosConocidos]="datosConocidos" 
+            (cerrarPanel)="cerrarCalculadora()" 
+            (inyectarResultado)="recibirDatosCalculadora($event)"
+            class="flex-1 flex flex-col h-full">
+        </app-calculator-panel>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- COLUMNA 3: VARIABLES Y RESULTADO (4/12)    -->
+    <!-- ========================================== -->
+    <div class="col-span-4 flex flex-col h-full overflow-hidden bg-white p-5">
+      <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">3. Variables y Resultado</h4>
+
+        <!-- LISTA DE VARIABLES CON FÓRMULA INDIVIDUAL -->
+        <div class="flex flex-col">
+          <div *ngFor="let v of variables; let i = index" class="flex flex-col py-3 border-b border-slate-100 last:border-0">
+            
+            <!-- Fila Principal de la Variable -->
+            <div class="flex items-start justify-between text-sm">
+              
+              <!-- Lado Izquierdo: Nombre y Botón de Fórmula -->
+              <div class="flex flex-col gap-1 pr-2">
+                <span class="text-slate-700 capitalize font-medium leading-tight">{{ v.nombre }}</span>
+                
+                <button *ngIf="v.formula" (click)="toggleFormulaVariable(i)" 
+                        class="text-[10px] text-blue-500 hover:text-blue-700 font-bold flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-none p-0 text-left w-fit mt-0.5">
+                  {{ v.mostrarFormula ? 'Ocultar fórmula' : 'Ver fórmula utilizada' }}
+                </button>
+              </div>
+
+              <!-- Lado Derecho: Valor y Estado -->
+              <div class="flex items-center gap-2 shrink-0 mt-0.5">
+                <span class="font-bold text-slate-800">{{ v.valor }}</span>
+                <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded"
+                      [ngClass]="v.estado === 'Calculado' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
+                  {{ v.estado }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Cajita blanca de la fórmula -->
+            <div *ngIf="v.mostrarFormula && v.formula" class="mt-4 p-6 bg-white border border-slate-200 shadow-md rounded-lg flex items-center justify-center relative animate-fade-in">
+
+              <mat-icon class="absolute top-2 left-2 text-[16px] text-slate-200">functions</mat-icon>
+              
+              <!-- Texto de la fórmula: grande, centrado, letra serif cursiva -->
+              <span class="text-base sm:text-[15px] text-slate-800 font-serif italic tracking-wide text-center leading-relaxed">
+                {{ v.formula }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      <!-- TEXTAREA DE PROPUESTA ACADÉMICA (Abajo) -->
+      <div class="flex-1 flex flex-col min-h-0">
+        <div class="flex items-center justify-between pb-2">
+          <h5 class="text-[11px] font-bold text-blue-600 uppercase flex items-center gap-1">
+            <mat-icon class="text-[14px] w-4 h-4">description</mat-icon> Propuesta Académica Generada
+          </h5>
+          <span *ngIf="isComplete" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+            Listo (100%)
+          </span>
+          <span *ngIf="!isComplete" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+            En construcción ({{ progressPercentage }}%)
+          </span>
+        </div>
+        
         <textarea [(ngModel)]="draftText"
-                  placeholder="La redacción formal de tu respuesta aparecerá aquí conforme interactúes con el asistente..."
-                  class="flex-1 w-full border border-slate-200 rounded-lg p-3 text-sm leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-blue-400 text-slate-700 bg-slate-50/20"></textarea>
+                  placeholder="La redacción formal de tu respuesta y cálculos aparecerá aquí..."
+                  class="flex-1 w-full border border-slate-200 rounded-lg p-4 text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 text-slate-700 bg-slate-50/30 shadow-inner"></textarea>
       </div>
 
-      <!-- MÉTRICAS RESUMIDAS -->
-      <div *ngIf="metricsSummary" class="bg-slate-100 text-slate-700 text-xs px-3 py-2 rounded-md mb-3 flex items-center gap-2">
-        <span class="font-bold">•</span> {{ metricsSummary }}
-      </div>
-
-      <!-- ACCIONES DERECHA -->
-      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-        <button mat-stroked-button (click)="recalculate()" [disabled]="isLoading" class="text-slate-600 text-xs">
-          <mat-icon class="text-sm">restart_alt</mat-icon> Reiniciar
+      <!-- ACCIONES FINALES -->
+      <div class="flex items-center justify-between gap-3 pt-4 mt-2 border-t border-slate-100">
+        <button mat-stroked-button (click)="recalculate()" [disabled]="isLoading" class="text-slate-600">
+          <mat-icon>restart_alt</mat-icon> Reiniciar
         </button>
-        <button mat-flat-button color="primary" (click)="useAnswer()" [disabled]="!draftText.trim()">
-          <mat-icon>check</mat-icon> Usar esta respuesta en mi plan
+        <button mat-flat-button color="primary" (click)="useAnswer()" [disabled]="!draftText.trim()" class="flex-1 bg-emerald-600 hover:bg-emerald-700">
+          <mat-icon>check</mat-icon> Aprobar e Integrar al Plan
         </button>
       </div>
     </div>

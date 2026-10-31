@@ -83,5 +83,12 @@ export class DashboardService {
   let URL = URL_SERVICIOS + "/getpackageplans?idPackage=" + idPackage;
   let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
   return this.http.get(URL, { headers });
-}
+  }
+  
+  getAdminStats() {
+    let URL = URL_SERVICIOS + "/admin/stats";
+    let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.get(URL, { headers });
+  }
+
 }

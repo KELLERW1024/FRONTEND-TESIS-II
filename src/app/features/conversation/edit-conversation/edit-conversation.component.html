@@ -66,8 +66,6 @@
                         Tu plan de tesis ha sido completado correctamente.
                         Ya puedes ver todas tus respuestas y descargar tu documento final.
                     </h4>
-
-
                 </div>
 
 
@@ -76,19 +74,15 @@
                     <div class="p-4 text-center">
                         <mat-card-title>
                             {{ dataCurrentQuestion?.parent_node?.titulo }}
-                        </mat-card-title>
-
-                           
+                        </mat-card-title>            
                     </div>
 
                     <mat-card-content class="border-t border-border">
 
                         <form [formGroup]="form" (ngSubmit)="conversationPayloadResponse()">
                             <div class="grid grid-cols-8 gap-x-4 text-sm">
-
                                 <div class="col-span-8 ">
                                     <div class="flex justify-between items-center gap-4 mb-2">
-
                                         <div class="font-semibold text-sm">
                                             <span>{{ dataCurrentQuestion?.question?.question_text }}</span>
                                             <span class="mx-1 text-gray-400">=></span>
@@ -109,43 +103,6 @@
                                                 💡 Ayúdame a responder
                                             </button>
 
-                                         <!-- <button type="button"
-                                            class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
-                                            title="Adjuntar archivo" (click)="fileInput.click()">
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em"
-                                                viewBox="0 0 24 24">
-                                                <path d="M0 0h24v24H0z" fill="none" />
-                                                <path fill="currentColor"
-                                                    d="M22 13.75v-2.202c0-2.632 0-3.949-.77-4.804a3 3 0 0 0-.224-.225c-.855-.769-2.172-.769-4.804-.769h-.374c-1.153 0-1.73 0-2.268-.153a4 4 0 0 1-.848-.352c-.488-.271-.896-.68-1.712-1.495l-.55-.55c-.274-.274-.41-.41-.554-.53a4 4 0 0 0-2.18-.903c-.186-.017-.38-.017-.766-.017c-.883 0-1.324 0-1.692.07A4 4 0 0 0 2.07 5.007C2 5.376 2 5.818 2 6.7v7.05c0 3.771 0 5.657 1.172 6.828S6.229 21.75 10 21.75h4c3.771 0 5.657 0 6.828-1.172S22 17.521 22 13.75"
-                                                    opacity=".5" />
-                                                <path fill="currentColor"
-                                                    d="M12 11a.75.75 0 0 1 .75.75V13H14a.75.75 0 0 1 0 1.5h-1.25v1.25a.75.75 0 0 1-1.5 0V14.5H10a.75.75 0 0 1 0-1.5h1.25v-1.25A.75.75 0 0 1 12 11" />
-                                            </svg>
-                                         </button> -->
-                                        
-
-                                         <!-- <input type="file" #fileInput multiple style="display: none"
-                                            (change)="onFileSelected($event)" />
-                                         <div *ngIf="selectedFiles.length > 0" class="mt-1">
-                                            <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se
-                                                    permite max. una imagen y un documento)</small> </p>
-
-                                            <ul>
-                                                <li
-                                                    *ngFor="let file of selectedFiles; let i = index; trackBy: trackByFile">
-                                                    {{ file.name }} ({{ file.size / 1024 | number:'1.0-0' }} KB)
-
-                                                    <button type="button" (click)="removeFile(i)"
-                                                        class="ml-2 text-red-500 hover:text-red-700"
-                                                        title="Eliminar archivo">
-                                                        ✖
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                         </div> -->
-
-
                                             <button mat-stroked-button type="button" 
                                             class="border border-secondary! text-secondary text-xs h-8" 
                                             (click)="mostrarSeccion()">
@@ -156,11 +113,11 @@
 
                                     <mat-label class="font-semibold mb-2 block">
 
-                                            <div [hidden]="!mostrarDiv"
-                                            class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50"
-                                            (dragover)="onDragOver2($event)"
-                                            (drop)="onDrop2($event)"
-                                            (click)="fileInput.click()">
+                                        <div [hidden]="!mostrarDiv"
+                                             class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50"
+                                             (dragover)="onDragOver2($event)"
+                                             (drop)="onDrop2($event)"
+                                             (click)="fileInput.click()">
 
                                             <mat-icon class="text-gray-500 text-4xl">
                                                 cloud_upload
@@ -170,17 +127,16 @@
                                                 Arrastra tus imágenes aquí o haz clic para seleccionar
                                             </p>
 
-                                           <input type="file" #fileInput multiple style="display: none"
+                                            <input type="file" #fileInput multiple style="display: none"
                                             (change)="onFileSelected($event)" />
-
                                         </div>
 
                                     </mat-label>
+
                                     <div class="flex gap-2 mt-2">
-                                         <div *ngIf="selectedFiles.length > 0" class="mt-1">
+                                        <div *ngIf="selectedFiles.length > 0" class="mt-1">
                                             <p class="text-sm font-medium">Archivos seleccionados: <small>(Solo se
                                                     permite max. una imagen y un documento)</small> </p>
-
                                             <ul>
                                                 <li
                                                     *ngFor="let file of selectedFiles; let i = index; trackBy: trackByFile">
@@ -198,32 +154,21 @@
                                         <div *ngFor="let img of previewFiles">
                                             <img [src]="img" width="80" class="rounded" />
                                         </div>
-
                                     </div>
+
                                     <mat-checkbox formControlName="showImages" color="primary">
-                                       <strong> Generar imagen referencial en la respuesta. </strong>
+                                        <strong> Generar imagen referencial en la respuesta. </strong>
                                     </mat-checkbox>
                                     <mat-checkbox formControlName="crearCuadro" color="primary">
                                         <strong> Generar cuadro en la respuesta.</strong>
                                     </mat-checkbox>
 
                                     <div class="flex items-center gap-1 w-full">
-
                                         <mat-form-field appearance="outline" class="flex-1">
-                                            <textarea matInput rows="5" autofocus formControlName="answer">
-                                        </textarea>
-
+                                            <textarea matInput rows="5" autofocus formControlName="answer"></textarea>
                                         </mat-form-field>
-
                                     </div>
-                                    <!-- <p> -->
-                                    
-                                    <!-- </p> -->
-                                    <!-- <p>
-                                    <mat-checkbox formControlName="showImages"  color="primary">Quiero ver imagenes en la respuesta generada.</mat-checkbox>
-                                    </p> -->
                                 </div>
-
                             </div>
 
                             <div class="mt-0 flex gap-2">
@@ -278,22 +223,8 @@
                                     <input #fileInputAddDoc type="file" accept="image/*, 
                                             .xls,
                                             .xlsx" hidden (change)="onFileSelectedAddDoc($event)">
-
-                                    <!-- <button type="button"
-                                        class="p-2 rounded-full hover:bg-green-100 transition cursor-pointer"
-                                        title="Adjuntar archivo" (click)="fileInputAddDoc.click()">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em"
-                                            viewBox="0 0 16 16">
-                                            <path d="M0 0h24v24H0z" fill="none" />
-                                            <path fill="currentColor" fill-rule="evenodd"
-                                                d="M3 2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v3h.5a.5.5 0 0 1 .5.5v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5H3zM3 5v2.5h10v-1H7.5a.5.5 0 0 1-.354-.146L5.793 5zm9 .5V3H4v1h2a.5.5 0 0 1 .354.146L7.707 5.5z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-
-                                    </button> -->
                                     
-                                                                        <!-- INI -->
+                                        <!-- INI -->
                                     <div
                                         class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50"
                                         (dragover)="onDragOver($event)"
@@ -309,15 +240,6 @@
                                             Arrastra tus imágenes aquí o haz clic para seleccionar
                                         </p>
 
-                                        <!-- <input
-                                            #fileInput
-                                            type="file"
-                                            hidden
-                                            multiple
-                                            accept="image/*"
-                                            (change)="onFileSelectedAddDoc($event)"
-                                        /> -->
-
                                     </div>
                                     <!-- FIN -->
                                     <!-- PREVIEW DE LA IMAGEN O ARCHIVO  SELECCIONADO -->
@@ -332,11 +254,9 @@
                                                 <button type="button"
                                                     class="absolute top-2 right-2 bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center z-10 shadow"
                                                     (click)="selectedFilesAddDoc.splice(i, 1)">
-
                                                     ✕
                                                 </button>
-                                                
-
+                                            
                                                 <mat-card-content class="p-0">
 
                                                     <!-- 🖼 IMAGEN -->
@@ -348,50 +268,25 @@
 
                                                     </div>
 
-                                                    <!-- 📄 DOCUMENTO -->
-                                                    <!-- <div *ngIf="item.category === 'document'"
-                                                        class="w-full bg-gray-100 px-4 py-10 text-center">
-
-                                                        <p class="text-5xl">
-                                                            📄
-                                                        </p>
-
-                                                        <p class="text-sm text-gray-600 mt-2">
-                                                            {{ item.name }}
-                                                        </p>
-
-                                                    </div> -->
-
                                                     <!-- 📝 DESCRIPCIÓN -->
                                                     <div class="p-3">
-
                                                         <input type="text" [(ngModel)]="item.description"
                                                             [ngModelOptions]="{standalone: true}"
                                                             placeholder="Descripción"
                                                             class="border rounded w-full p-2 text-sm">
-
                                                     </div>
 
                                                     <!-- 📌 FUENTE -->
                                                     <div class="p-3">
-
                                                         <input type="text" [(ngModel)]="item.fuente"
                                                             [ngModelOptions]="{standalone: true}" placeholder="Fuente"
                                                             class="border rounded w-full p-2 text-sm">
-
                                                     </div>
-
                                                 </mat-card-content>
-
                                             </mat-card>
-
                                         </div>
-
                                     </div>
-
-                                    
                                 </div>
-
 
                             </div>
                             <!-- VER DE LA IMAGEN GENERADA POR LA IA -->
@@ -488,9 +383,6 @@
                                 </mat-chip-listbox>
                             </div>
 
-                            
-                            
-
                             <div class="mt-3 flex gap-2">
                                 <button mat-flat-button color="accent" (click)="guardarRespuesta()">
                                     Guardar esta respuesta para esta pregunta
@@ -501,7 +393,6 @@
                     </mat-card-content>
                 </mat-card>
             </div>
-
 
         </div>
     </mat-card-content>
@@ -533,8 +424,6 @@
             <p><strong>Detalle:</strong> {{ selectedQuestion?.question_detail }}</p>
 
             <p><strong>Ejemplo:</strong> {{ selectedQuestion?.question_example}}</p>
-
-
 
         </div>
         <div class="flex justify-end gap-2 p-4 ">
@@ -649,7 +538,6 @@
 
 </ng-template>
 
-
 <div *ngIf="selectedImage" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
     (click)="closeImage()">
 
@@ -689,31 +577,63 @@
                     />
                 }
 
-
             </ng-container>
-
 
     </div>
 
 </ng-template>
 
-    <!-- 
-    <div 
-        *ngIf="isLoading"
-        class="absolute inset-0 bg-white/70 flex items-center justify-center z-50">
+    <!-- ============================================= -->
+    <!-- MODAL DE RESPUESTA AUTOMÁTICA DE LA IA -->
+    <!-- ============================================= -->
+    <div *ngIf="showAutoAnswerModal" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+        <div class="bg-white w-full max-w-2xl rounded-lg shadow-md border border-slate-200 overflow-hidden">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 bg-slate-50">
+                <h5 class="font-semibold text-blue-800 text-base flex items-center gap-2 m-0">
+                    <mat-icon class="text-blue-700 !w-5 !h-5 !text-xl">auto_awesome</mat-icon>
+                    Respuesta sugerida por la IA
+                </h5>
+                <button mat-icon-button (click)="cerrarModalAutoRespuesta()">
+                    <mat-icon class="text-slate-500">close</mat-icon>
+                </button>
+            </div>
 
-        <div class="flex flex-col items-center gap-3">
+            <div class="p-5 space-y-4 max-h-[50vh] overflow-y-auto text-sm">
+                
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Pregunta actual:</span>
+                    <p class="font-medium text-slate-900 text-sm m-0 leading-normal">
+                        {{ autoSuggestedQuestion?.question_text || dataCurrentQuestion?.question?.question_text }}
+                    </p>
+                </div>
 
-            <mat-spinner diameter="50"></mat-spinner>
+                <!-- Respuesta sugerida -->
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Respuesta propuesta:</span>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-md text-slate-700 text-sm whitespace-pre-line leading-relaxed">
+                        {{ autoSuggestedAnswer }}
+                    </div>
+                </div>
 
-            <span class="text-gray-600 text-sm">
-                Procesando, espere por favor...
-            </span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2">
+                <button mat-stroked-button class="border border-slate-300 text-slate-700 text-sm" (click)="editarRespuestaAutomatica()">
+                <!--  <mat-icon class="!text-lg !w-4 !h-4 mr-1">edit</mat-icon>-->
+                    Editar
+                </button>
+
+                <button mat-flat-button color="primary" class="text-sm font-medium" (click)="confirmarRespuestaAutomatica()">
+                    <!-- <mat-icon class="!text-lg !w-4 !h-4 mr-1">check</mat-icon>-->
+                    Confirmar
+                </button>
+            </div>
 
         </div>
-
     </div>
-    -->
   
     <app-loader 
         [isLoading]="isLoading" 

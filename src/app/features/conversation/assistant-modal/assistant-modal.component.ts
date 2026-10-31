@@ -16,11 +16,26 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConversationService } from '../service/conversation.service';
+import { CalculatorPanelComponent } from './calculator-panel/calculator-panel.component';
 
 export interface AssistantModalData {
   idConversation: number;
   question: any;
   parentNode: any;
+}
+
+// INTERFACES PARA EL SUPER-MODAL
+export interface Brecha {
+  dato: string;
+  criticidad: 'Crítica' | 'Importante' | 'Recomendable' | 'Opcional' | string;
+}
+
+export interface VariableNegocio {
+  nombre: string;
+  valor: string;
+  estado: 'Calculado' | 'Supuesto' | string;
+  formula?: string | null;
+  mostrarFormula?: boolean;
 }
 
 @Component({
@@ -32,7 +47,8 @@ export interface AssistantModalData {
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    CalculatorPanelComponent
   ],
   templateUrl: './assistant-modal.component.html',
   styleUrls: ['./assistant-modal.component.scss']
@@ -49,7 +65,16 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
   progressPercentage: number = 0;
   isComplete: boolean = false;
   isLoading: boolean = false;
+  contextoGeneral: string = '';
   private shouldScrollToBottom: boolean = false;
+  mostrarCalculadoraPanel: boolean = false;
+
+  // ESTADOS DEL SUPER-MODAL
+  brechas: Brecha[] = [];
+  variables: VariableNegocio[] = [];
+  
+  // DATOS YA CONOCIDOS (Memoria Inmutable)
+  datosConocidos: { nombre: string, valor: string }[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<AssistantModalComponent>,
@@ -131,15 +156,40 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
   }
 
   private applyAiResponse(data: any): void {
+    
     if (data.chat_message) {
       this.messages.push({ role: 'assistant', content: data.chat_message });
     }
     if (data.draft_text) {
       this.draftText = data.draft_text;
     }
+
+    this.contextoGeneral = data.contexto_general || '';
+    
     this.metricsSummary = data.metrics_summary;
     this.isComplete = data.is_complete;
     this.progressPercentage = data.progress_percentage || 0;
+
+    // MAPEO DE BRECHAS
+    this.brechas = data.brechas_detectadas || [];
+    
+    // MAPEO DE VARIABLES CON FÓRMULAS INDIVIDUALES
+    this.variables = (data.variables_negocio || []).map((v: any) => ({
+      nombre: v.nombre ? v.nombre.replace(/_/g, ' ') : '',
+      valor: v.valor,
+      estado: v.estado,
+      formula: v.formula || null,
+      mostrarFormula: false // Inicia oculta
+    }));
+    
+    // MAPEO DE DATOS YA CONOCIDOS (Limpiando nulos y formateando claves)
+    const rawDatos = data.datos_conocidos || {};
+    this.datosConocidos = Object.keys(rawDatos)
+      .filter(key => rawDatos[key] !== null && rawDatos[key] !== '')
+      .map(key => ({
+        nombre: key.replace(/_/g, ' '), // Cambia guiones_bajos a espacios
+        valor: rawDatos[key]
+      }));
   }
 
   recalculate(): void {
@@ -148,10 +198,44 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
     this.metricsSummary = null;
     this.progressPercentage = 0;
     this.isComplete = false;
+    this.brechas = [];
+    this.variables = [];
+    this.datosConocidos = [];
     this.sendInitialPrompt();
   }
 
   useAnswer(): void {
     this.dialogRef.close(this.draftText);
+  }
+
+  // NUEVO MÉTODO: Alterna la visibilidad de la fórmula por cada variable
+  toggleFormulaVariable(index: number): void {
+    if (this.variables[index]) {
+      this.variables[index].mostrarFormula = !this.variables[index].mostrarFormula;
+    }
+  }
+
+abrirCalculadora(): void {
+    this.mostrarCalculadoraPanel = true;
+  }
+
+  cerrarCalculadora(): void {
+    this.mostrarCalculadoraPanel = false;
+  }
+
+  recibirDatosCalculadora(mensaje: string): void {
+    this.mostrarCalculadoraPanel = false;
+    this.userInput = mensaje;
+    this.sendMessage(); // Lo enviamos a la IA automáticamente
+  }
+
+  subirArchivo(): void {
+    // TODO: Aquí integraremos la lógica para seleccionar y procesar archivos
+    console.log('Abrir selector de archivos...');
+  }
+  
+  actionEstimarIA(): void {
+    this.userInput = "No conozco el dato exacto, ¿puedes estimarlo según el rubro?";
+    this.sendMessage();
   }
 }

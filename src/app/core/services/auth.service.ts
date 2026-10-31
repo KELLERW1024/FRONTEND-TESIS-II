@@ -35,6 +35,27 @@ export class AuthService {
     }
   }*/
 
+  // Obtiene el objeto usuario logueado almacenado
+  getUser(): any {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+
+  // Obtiene el role_id (1 = Admin, 2 = Usuario)
+  getRoleId(): number | null {
+    const user = this.getUser();
+    return user && user.role_id ? Number(user.role_id) : null;
+  }
+
+  isAdmin(): boolean {
+    return this.getRoleId() === 1;
+  }
+
+  isUser(): boolean {
+    return this.getRoleId() === 2;
+  }
+
+
   setLoggedIn(status: boolean) {
     this.loggedIn.next(status);
   }

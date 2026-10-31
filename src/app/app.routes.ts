@@ -3,11 +3,17 @@ import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
 import { LoginComponent } from './features/authentication/login/login.component';
 import { authGuard } from './guard/auth.guard';
+import { roleGuard } from './guard/role.guard';
 import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 
-
 export const routes: Routes = [
-   {
+
+  {
+    path: '',
+    redirectTo: 'landing',
+    pathMatch: 'full'
+  },
+  {
     path: 'authentication',
     loadChildren: () =>
       import('./features/authentication/authentication.routes')
@@ -35,6 +41,8 @@ export const routes: Routes = [
       },
       {
         path: 'users',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
         loadComponent: () =>
           import('./features/users/users.component').then((m) => m.UsersComponent),
       },
@@ -50,11 +58,15 @@ export const routes: Routes = [
       },
       {
         path: 'packages',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
         loadComponent: () =>
           import('./features/packages/view-packages/view-packages.component').then((m) => m.ViewPackagesComponent),
       },
       {
         path: 'plans',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
         loadComponent: () =>
           import('./features/plans/plan/plan.component').then((m) => m.PlansComponent),
       },
@@ -65,11 +77,15 @@ export const routes: Routes = [
       },
       {
         path: 'coupons',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
         loadChildren: () =>
           import('./features/coupons/coupons.routes').then( (m) => m.CouponsRoutes ),
       },
       {
         path: 'payments',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
         loadChildren: () =>
           import('./features/payment/payments.routes').then( (m) => m.PaymentsRoutes ),
       },
@@ -87,7 +103,8 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
+        loadComponent: () =>
+          import('./features/profile/profile.component').then(m => m.ProfileComponent)
       },
     ],
   },
@@ -95,50 +112,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'dashboard'
   }, 
-
-
-  /* { path: '',
-    component: FullComponent,
-    children: [
-      {
-        path: '',
-        redirectTo: '/dashboard',
-        pathMatch: 'full',
-      },
-      {
-        path: 'dashboard',
-        loadChildren: () =>
-          import('./pages/pages.routes').then((m) => m.PagesRoutes),
-      },
-      {
-        path: 'ui-components',
-        loadChildren: () =>
-          import('./pages/ui-components/ui-components.routes').then(
-            (m) => m.UiComponentsRoutes
-          ),
-      },
-      {
-        path: 'extra',
-        loadChildren: () =>
-          import('./pages/extra/extra.routes').then((m) => m.ExtraRoutes),
-      },
-    ],
-  },
-  {
-    path: '',
-    component: BlankComponent,
-    children: [
-      {
-        path: 'authentication',
-        loadChildren: () =>
-          import('./pages/authentication/authentication.routes').then(
-            (m) => m.AuthenticationRoutes
-          ),
-      },
-    ],
-  },
-  {
-    path: '**',
-    redirectTo: 'authentication/error',
-  },*/
 ];

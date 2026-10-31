@@ -1,5 +1,5 @@
 import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
 import { CoreService } from 'src/app/services/core.service';
@@ -16,6 +16,7 @@ import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { AppNavItemComponent } from './sidebar/nav-item/nav-item.component';
 import { navItems } from './sidebar/sidebar-data';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -54,9 +55,22 @@ interface quicklinks {
   encapsulation: ViewEncapsulation.None
 })
 export class FullComponent implements OnInit {
+  private authService = inject(AuthService);
+
   navItems = navItems;
 
-
+private adminRoutes: string[] = [
+    '/users',
+    '/suscriptions',
+    '/payments',
+    'content',
+    '/packages',
+    '/plans',
+    '/coupons',
+    'useia',
+    '/useia/tokens',
+    '/use/consume'
+  ];
 
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
@@ -221,8 +235,19 @@ export class FullComponent implements OnInit {
     this.cdr.detectChanges(); // Ensures Angular updates the view
   }
 
-  ngOnInit(): void { }
-
+  ngOnInit(): void { 
+    if (!this.authService.isAdmin()) {
+      this.navItems = navItems.filter((item) => {
+        if (item.route && this.adminRoutes.includes(item.route)) {
+          return false;
+        }
+        return true;
+      });
+    } else {
+      this.navItems = navItems;
+    }
+  }
+  
   ngOnDestroy() {
     this.layoutChangesSubscription.unsubscribe();
   }

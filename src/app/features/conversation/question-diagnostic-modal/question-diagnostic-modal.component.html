@@ -5,15 +5,13 @@
         <div class="text-lg font-medium">
             <strong>Diagnóstico inicial</strong>
         </div>
-        
-        <div class="mt-4 flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-sm">
+            <div class="mt-4 flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-sm">
             <mat-icon class="text-blue-600 scale-90 shrink-0">info</mat-icon>
             <div class="leading-relaxed">
-                Este diagnóstico nos permite identificar el <strong>rubro y enfoque principal</strong> de tu negocio. Con base en tus respuestas, la IA estructurará y adaptará los capítulos de tu plan de forma precisa.
+                Este diagnóstico es fundamental para el éxito de tu proyecto. <strong>Tus respuestas servirán como la base principal para estructurar y desarrollar cada capítulo de tu plan.</strong><br> Procura proporcionar detalles precisos y claros, ya que la IA utilizará esta información para adaptar y profundizar todo el contenido de forma personalizada.
             </div>
         </div>
     </div>
-
 
     <!-- CONTENT -->
     <mat-card-content class="border-t border-border pt-6">
@@ -48,15 +46,12 @@
                             <strong>
                                 Ver detalle para responder
                             </strong>
-
                         </small>
-
                     </div>
 
                     
                     <!-- RESPUESTA -->
                     <div class="w-full">
-
                         <mat-form-field
                             appearance="outline"
                             class="w-full">
@@ -72,11 +67,8 @@
                                 [name]="'answer_' + question.id"
                                 placeholder="Escribe aquí tu respuesta...">
                             </textarea>
-
                         </mat-form-field>
-
                     </div>
-
                 </div>
 
 
@@ -93,7 +85,6 @@
                         Guardar información
 
                     </button>
-
 
                     <button
                         mat-stroked-button
@@ -143,8 +134,6 @@
             <p><strong>Ejemplo:</strong> {{ selectedQuestion?.question_example }}</p>
 
             <!-- <p><strong>Validacion:</strong> {{ selectedQuestion?.validation_detail }}</p> -->
-
-
         </div>
         <div class="flex justify-end gap-2 p-4 ">
 

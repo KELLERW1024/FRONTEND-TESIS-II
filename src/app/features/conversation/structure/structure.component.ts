@@ -330,6 +330,9 @@ getNodeCode(
 
   const titulo = this.normalize(node.titulo);
   if(
+      titulo.includes('diagnostico') ||
+      titulo.includes('resumen ejecutivo') ||
+      titulo.includes('introduccion') ||
       titulo.includes('conclusion') || 
       titulo.includes('recomendacion') ||
       titulo.includes('anexos')
@@ -342,6 +345,9 @@ getNodeCode(
     const capitulos = this.planNode.filter(n => {
       const t = this.normalize(n.titulo);
       return (
+        !t.includes('diagnostico') &&
+        !t.includes('resumen ejecutivo') && 
+        !t.includes('introduccion') &&
         !t.includes('conclusion') && 
         !t.includes('recomendacion') &&
         !t.includes('anexo')
@@ -842,15 +848,4 @@ editNode(node: PlanNode): void {
         }
       });
   }
-
-        /*},
-        error: (err: any) => {
-          console.error(  'Error obteniendo estructura:', err );
-
-        },
-        complete: () => {
-          console.log( 'Completado' );
-        }
-
-      });*/
 }
