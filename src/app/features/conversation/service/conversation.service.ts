@@ -168,13 +168,56 @@ export class ConversationService {
      
     }
     
-    deleteChaptersAnswers(idConversation: number, startChapterId: number): Observable<any> {
+    // Borra la respuesta de la pregunta anterior y la vuelve la actual (no hay vuelta atrás).
+    // idQuestion es la pregunta que ve el usuario: si ya no es la actual, el backend lo rechaza.
+    goBack(idConversation: number, idQuestion: number): Observable<any> {
+      const headers = new HttpHeaders({
+        'Authorization': 'Bearer ' + this.authService.token
+      });
+      return this.http.post(`${this.url}/go-back`, {
+        idConversation,
+        idQuestion
+      }, { headers });
+    }
+
+    // ============================================================
+    // ANEXOS DEL PLAN (imágenes o Excel al final del documento)
+    // ============================================================
+
+    getAnnexes(idConversation: number): Observable<any> {
+      const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+      return this.http.get(`${this.url}/annexes`, { headers, params: { idConversation } });
+    }
+
+    // data: FormData con idConversation, title, source y file
+    addAnnex(data: FormData): Observable<any> {
+      const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+      return this.http.post(`${this.url}/annexes`, data, { headers });
+    }
+
+    // Sube o baja el anexo una posición
+    moveAnnex(id: number, direction: 'up' | 'down'): Observable<any> {
+      const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+      return this.http.patch(`${this.url}/annexes/${id}/move`, { direction }, { headers });
+    }
+
+    deleteAnnex(id: number): Observable<any> {
+      const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+      return this.http.delete(`${this.url}/annexes/${id}`, { headers });
+    }
+
+    // Borra las respuestas de la Fase 1 desde ese punto en adelante: una pregunta
+    // o un nodo (capítulo, sección o subsección)
+    deleteChaptersAnswers(
+      idConversation: number,
+      start: { startNodeId?: number; startQuestionId?: number }
+    ): Observable<any> {
       const headers = new HttpHeaders({
         'Authorization': 'Bearer ' + this.authService.token
       });
       return this.http.post(`${this.url}/delete-chapters-answers`, {
         idConversation,
-        startChapterId
+        ...start
       }, { headers });
     }
 }

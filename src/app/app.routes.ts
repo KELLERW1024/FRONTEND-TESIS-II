@@ -90,6 +90,13 @@ export const routes: Routes = [
           import('./features/payment/payments.routes').then( (m) => m.PaymentsRoutes ),
       },
       {
+        path: 'token-usage',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
+        loadComponent: () =>
+          import('./features/token-usage/token-usage.component').then((m) => m.TokenUsageComponent),
+      },
+      {
         path: 'ui-components',
         loadChildren: () =>
           import('./pages/ui-components/ui-components.routes').then(

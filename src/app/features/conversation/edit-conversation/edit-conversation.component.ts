@@ -34,7 +34,7 @@ import {
   IaResponse
 } from 'src/app/core/models/IAResponse';
 
-import { ConversationPlanResponse } from 'src/app/core/models/ConversationPlanResponse';
+import { ConversationPlanResponse, RestoredAnswer } from 'src/app/core/models/ConversationPlanResponse';
 
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConversationFormService } from '../service/conversation-form.service';
@@ -75,6 +75,9 @@ export class EditConversationComponent {
   @ViewChild('tableModal')
   tableModal!: TemplateRef<any>;
 
+  @ViewChild('goBackDialog')
+  goBackDialog!: TemplateRef<any>;
+
 
   // ============================================================
   // VARIABLES - CONVERSACIÓN
@@ -109,6 +112,10 @@ export class EditConversationComponent {
   form!: FormGroup;
 
   isLoading = false;
+
+  // Texto del indicador de carga: cambia según la acción (validar o guardar la sugerencia)
+  loaderTitle = 'Validando información';
+  loaderDescription = 'Analizando y estructurando tu respuesta. Esto tomará unos segundos...';
 
   mostrarDiv = false;
 
@@ -165,6 +172,19 @@ export class EditConversationComponent {
   imagesSafe: any[] = [];
 
   selectedImage: string | null = null;
+
+
+  // ============================================================
+  // VARIABLES - VOLVER A LA PREGUNTA ANTERIOR
+  // ============================================================
+
+  isGoingBack = false;
+
+  // La pregunta se cargó con lo recuperado al volver: hay que validar antes de guardar
+  modoRetroceso = false;
+
+  // Archivos que tenía la respuesta anterior (hay que volver a adjuntarlos)
+  archivosAnteriores: string[] = [];
 
 
   // ============================================================
@@ -233,19 +253,19 @@ export class EditConversationComponent {
 
   }
 
-  irEditCapitulo() {
+  irDeleteCapitulo() {
 
     this.router.navigate([
-      '/conversations/edit-capitulo-conversation',
+      '/conversations/delete-capitulo-conversation',
       this.idSuscriptionConversation
     ]);
 
   }
 
-  irDeleteCapitulo() {
+  irAnexos() {
 
     this.router.navigate([
-      '/conversations/delete-capitulo-conversation',
+      '/conversations/anexos',
       this.idSuscriptionConversation
     ]);
 
@@ -285,6 +305,9 @@ export class EditConversationComponent {
           this.dataCurrentQuestion = resp;
           console.log('Data Question Ultimate => ', resp);
 
+          // Si se volvió a esta pregunta, cargar lo que escribió el usuario y su tabla
+          this.aplicarRespuestaRecuperada(resp?.restored);
+
           // VERIFICAR SI LA IA PROPUSO UNA RESPUESTA AUTOMÁTICA PARA MOSTRAR EL MODAL
           if (resp && resp.auto_generated) {
             this.autoSuggestedAnswer = resp.suggested_answer || '';
@@ -303,10 +326,12 @@ export class EditConversationComponent {
       });
   }
 
-  // 1. CONFIRMAR: Guarda automáticamente la respuesta sugerida y continúa
   confirmarRespuestaAutomatica() {
     if (!this.autoSuggestedAnswer || !this.dataCurrentQuestion?.question) return;
 
+
+    this.loaderTitle = 'Guardando respuesta';
+    this.loaderDescription = 'Esto tomará solo unos segundos…';
     this.isLoading = true;
     const conversationId = this.idSuscriptionConversation;
     const questionId = this.dataCurrentQuestion.question.id;
@@ -664,6 +689,26 @@ export class EditConversationComponent {
   // ARCHIVOS ADICIONALES
   // ============================================================
 
+  // Tamaño máximo de cada imagen o Excel adjunto a la respuesta (el backend acepta hasta 20 MB)
+  readonly MAX_ADJUNTO_MB = 20;
+
+  // Deja fuera los archivos que superan el límite y avisa cuáles fueron
+  private filtrarPorTamano(files: File[]): File[] {
+    const maxBytes = this.MAX_ADJUNTO_MB * 1024 * 1024;
+    const grandes = files.filter(file => file.size > maxBytes);
+
+    if (grandes.length > 0) {
+      const nombres = grandes.map(file => file.name).join(', ');
+      this.showDialog(
+        'info',
+        `${nombres} supera el tamaño máximo de ${this.MAX_ADJUNTO_MB} MB y no se agregó.`,
+        'Información'
+      );
+    }
+
+    return files.filter(file => file.size <= maxBytes);
+  }
+
   onFileSelectedAddDoc(event: any): void {
 
     const files: FileList = event.target.files;
@@ -672,7 +717,7 @@ export class EditConversationComponent {
       return;
     }
 
-    Array.from(files).forEach(file => {
+    this.filtrarPorTamano(Array.from(files)).forEach(file => {
 
       const isImage =
         file.type.startsWith('image/');
@@ -777,14 +822,20 @@ export class EditConversationComponent {
 
     }
 
-    this.processFiles(files);
+    const validFiles = this.filtrarPorTamano(allowedFiles);
+
+    if (validFiles.length === 0) {
+      return;
+    }
+
+    this.processFiles(validFiles);
 
   }
 
 
-  private processFiles(files: FileList): void {
+  private processFiles(files: File[]): void {
 
-    Array.from(files).forEach(file => {
+    files.forEach(file => {
 
       const isImage =
         file.type.startsWith('image/');
@@ -991,6 +1042,8 @@ export class EditConversationComponent {
 
     this.selectedFilesAddDoc = [];
 
+    this.loaderTitle = 'Validando información';
+    this.loaderDescription = 'Analizando y estructurando tu respuesta. Esto tomará unos segundos...';
     this.isLoading = true;
     this.urlImagenIA = '';
 
@@ -1042,12 +1095,17 @@ export class EditConversationComponent {
         },
 
         error: (err: any) => {
-          this.isLoading = false; 
+          this.isLoading = false;
           console.error(err);
+
+          // Sesión vencida: el interceptor ya lleva al login
+          if (err?.status === 401) {
+            return;
+          }
 
           return this.showDialog(
             'info',
-            'Ocurrió un error, estamos trabajando para solucionarlo',
+            this.mensajeErrorValidacion(err),
             'Info'
           );
 
@@ -1222,6 +1280,16 @@ export class EditConversationComponent {
 
   guardarRespuesta() {
 
+    // Al volver a una pregunta, la respuesta se debe validar de nuevo antes de guardarla
+    if (this.modoRetroceso && !this.iaResponse) {
+      this.showDialog(
+        'info',
+        'Antes de guardar, presiona "Validar información" para generar de nuevo la respuesta.',
+        'Información'
+      );
+      return;
+    }
+
     const formDataPayload = this.buildFormData('save');
 
     this.conversationService  .guardarRespuestas(  formDataPayload  )
@@ -1259,6 +1327,24 @@ export class EditConversationComponent {
           });
           */
 
+        },
+
+        // No se limpia nada: la respuesta y los archivos siguen en pantalla para corregir y reintentar
+        error: (err: any) => {
+          console.error(err);
+
+          // Sesión vencida: el interceptor ya lleva al login
+          if (err?.status === 401) {
+            return;
+          }
+
+          this.showDialog(
+            'info',
+            err?.status === 422 && err?.error?.message
+              ? err.error.message
+              : 'No se pudo guardar la respuesta. Inténtalo de nuevo.',
+            'Información'
+          );
         }
 
       });
@@ -1537,6 +1623,21 @@ descargarImagen(url: string): void {
   }
 
 
+  // Mensaje breve según el error de "Validar información"
+  private mensajeErrorValidacion(err: any): string {
+    // Sin conexión: desde el navegador (0) o desde el servidor hacia el servicio externo (503)
+    if (err?.status === 0 || err?.status === 503) {
+      return 'No se pudo conectar. Inténtalo de nuevo en unos segundos.';
+    }
+
+    // Archivo rechazado por tipo o tamaño
+    if (err?.status === 422) {
+      return 'El archivo no es válido. Solo se admiten archivos JPG, PNG, PDF, Word.';
+    }
+
+    return 'Ocurrió un error, estamos trabajando para solucionarlo';
+  }
+
   limpiar(): void {
 
     this.form.reset();
@@ -1619,7 +1720,103 @@ descargarImagen(url: string): void {
 
   }
 
-  // ELIMINAR TABLA 
+  // ============================================================
+  // VOLVER A LA PREGUNTA ANTERIOR
+  // ============================================================
+
+  volverPreguntaAnterior(): void {
+    const goBack = this.dataCurrentQuestion?.go_back;
+
+    if (!goBack?.allowed) {
+      this.showDialog(
+        'info',
+        goBack?.reason ?? 'No es posible volver a la pregunta anterior.',
+        'Información'
+      );
+      return;
+    }
+
+    this.dialog
+      .open(this.goBackDialog, { width: '460px' })
+      .afterClosed()
+      .subscribe((confirmado: boolean) => {
+        if (confirmado) {
+          this.confirmarVolverPreguntaAnterior();
+        }
+      });
+  }
+
+  private confirmarVolverPreguntaAnterior(): void {
+    const questionId = this.dataCurrentQuestion?.question?.id;
+
+    if (!questionId || this.isGoingBack) {
+      return;
+    }
+
+    this.isGoingBack = true;
+
+    this.conversationService.goBack(this.idSuscriptionConversation, questionId).subscribe({
+      next: () => {
+        this.isGoingBack = false;
+        this.limpiarFormularioPregunta();
+        // Sin IA: la pregunta anterior se carga con lo recuperado, sin respuesta automática
+        this.obtenerDataConversation();
+      },
+      error: (err: any) => {
+        this.isGoingBack = false;
+        this.showDialog(
+          'info',
+          err?.error?.message ?? 'No se pudo volver a la pregunta anterior.',
+          'Información'
+        );
+        this.obtenerDataConversation();
+      }
+    });
+  }
+
+  private aplicarRespuestaRecuperada(restored: RestoredAnswer | null | undefined): void {
+    this.modoRetroceso = !!restored;
+
+    if (!restored) {
+      this.archivosAnteriores = [];
+      return;
+    }
+
+    // Primer cuadro con lo que escribió; el segundo queda vacío hasta validar
+    this.form.patchValue({
+      answer: restored.user_input ?? '',
+      showImages: false,
+      crearCuadro: false
+    });
+    this.reply = '';
+    this.iaResponse = null;
+
+    this.archivosAnteriores = restored.files ?? [];
+
+    // Se muestra la tabla que tenía; al validar sigue a la casilla "Generar cuadro"
+    this.tablaGenerada = restored.table ?? null;
+    this.prepararTabla();
+  }
+
+  // Deja la pregunta como nueva (lo mismo que se limpia después de guardar)
+  private limpiarFormularioPregunta(): void {
+    this.reply = '';
+    this.answers = [];
+    this.selectedFiles = [];
+    this.previewFiles = [];
+    this.selectedFilesAddDoc = [];
+    this.form.reset();
+    this.iaResponse = null;
+    this.iaImageResponse = null;
+    this.urlImagenIA = '';
+    this.descripcionImagenIA = '';
+    this.tablaGenerada = null;
+    this.displayedTableColumns = [];
+    this.modoRetroceso = false;
+    this.archivosAnteriores = [];
+  }
+
+  // ELIMINAR TABLA
   eliminarTabla(): void {
 
       this.tablaGenerada = null;

@@ -4,6 +4,16 @@ export interface ConversationPlanResponse {
   node: PlanNode | null;
   parent_node: PlanNode | null;
   question: PlanQuestion | null;
+  // Si se puede usar "Volver a la pregunta anterior" desde esta pregunta
+  go_back?: { allowed: boolean; reason: string | null };
+  // Lo recuperado al volver a esta pregunta (primer cuadro, tabla y nombres de archivos)
+  restored?: RestoredAnswer;
+}
+
+export interface RestoredAnswer {
+  user_input: string;
+  table: { title: string; columns: string[]; rows: any[][] } | null;
+  files: string[];
 }
 
 export interface PlanNode {

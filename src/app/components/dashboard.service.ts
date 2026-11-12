@@ -91,4 +91,16 @@ export class DashboardService {
     return this.http.get(URL, { headers });
   }
 
+  getMonthlyEarnings() {
+    let URL = URL_SERVICIOS + "/admin/monthly-earnings";
+    let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.get(URL, { headers });
+  }
+
+  getPlanPerformance() {
+    let URL = URL_SERVICIOS + "/admin/plan-performance";
+    let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.get(URL, { headers });
+  }
+
 }

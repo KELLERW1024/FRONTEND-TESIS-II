@@ -1,66 +1,44 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'src/app/material.module';
+import { DashboardService } from '../dashboard.service';
 
-export interface productsData {
+export interface PlanPerformance {
   id: number;
-  uname: string;
-  position: string;
-  productName: string;
-  budget: number;
-  priority: string;
+  name: string;
+  subscriptions: number;
+  revenue: number;
+  share: number;
 }
 
-const ELEMENT_DATA: productsData[] = [
-  {
-    id: 1,
-    uname: 'Sunil Joshi',
-    position: 'Web Designer',
-    productName: 'Elite Admin',
-    budget: 3.9,
-    priority: 'low',
-  },
-  {
-    id: 2,
-    uname: 'Andrew McDownland',
-    position: 'Project Manager',
-    productName: 'Real Homes Theme',
-    budget: 24.5,
-    priority: 'medium',
-  },
-  {
-    id: 3,
-    uname: 'Christopher Jamil',
-    position: 'Project Manager',
-    productName: 'MedicalPro Theme',
-    budget: 12.8,
-    priority: 'high',
-  },
-  {
-    id: 4,
-    uname: 'Nirav Joshi',
-    position: 'Frontend Engineer',
-    productName: 'Hosting Press HTML',
-    budget: 2.4,
-    priority: 'critical',
-  },
-  {
-    id: 5,
-    uname: 'Micheal Doe',
-    position: 'Content Writer',
-    productName: 'Helping Hands WP Theme',
-    budget: 9.3,
-    priority: 'low',
-  },
-];
+// Color fijo por plan
+const PLAN_COLORS = ['#539BFF', '#07caa6', '#e39816', '#2bb229d7', '#8B5CF6', '#39d0ee'];
 
+export function planColor(planId: number): string {
+  return PLAN_COLORS[(planId - 1) % PLAN_COLORS.length];
+}
 
 @Component({
   selector: 'app-top-projects',
   imports: [MaterialModule, CommonModule],
   templateUrl: './top-projects.component.html',
 })
-export class AppTopProjectsComponent {
-  displayedColumns: string[] = ['id', 'assigned', 'name', 'priority', 'budget'];
-  dataSource = ELEMENT_DATA;
+export class AppTopProjectsComponent implements OnInit {
+  displayedColumns: string[] = ['name', 'subscriptions', 'share', 'revenue'];
+  dataSource: PlanPerformance[] = [];
+
+  constructor(private service: DashboardService) {}
+
+  ngOnInit() {
+    this.service.getPlanPerformance().subscribe({
+      next: (resp: any) => {
+        this.dataSource = resp.data || [];
+      },
+      error: (err: any) => {
+        console.error('Error al cargar el rendimiento de planes:', err);
+      },
+    });
+  }
+
+  planColor = planColor;
 }

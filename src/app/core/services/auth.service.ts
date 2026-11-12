@@ -174,6 +174,36 @@ export class AuthService {
     }
   }
 
+  // Segundos que le quedan al token (0 si no hay token o ya venció)
+  tokenSecondsLeft(): number {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      return 0;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return Math.max(0, payload.exp - Math.floor(Date.now() / 1000));
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  // Extiende la sesión con un token nuevo. El backend solo acepta tokens vigentes.
+  refreshToken(): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    });
+
+    return this.http.post(`${this.url}/auth/refresh`, {}, { headers }).pipe(
+      map((auth: any) => {
+        this.saveTokenLocalStorage(auth);
+        return auth;
+      })
+    );
+  }
+
   clearSession() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

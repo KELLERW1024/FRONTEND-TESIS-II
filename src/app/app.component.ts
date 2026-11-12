@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { SessionTimeoutService } from './core/services/session-timeout.service';
 
 @Component({
     selector: 'app-root',
@@ -8,4 +9,9 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'TailwindAdmin Angular Admin Tempplate';
+
+  constructor() {
+    // Aviso de "sesión por expirar" con opción de extenderla
+    inject(SessionTimeoutService).start();
+  }
 }

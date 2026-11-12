@@ -1,0 +1,158 @@
+<mat-card class="cardWithShadow theme-card">
+
+  <!-- HEADER -->
+  <div class="p-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <mat-card-title class="mb-1">
+          Tokens por usuario
+        </mat-card-title>
+        <p class="text-sm text-muted">
+          Consulta los tokens de IA que ha consumido cada usuario en cada plan.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <mat-card-content class="border-t border-border">
+
+    <!-- FILTROS -->
+    <div class="rounded-2xl border border-border bg-white p-5 mb-6">
+      <div class="flex flex-col lg:flex-row gap-4">
+
+        <!-- BUSCAR -->
+        <mat-form-field appearance="outline" class="w-full lg:flex-1">
+          <mat-label>Buscar usuario</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            (keyup)="applyFilter($event)"
+            placeholder="Nombre, correo">
+        </mat-form-field>
+
+        <!-- PLAN -->
+        <mat-form-field appearance="outline" class="w-full lg:w-64">
+          <mat-label>Plan</mat-label>
+          <mat-select
+            [value]="selectedPlan"
+            (selectionChange)="filterPlan($event.value)">
+            <mat-option value="all">Todos</mat-option>
+            @for (plan of plans; track plan.id) {
+              <mat-option [value]="plan.id">{{ plan.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- SUSCRIPCIÓN -->
+        <mat-form-field appearance="outline" class="w-full lg:w-56">
+          <mat-label>Suscripción</mat-label>
+          <mat-select
+            [value]="selectedStatus"
+            (selectionChange)="filterStatus($event.value)">
+            <mat-option value="all">Todas</mat-option>
+            <mat-option value="active">Activa</mat-option>
+            <mat-option value="expired">Expirada</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="overflow-x-auto rounded-2xl border border-border">
+      <table
+        mat-table
+        [dataSource]="rows"
+        matSort
+        matSortActive="tokens"
+        matSortDirection="desc"
+        matSortDisableClear
+        (matSortChange)="sortTokens($event)"
+        class="w-full">
+
+        <!-- NOMBRE Y APELLIDO -->
+        <ng-container matColumnDef="user">
+          <th mat-header-cell *matHeaderCellDef> Nombre y Apellido </th>
+          <td mat-cell *matCellDef="let row">
+            <div class="flex items-center gap-3 py-2">
+              <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold">
+                {{ row.name?.charAt(0) | uppercase }}
+              </div>
+              <span class="font-semibold text-sm">
+                {{ row.name }} {{ row.last_name || '' }}
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- EMAIL -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef> Email </th>
+          <td mat-cell *matCellDef="let row" class="text-sm text-slate-600">
+            {{ row.email }}
+          </td>
+        </ng-container>
+
+        <!-- PLAN -->
+        <ng-container matColumnDef="plan">
+          <th mat-header-cell *matHeaderCellDef> Plan </th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.plan_id) {
+              <span class="inline-flex items-center gap-2 text-sm">
+                {{ row.plan_name }}
+              </span>
+            } @else {
+              <span class="text-xs text-muted">Sin plan identificado</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- SUSCRIPCIÓN -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Suscripción </th>
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="{
+                'bg-green-100 text-green-700': row.subscription_status === 'active',
+                'bg-red-100 text-red-700': row.subscription_status === 'expired',
+                'bg-amber-100 text-amber-700': row.subscription_status === 'pending',
+                'bg-slate-100 text-slate-600': row.subscription_status === 'cancelled'
+              }">
+              <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+              {{ statusLabel(row.subscription_status) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- TOKENS -->
+        <ng-container matColumnDef="tokens">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Tokens usados </th>
+          <td mat-cell *matCellDef="let row" class="font-semibold text-sm">
+            {{ row.tokens_used | number }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-slate-50 transition"></tr>
+      </table>
+
+      @if (!isLoading && rows.length === 0) {
+        <p class="text-center text-muted text-sm py-6">No hay consumo de tokens para mostrar.</p>
+      }
+    </div>
+
+    <!-- PAGINADOR -->
+    <div class="mt-2">
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        (page)="onPage($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+  </mat-card-content>
+</mat-card>

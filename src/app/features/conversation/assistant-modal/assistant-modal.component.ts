@@ -76,6 +76,9 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
   // DATOS YA CONOCIDOS (Memoria Inmutable)
   datosConocidos: { nombre: string, valor: string }[] = [];
 
+  // Confirmación antes de integrar una propuesta incompleta (< 100 %)
+  showIntegrateConfirm: boolean = false;
+
   constructor(
     public dialogRef: MatDialogRef<AssistantModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AssistantModalData,
@@ -170,6 +173,9 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
     this.isComplete = data.is_complete;
     this.progressPercentage = data.progress_percentage || 0;
 
+    // La propuesta cambió: la confirmación anterior ya no aplica
+    this.showIntegrateConfirm = false;
+
     // MAPEO DE BRECHAS
     this.brechas = data.brechas_detectadas || [];
     
@@ -201,7 +207,23 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
     this.brechas = [];
     this.variables = [];
     this.datosConocidos = [];
+    this.showIntegrateConfirm = false;
     this.sendInitialPrompt();
+  }
+
+  // "Aprobar e Integrar": si la propuesta no está completa, primero se muestra
+  // un aviso y el usuario decide si integra de todos modos
+  approveAnswer(): void {
+    if (this.isComplete) {
+      this.useAnswer();
+      return;
+    }
+
+    this.showIntegrateConfirm = true;
+  }
+
+  cancelIntegrate(): void {
+    this.showIntegrateConfirm = false;
   }
 
   useAnswer(): void {

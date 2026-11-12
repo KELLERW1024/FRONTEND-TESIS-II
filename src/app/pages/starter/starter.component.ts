@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
 import { AppMathewAndersonComponent } from 'src/app/components/mathew-anderson/mathew-anderson.component';
 import { AppTopCardsComponent } from 'src/app/components/top-cards/top-cards.component';
@@ -8,10 +9,12 @@ import { AppMonthlyEarningsComponent } from 'src/app/components/monthly-earnings
 import { AppRecentTransactionsComponent } from 'src/app/components/recent-transactions/recent-transactions.component';
 import { AppTopProjectsComponent } from 'src/app/components/top-projects/top-projects.component';
 import { PriceComponent } from 'src/app/components/price/price.component';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-starter',
   imports: [
+    CommonModule,
     MaterialModule,
     PriceComponent,
     AppMathewAndersonComponent,
@@ -26,6 +29,11 @@ import { PriceComponent } from 'src/app/components/price/price.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class StarterComponent { 
+  constructor(public authService: AuthService) {}
 
+  // 2. Crear el método que verifica si es admin
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }  
   
 }

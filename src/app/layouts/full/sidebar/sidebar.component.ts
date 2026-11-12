@@ -37,7 +37,7 @@ export class SidebarComponent implements OnInit {
     '/plans',
     '/coupons',
     'useia',
-    '/useia/tokens',
+    '/token-usage',
     '/use/consume'
   ];
 

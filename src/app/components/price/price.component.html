@@ -4,10 +4,11 @@
     Elige el paquete que mejor se adapte a tu proyecto!
   </h4>
 
+
 </div>
 <div class="grid grid-cols-12 gap-6 mt-16">
 
-  <!-- SILVER / PAQUETES -->
+  <!-- SILVER -->
   <div class="col-span-12 sm:col-span-6 lg:col-span-4" *ngFor="let pack of packages">
 
     <mat-card class="cardWithShadow">
@@ -42,209 +43,245 @@
 
   </div>
 
-</div>
 
+</div>
 <!-- MODAL PRICES -->
-<ng-template #pricesModal>
+ <ng-template #pricesModal>
     <h2 mat-dialog-title>Crear cupón</h2>
 
     <mat-dialog-content class="!max-w-none">
         <div class="grid grid-cols-1 gap-4 pt-2">
-            <div class="grid grid-cols-12 gap-6">
 
-              <!-- SILVER -->
-              <div class="col-span-12 sm:col-span-6 lg:col-span-4">
-                <mat-card class="cardWithShadow">
-                  <mat-card-content class="py-6">
-                    <span class="block uppercase text-xs mb-4">Silver</span>
-                    <img src="/assets/images/backgrounds/silver.png" width="90" alt="badge">
-                    <h2 class="text-5xl font-bold my-5">Free</h2>
-                    <div class="flex items-center py-3">
-                      <mat-icon class="text-primary mr-2">check</mat-icon>
-                      <span class="text-sm font-medium">3 Members</span>
-                    </div>
-                    <div class="flex items-center py-3">
-                      <mat-icon class="text-primary mr-2">check</mat-icon>
-                      <span class="text-sm font-medium">Single Device</span>
-                    </div>
-                    <button mat-flat-button color="primary" class="w-full mt-6">
-                      Choose Silver
-                    </button>
-                  </mat-card-content>
-                </mat-card>
-              </div>
 
-              <!-- BRONZE -->
-              <div class="col-span-12 sm:col-span-6 lg:col-span-4">
-                <mat-card class="cardWithShadow">
-                  <mat-card-content class="py-6">
-                    <span class="absolute right-4 uppercase bg-yellow-100 text-yellow-700 px-2 py-1 text-xs rounded">
-                      Popular
-                    </span>
-                    <span class="block uppercase text-xs mb-4">Bronze</span>
-                    <img src="/assets/images/backgrounds/bronze.png" width="90" alt="badge">
-                    <div class="flex items-center my-5">
-                      <span class="text-xl font-bold">$</span>
-                      <h2 class="text-5xl font-bold mx-2">10.99</h2>
-                      <span class="text-sm">/mo</span>
-                    </div>
-                    <button mat-flat-button color="primary" class="w-full mt-6">
-                      Choose Bronze
-                    </button>
-                  </mat-card-content>
-                </mat-card>
-              </div>
+                <div class="grid grid-cols-12 gap-6">
 
-              <!-- GOLD -->
-              <div class="col-span-12 sm:col-span-6 lg:col-span-4">
-                <mat-card class="cardWithShadow">
-                  <mat-card-content class="py-6">
-                    <span class="block uppercase text-xs mb-4">Gold</span>
-                    <img src="/assets/images/backgrounds/gold.png" width="90" alt="badge">
-                    <div class="flex items-center my-5">
-                      <span class="text-xl font-bold">$</span>
-                      <h2 class="text-5xl font-bold mx-2">22.99</h2>
-                      <span class="text-sm">/mo</span>
-                    </div>
-                    <button mat-flat-button color="primary" class="w-full mt-6">
-                      Choose Gold
-                    </button>
-                  </mat-card-content>
-                </mat-card>
-              </div>
+                    <!-- <div class="grid grid-cols-12 gap-6 mt-16"> -->
 
+  <!-- SILVER -->
+      <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+        <mat-card class="cardWithShadow">
+          <mat-card-content class="py-6">
+
+            <span class="block uppercase text-xs mb-4">Silver</span>
+
+            <img src="/assets/images/backgrounds/silver.png" width="90" alt="badge">
+
+            <h2 class="text-5xl font-bold my-5">Free</h2>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">3 Members</span>
             </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">Single Device</span>
+            </div>
+
+            <div class="flex items-center py-3 opacity-50">
+              <mat-icon class="mr-2">close</mat-icon>
+              <span class="text-sm font-medium">50GB Storage</span>
+            </div>
+
+            <div class="flex items-center py-3 opacity-50">
+              <mat-icon class="mr-2">close</mat-icon>
+              <span class="text-sm font-medium">Monthly Backups</span>
+            </div>
+
+            <div class="flex items-center py-3 opacity-50">
+              <mat-icon class="mr-2">close</mat-icon>
+              <span class="text-sm font-medium">Permissions & workflows</span>
+            </div>
+
+            <button mat-flat-button color="primary" class="w-full mt-6">
+              Choose Silver
+            </button>
+
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- BRONZE -->
+      <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+        <mat-card class="cardWithShadow">
+          <mat-card-content class="py-6">
+
+            <span class="absolute right-4 uppercase bg-yellow-100 text-yellow-700 px-2 py-1 text-xs rounded">
+              Popular
+            </span>
+
+            <span class="block uppercase text-xs mb-4">Bronze</span>
+
+            <img src="/assets/images/backgrounds/bronze.png" width="90" alt="badge">
+
+            <div class="flex items-center my-5">
+              <span class="text-xl font-bold">$</span>
+              <h2 class="text-5xl font-bold mx-2">10.99</h2>
+              <span class="text-sm">/mo</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">5 Members</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">Multiple Device</span>
+            </div>
+
+            <div class="flex items-center py-3 opacity-50">
+              <mat-icon class="mr-2">close</mat-icon>
+              <span class="text-sm font-medium">80GB Storage</span>
+            </div>
+
+            <div class="flex items-center py-3 opacity-50">
+              <mat-icon class="mr-2">close</mat-icon>
+              <span class="text-sm font-medium">Monthly Backups</span>
+            </div>
+
+            <div class="flex items-center py-3 opacity-50">
+              <mat-icon class="mr-2">close</mat-icon>
+              <span class="text-sm font-medium">Permissions & workflows</span>
+            </div>
+
+            <button mat-flat-button color="primary" class="w-full mt-6">
+              Choose Bronze
+            </button>
+
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- GOLD -->
+      <div class="col-span-12 sm:col-span-6 lg:col-span-4">
+        <mat-card class="cardWithShadow">
+          <mat-card-content class="py-6">
+
+            <span class="block uppercase text-xs mb-4">Gold</span>
+
+            <img src="/assets/images/backgrounds/gold.png" width="90" alt="badge">
+
+            <div class="flex items-center my-5">
+              <span class="text-xl font-bold">$</span>
+              <h2 class="text-5xl font-bold mx-2">22.99</h2>
+              <span class="text-sm">/mo</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">Unlimited Members</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">Multiple Device</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">150GB Storage</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">Monthly Backups</span>
+            </div>
+
+            <div class="flex items-center py-3">
+              <mat-icon class="text-primary mr-2">check</mat-icon>
+              <span class="text-sm font-medium">Permissions & workflows</span>
+            </div>
+
+            <button mat-flat-button color="primary" class="w-full mt-6">
+              Choose Gold
+            </button>
+
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+
+                </div>
+
+
         </div>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancelar</button>
-        <button mat-raised-button color="primary">Guardar cupón</button>
+        <button mat-button mat-dialog-close>
+        Cancelar
+        </button>
+
+        <button mat-raised-button color="primary" >
+        Guardar cupón
+        </button>
     </mat-dialog-actions>
 </ng-template>
 
+ <!-- ============================= -->
+    <!-- RESUMEN DE PAGOS -->
+    <!-- ============================= -->
 
-<!-- ================================================= -->
-<!-- SECCIÓN DE ADMINISTRADOR -->
-<!-- ================================================= -->
-<div class="mt-16 border-t border-gray-200 pt-8" *ngIf="isAdmin">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-6" *ngIf="isAdmin">
 
-  <!-- Encabezado del Panel de Ventas -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-    <div>
-      <h3 class="text-2xl font-bold text-gray-800">Panel de ventas</h3>
-      <p class="text-sm text-gray-500 mt-1">Rastree los ingresos, el rendimiento y el crecimiento de las ventas en tiempo real</p>
-    </div>
-  </div>
-
-  <!-- 1. Las 4 Tarjetas Superiores de Estadísticas-->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-    <!-- Tarjeta 1: Ingresos totales -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-500 font-medium">Ingresos totales</p>
-          <h4 class="text-3xl font-bold text-gray-800 mt-2">${{ totalRevenue | number:'1.0-2' }}</h4>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-          <span class="text-xl font-bold">$</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tarjeta 2: Ventas totales -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-500 font-medium">Ventas totales</p>
-          <h4 class="text-3xl font-bold text-gray-800 mt-2">{{ totalSales | number }}</h4>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-          <mat-icon>shopping_bag</mat-icon>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tarjeta 3: Tasa de conversión -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-500 font-medium">Tasa de conversión</p>
-          <h4 class="text-3xl font-bold text-gray-800 mt-2">{{ conversionRate }}%</h4>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-          <mat-icon>trending_up</mat-icon>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tarjeta 4: Tasa de reembolso -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-gray-500 font-medium">Tasa de reembolso</p>
-          <h4 class="text-3xl font-bold text-gray-800 mt-2">{{ refundRate }}%</h4>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600">
-          <mat-icon>assignment_return</mat-icon>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-<!-- Contenedor principal -->
-  <div class="grid grid-cols-12 gap-6 mt-6">
-
-    <!-- Gráfico de Líneas-->
-    <div class="col-span-12 lg:col-span-8">
-      <mat-card class="cardWithShadow p-6 rounded-2xl bg-white border border-gray-200">
-        
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+      <!-- TARJETA 1: PENDIENTES -->
+      <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-gray-800">Estadísticas de usuarios e ingresos</h3>
-            <p class="text-xs text-gray-500 mt-0.5">Visualice el progreso y la interacción mes a mes.</p>
+            <p class="text-sm text-amber-700 font-medium">Pagos pendientes</p>
+            <p class="text-3xl font-bold text-amber-800 mt-2">{{ pendingPayments }}</p>
           </div>
-          
-          <div class="flex items-center space-x-3 mt-4 sm:mt-0">
-            <div class="flex items-center space-x-4 text-xs text-gray-600">
-              <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600 mr-1.5"></span>Online Sales</span>
-              <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-blue-300 mr-1.5"></span>Offline Sales</span>
-            </div>
-            <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg text-xs font-medium">
-              <button class="px-3 py-1 bg-white shadow-sm rounded-md text-gray-700">Diario</button>
-              <button class="px-3 py-1 text-gray-500 hover:text-gray-700">Semanal</button>
-              <button class="px-3 py-1 text-gray-500 hover:text-gray-700">Mensual</button>
-            </div>
+          <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center">
+            <mat-icon class="text-amber-600">pending_actions</mat-icon>
           </div>
         </div>
+        <p class="text-xs text-amber-600 mt-3">Comprobantes por validar (Yape)</p>
+      </div>
 
-        <div class="h-80 flex items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-          <p class="text-sm text-gray-400 font-medium">[Gráfico de Líneas Principal - TailAdmin Style]</p>
+
+      <!-- TARJETA 2: SUSCRIPCIONES ACTIVAS -->
+      <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-emerald-700 font-medium">Suscripciones activas</p>
+            <p class="text-3xl font-bold text-emerald-800 mt-2">{{ activeSubscriptions }}</p>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <mat-icon class="text-emerald-600">verified</mat-icon>
+          </div>
         </div>
+        <p class="text-xs text-emerald-600 mt-3">Usuarios con planes vigentes</p>
+      </div>
 
-      </mat-card>
+
+      <!-- TARJETA 3: USUARIOS REGISTRADOS -->
+      <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-blue-700 font-medium">Usuarios registrados</p>
+            <p class="text-3xl font-bold text-blue-800 mt-2">{{ totalUsers }}</p>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
+            <mat-icon class="text-blue-600">group</mat-icon>
+          </div>
+        </div>
+        <p class="text-xs text-blue-600 mt-3">Total de cuentas creadas</p>
+      </div>
+
+
+      <!-- TARJETA 4: INGRESOS TOTALES -->
+      <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-indigo-700 font-medium">Ingresos totales</p>
+            <p class="text-3xl font-bold text-indigo-800 mt-2">{{ totalProcessed | currency }}</p>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center">
+            <mat-icon class="text-indigo-600">payments</mat-icon>
+          </div>
+        </div>
+        <p class="text-xs text-indigo-600 mt-3">Dinero procesado (Completado)</p>
+      </div>
+
     </div>
-
-    <!-- Gráfico Circular / Dona  -->
-    <div class="col-span-12 lg:col-span-4">
-      <mat-card class="cardWithShadow p-6 rounded-2xl bg-white border border-gray-200">
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold text-gray-800">Paquetes más vendidos</h3>
-          <p class="text-xs text-gray-500 mt-0.5">Distribución de compras por tipo de plan.</p>
-        </div>
-
-        <div class="mt-4">
-          <apx-chart
-            [series]="packageChartOptions.series!"
-            [chart]="packageChartOptions.chart!"
-            [labels]="packageChartOptions.labels!"
-            [colors]="packageChartOptions.colors!"
-            [responsive]="packageChartOptions.responsive!">
-          </apx-chart>
-        </div>
-      </mat-card>
-    </div>
-
-  </div>

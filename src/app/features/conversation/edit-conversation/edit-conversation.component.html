@@ -26,17 +26,20 @@
         <span>Ver avance del plan</span>
       </button>
 
-      <button mat-menu-item (click)="irEditCapitulo()">
-        <mat-icon>edit</mat-icon>
-        <span>Editar capítulo</span>
-      </button>
-
       <button mat-menu-item (click)="generarArchivo()">
         <mat-icon>download</mat-icon>
         <span>Generar archivo</span>
       </button>
 
-      <button mat-menu-item>
+      <!-- Solo se activa cuando el plan está completo -->
+      <button mat-menu-item (click)="irAnexos()" [disabled]="!dataCurrentQuestion?.completed">
+        <mat-icon>attach_file</mat-icon>
+        <span>Anexos</span>
+      </button>
+
+      <button mat-menu-item
+              (click)="volverPreguntaAnterior()"
+              [disabled]="isGoingBack || !dataCurrentQuestion?.question">
         <mat-icon>arrow_back</mat-icon>
         <span>Volver a la pregunta anterior</span>
       </button>
@@ -45,7 +48,7 @@
 
       <button mat-menu-item (click)="irDeleteCapitulo()">
         <mat-icon color="warn">delete</mat-icon>
-        <span>Eliminar respuestas del capítulo</span>
+        <span>Eliminar respuestas desde una sección</span>
       </button>
 
     </mat-menu>
@@ -156,6 +159,13 @@
                                         </div>
                                     </div>
 
+                                    <!-- ARCHIVOS QUE TENÍA LA RESPUESTA AL VOLVER A ESTA PREGUNTA -->
+                                    <p *ngIf="modoRetroceso && archivosAnteriores.length > 0"
+                                       class="my-2 text-sm text-amber-800">
+                                        Tenías adjuntos: <strong>{{ archivosAnteriores.join(', ') }}</strong>.
+                                        Vuelve a adjuntarlos si los necesitas.
+                                    </p>
+
                                     <mat-checkbox formControlName="showImages" color="primary">
                                         <strong> Generar imagen referencial en la respuesta. </strong>
                                     </mat-checkbox>
@@ -182,12 +192,7 @@
                         </form>
 
                     </mat-card-content>
-                    <!-- 
-                        RESPUESTA OBTENIDA EN EL TEXT AREA
-                        BOTON ADJUNTAR IMAGEN 
-                        LISTA DE BIBLIOGRAFIA UTILIZADA 
-                        BOTON GUARDAR ESTA RESPUESTA 
-                    -->
+
                     <mat-card-content class="border-t border-border">
                         <form>
                             <div class="grid grid-cols-8 gap-x-4 text-sm">
@@ -237,7 +242,11 @@
                                         </mat-icon>
 
                                         <p class="mt-2 text-gray-600">
-                                            Arrastra tus imágenes aquí o haz clic para seleccionar
+                                            Arrastra tus imágenes o archivos Excel aquí, o haz clic para seleccionar
+                                        </p>
+
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            Máximo {{ MAX_ADJUNTO_MB }} MB por archivo. El Excel debe tener una sola hoja.
                                         </p>
 
                                     </div>
@@ -268,7 +277,31 @@
 
                                                     </div>
 
-                                                    <!-- 📝 DESCRIPCIÓN -->
+                                                    <!-- ARCHIVO EXCEL -->
+                                                    <div *ngIf="item.category !== 'image'"
+                                                        class="w-full flex justify-center bg-gray-100">
+
+                                                        <div class="w-[90%] h-32 mt-3 rounded-md bg-emerald-50 border border-emerald-100 flex flex-col items-center justify-center gap-2 px-3">
+
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" aria-hidden="true">
+                                                                <path fill="#21A366" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                                                <path fill="#107C41" d="M14 2v6h6z"/>
+                                                                <path fill="#fff" d="M8.2 11h1.7l1.1 2 1.1-2h1.7l-1.9 3 1.9 3h-1.7L11 15l-1.1 2H8.2l1.9-3z"/>
+                                                            </svg>
+
+                                                            <div class="text-center w-full min-w-0">
+                                                                <p class="text-sm font-semibold text-gray-800 truncate m-0" [title]="item.name">
+                                                                    {{ item.name }}
+                                                                </p>
+                                                                <p class="text-xs text-gray-500 m-0 mt-1">
+                                                                    {{ item.size / 1024 | number:'1.0-0' }} KB · Excel
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <!-- DESCRIPCIÓN -->
                                                     <div class="p-3">
                                                         <input type="text" [(ngModel)]="item.description"
                                                             [ngModelOptions]="{standalone: true}"
@@ -439,6 +472,25 @@
 </div>
 
 <!-- Modal -->
+<!-- CONFIRMACIÓN: VOLVER A LA PREGUNTA ANTERIOR -->
+<ng-template #goBackDialog>
+    <h2 mat-dialog-title class="flex items-center gap-2">
+        <mat-icon class="text-amber-600">warning_amber</mat-icon>
+        ¿Volver a la pregunta anterior?
+    </h2>
+
+    <mat-dialog-content>
+        <p class="text-sm font-semibold">
+            Esta acción no se puede deshacer: no podrás volver a esta pregunta sin responder de nuevo la anterior.
+        </p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button [mat-dialog-close]="false">Cancelar</button>
+        <button mat-flat-button color="warn" [mat-dialog-close]="true">Sí, volver</button>
+    </mat-dialog-actions>
+</ng-template>
+
 <ng-template #tableModal>
 
     <h2 mat-dialog-title>
@@ -636,7 +688,7 @@
     </div>
   
     <app-loader 
-        [isLoading]="isLoading" 
-        title="Validando información" 
-        description="Analizando y estructurando tu respuesta. Esto tomará unos segundos...">
+        [isLoading]="isLoading"
+        [title]="loaderTitle"
+        [description]="loaderDescription">
     </app-loader>

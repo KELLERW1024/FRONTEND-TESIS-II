@@ -72,7 +72,7 @@ export const navItems: NavItem[] = [
       {
         displayName: 'Tokens por usuario',
         iconName: 'tabler:point',
-        route: '/useia/tokens',
+        route: '/token-usage',
       },
       {
         displayName: 'Consumo IA',

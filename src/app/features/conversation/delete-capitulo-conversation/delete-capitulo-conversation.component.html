@@ -6,13 +6,13 @@
             <div class="col-span-12 lg:col-span-12">
 
                 <!-- ========================================================= -->
-                <!-- ELIMINACIÓN EN CASCADA POR CAPÍTULOS -->
+                <!-- ELIMINACIÓN EN CASCADA DESDE UNA SECCIÓN -->
                 <!-- ========================================================= -->
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-gray-200 pb-4">
                   <div>
-                    <h2 class="text-xl font-bold text-gray-800">Eliminar respuestas por capítulo</h2>
+                    <h2 class="text-xl font-bold text-gray-800">Eliminar respuestas desde una sección</h2>
                     <p class="text-sm text-gray-500 mt-1">
-                      Selecciona el capítulo desde el cual deseas reiniciar. Por coherencia del proyecto, los capítulos posteriores también se vaciarán automáticamente.
+                      Elige el capítulo, la sección o la pregunta desde la cual deseas reiniciar. Por coherencia del proyecto, también se vaciarán las respuestas que vienen después.
                     </p>
                   </div>
 
@@ -27,52 +27,23 @@
                 </div>
 
                 <div *ngIf="!isLoading" class="space-y-3">
-                  <div *ngFor="let cap of chapters; let i = index"
-                       class="flex items-center justify-between p-4 rounded-lg border transition-all"
+                  <div *ngFor="let group of chapters"
+                       class="rounded-lg border transition-all"
                        [ngClass]="{
-                         'border-red-300 bg-red-50/60': cap.checked && cap.answeredQuestions > 0,
-                         'border-gray-200 bg-white hover:bg-gray-50': !cap.checked && cap.answeredQuestions > 0,
-                         'border-gray-100 bg-gray-100/70 opacity-60': cap.answeredQuestions === 0
+                         'border-red-300 bg-red-50/60': estadoNodo(group.chapter) === 'delete',
+                         'border-red-200 bg-red-50/30': estadoNodo(group.chapter) === 'partial',
+                         'border-gray-200 bg-white': estadoNodo(group.chapter) === 'keep' && group.chapter.answeredQuestions > 0,
+                         'border-gray-100 bg-gray-100/70 opacity-60': group.chapter.answeredQuestions === 0
                        }">
 
-                    <div class="flex items-center gap-3">
-                      <mat-checkbox
-                        color="warn"
-                        [checked]="cap.checked && cap.answeredQuestions > 0"
-                        [disabled]="cap.answeredQuestions === 0 || cap.cascadeLocked"
-                        (change)="onToggleChapter(i, $event.checked)">
-                      </mat-checkbox>
+                    <!-- CAPÍTULO -->
+                    <ng-container *ngTemplateOutlet="nodeRow; context: { $implicit: group.chapter, group: group }"></ng-container>
 
-                      <div>
-                        <span class="font-semibold text-gray-800 block">
-                          {{ cap.titulo }}
-                        </span>
-                        <span class="text-xs text-gray-500">
-                          {{ cap.answeredQuestions }} de {{ cap.totalQuestions }} preguntas respondidas
-                        </span>
-                      </div>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                      <span *ngIf="cap.cascadeLocked && cap.answeredQuestions > 0"
-                            class="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">
-                        Se eliminará en cascada
-                      </span>
-
-                      <span *ngIf="cap.answeredQuestions > 0 && cap.answeredQuestions >= cap.totalQuestions"
-                            class="px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
-                        Completado
-                      </span>
-
-                      <span *ngIf="cap.answeredQuestions > 0 && cap.answeredQuestions < cap.totalQuestions"
-                            class="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                        En progreso
-                      </span>
-
-                      <span *ngIf="cap.answeredQuestions === 0"
-                            class="px-2.5 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-600">
-                        Sin respuestas
-                      </span>
+                    <!-- SECCIONES Y SUBSECCIONES -->
+                    <div *ngIf="group.expanded && group.sections.length > 0" class="border-t border-gray-200 py-1">
+                      <ng-container *ngFor="let row of group.sections">
+                        <ng-container *ngTemplateOutlet="nodeRow; context: { $implicit: row, group: null }"></ng-container>
+                      </ng-container>
                     </div>
 
                   </div>
@@ -81,7 +52,7 @@
                 <div *ngIf="!isLoading" class="flex justify-end items-center mt-6 pt-4 border-t border-gray-200">
                     <button mat-flat-button
                             color="warn"
-                            [disabled]="!selectedStartChapter"
+                            [disabled]="!seleccion"
                             (click)="abrirConfirmacion()">
                         <mat-icon class="me-1">delete_sweep</mat-icon>
                         Eliminar respuestas seleccionadas
@@ -91,24 +62,124 @@
             </div>
         </div>
     </mat-card-content>
-   
+
 </mat-card>
+
+<!-- FILA DE UN NODO (capítulo o sección) -->
+<ng-template #nodeRow let-row let-group="group">
+    <div class="flex items-center justify-between gap-3 px-4"
+         [ngClass]="group ? 'py-4' : 'py-2'"
+         [style.padding-left.px]="16 + row.depth * 24">
+
+        <div class="flex items-center gap-3 min-w-0">
+            <mat-radio-button
+                color="warn"
+                [checked]="estaSeleccionadoNodo(row)"
+                [disabled]="!puedeSeleccionar(row)"
+                (change)="seleccionarNodo(row)">
+            </mat-radio-button>
+
+            <div class="min-w-0">
+                <span [ngClass]="group ? 'font-semibold text-gray-800' : 'text-sm text-gray-700'" class="block">
+                    <span *ngIf="!group && row.codigo" class="text-gray-500 me-1">{{ row.codigo }}</span>{{ row.titulo }}
+                </span>
+                <span class="text-xs text-gray-500">
+                    {{ row.answeredQuestions }} de {{ row.totalQuestions }} preguntas respondidas
+                </span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+            <span *ngIf="estadoNodo(row) === 'delete' && row.answeredQuestions > 0"
+                  class="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">
+                Se eliminará
+            </span>
+
+            <ng-container *ngIf="group">
+                <span *ngIf="row.answeredQuestions > 0 && row.answeredQuestions >= row.totalQuestions"
+                      class="px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                    Completado
+                </span>
+
+                <span *ngIf="row.answeredQuestions > 0 && row.answeredQuestions < row.totalQuestions"
+                      class="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                    En progreso
+                </span>
+
+                <span *ngIf="row.answeredQuestions === 0"
+                      class="px-2.5 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-600">
+                    Sin respuestas
+                </span>
+
+                <button *ngIf="group.sections.length > 0"
+                        mat-icon-button
+                        (click)="toggleCapitulo(group)"
+                        [attr.aria-label]="group.expanded ? 'Ocultar secciones' : 'Ver secciones'">
+                    <mat-icon>{{ group.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+            </ng-container>
+
+            <!-- Desplegar las preguntas propias de la sección -->
+            <button *ngIf="!group && row.questions.length > 0"
+                    mat-icon-button
+                    (click)="togglePreguntas(row)"
+                    [attr.aria-label]="row.expanded ? 'Ocultar preguntas' : 'Ver preguntas'">
+                <mat-icon>{{ row.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- PREGUNTAS DE LA SECCIÓN -->
+    <div *ngIf="!group && row.expanded" class="pb-2">
+        <div *ngFor="let question of row.questions; let q = index"
+             class="flex items-center justify-between gap-3 py-1.5 pe-4"
+             [style.padding-left.px]="16 + (row.depth + 1) * 24">
+
+            <div class="flex items-center gap-3 min-w-0">
+                <mat-radio-button
+                    color="warn"
+                    [checked]="estaSeleccionadaPregunta(question)"
+                    [disabled]="!question.answered"
+                    (change)="seleccionarPregunta(row, question)">
+                </mat-radio-button>
+
+                <span class="text-xs text-gray-600 min-w-0">
+                    <span class="font-semibold text-gray-500 me-1">P{{ q + 1 }}</span>{{ question.text }}
+                </span>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <span *ngIf="seEliminaPregunta(question) && question.answered"
+                      class="px-2 py-0.5 text-[11px] font-medium rounded-full bg-red-100 text-red-700">
+                    Se eliminará
+                </span>
+                <span *ngIf="!question.answered"
+                      class="px-2 py-0.5 text-[11px] font-medium rounded-full bg-gray-200 text-gray-600">
+                    Sin respuesta
+                </span>
+            </div>
+        </div>
+    </div>
+</ng-template>
 
     <div *ngIf="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded w-96">
 
-            <h2 class="text-sm font-semibold mb-4">Confirmar eliminacion</h2>
+            <h2 class="text-sm font-semibold mb-4">Confirmar eliminación</h2>
 
             <p class="text-sm text-gray-600 mb-3">
-                Por la relación entre los capítulos, se vaciarán las respuestas de:
+                Se eliminarán <strong>{{ respuestasAEliminar }}</strong> respuestas, desde
+                <strong>{{ seleccion?.label }}</strong>
+                hasta el final del plan.
             </p>
 
-            <ul class="list-disc list-inside text-sm font-semibold text-gray-800 bg-red-50 p-3 rounded border border-red-200 mb-4 max-h-40 overflow-y-auto">
-                <li *ngFor="let c of selectedChaptersList">{{ c.titulo }}</li>
-            </ul>
+            <p *ngIf="phase2Answered > 0" class="text-sm text-gray-600 mb-3">
+                También se volverán a generar el resumen ejecutivo, la introducción, las conclusiones y las recomendaciones.
+            </p>
 
             <p class="text-xs text-gray-500">
-                Esta acción no se puede deshacer. Tu progreso volverá al inicio de <strong>{{ selectedStartChapter?.titulo }}</strong>.
+                Esta acción no se puede deshacer.
             </p>
 
             <div class="flex justify-end gap-2 mt-6">
