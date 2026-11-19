@@ -16,6 +16,10 @@ export interface IaResponse {
   response?: string;
   images?: string[];
   references: Reference[] | null;
+  reference_warning?: string | null;
+  // Alguna operación de la respuesta no se pudo calcular (CalculationService)
+  calculation_warning?: string | null;
+  unused_sources?: { apa_text: string; reason: string }[];
 }
 export interface IaImageResponse {
   id?: string  ;
@@ -30,13 +34,25 @@ export interface urls{
   get?: string;
 }
 
+export interface Source extends Reference {
+  excerpt?: string;
+}
+
+// Fuente citada en la respuesta. apa_text es el texto APA 7 que arma el backend para mostrarlo
 export interface Reference {
   authors: string[];
-  title: string;
   year: string;
+  title: string;
   source_type: string;
-  url: string;
-  apa_citation: string;
+  container_title?: string | null;
+  volume?: string | null;
+  issue?: string | null;
+  pages?: string | null;
+  publisher?: string | null;
+  url?: string | null;
+  doi?: string | null;
+  in_text_citation?: string | null;
+  apa_text?: string;
 }
 
 export interface ChatTable {

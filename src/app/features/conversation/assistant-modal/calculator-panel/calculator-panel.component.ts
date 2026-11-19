@@ -18,9 +18,8 @@ interface Herramienta {
 })
 export class CalculatorPanelComponent implements OnInit {
   // 1. Recibe los datos que ya están en la columna izquierda
-  @Input() datosConocidos: { nombre: string, valor: string }[] = [];
-  
-  // 2. Eventos para comunicarse con el modal padre
+  @Input() datosConocidos: { clave: string, nombre: string, valor: string }[] = [];
+
   @Output() cerrarPanel = new EventEmitter<void>();
   @Output() inyectarResultado = new EventEmitter<string>();
 
@@ -178,26 +177,19 @@ export class CalculatorPanelComponent implements OnInit {
   }
 
   intentarAutocompletar() {
-    // Autocompletar Precio
-    const precioDato = this.datosConocidos.find(d => d.nombre.toLowerCase().includes('precio') || d.nombre.toLowerCase().includes('tarifa'));
-    if (precioDato) {
-      const soloNumeros = precioDato.valor.replace(/[^0-9.]/g, '');
-      if (soloNumeros) this.pePrecioVenta = parseFloat(soloNumeros);
-    }
 
-    // Autocompletar Equipos/Estaciones (Para Capacidad Máxima)
-    const equiposDato = this.datosConocidos.find(d => d.nombre.toLowerCase().includes('equipo') || d.nombre.toLowerCase().includes('estacion'));
-    if (equiposDato) {
-      const soloNumeros = equiposDato.valor.replace(/[^0-9.]/g, '');
-      if (soloNumeros) this.capEquipos = parseFloat(soloNumeros);
-    }
+    const valorDe = (clave: string) => this.datosConocidos.find(d => d.clave === clave)?.valor ?? '';
 
-    // Autocompletar Días Laborables
-    const diasDato = this.datosConocidos.find(d => d.nombre.toLowerCase().includes('dias') || d.nombre.toLowerCase().includes('laborable'));
-    if (diasDato) {
-      const soloNumeros = diasDato.valor.replace(/[^0-9.]/g, '');
-      if (soloNumeros) this.capDiasLaborables = parseFloat(soloNumeros);
-    }
+    const precio = valorDe('precio_o_tarifa').match(/\d+(?:[.,]\d+)?/);
+    if (precio) this.pePrecioVenta = parseFloat(precio[0].replace(',', '.'));
+
+    const capacidad = valorDe('capacidad_operativa');
+
+    const equipos = capacidad.match(/(\d+)\s*(?:equipos?|estaciones?|microscopios?|máquinas?|maquinas?)/i);
+    if (equipos) this.capEquipos = parseFloat(equipos[1]);
+
+    const dias = capacidad.match(/(\d+)\s*d[ií]as/i);
+    if (dias) this.capDiasLaborables = parseFloat(dias[1]);
   }
 
   // --- RESULTADOS MATEMÁTICOS ---

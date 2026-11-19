@@ -19,7 +19,6 @@ export class ConversationService {
 
     obtienerDataPlan(idPlan : number ){
       // this.url 
-      //console.log("TOKEN: " + this.authService.token )
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
       return this.http.get( this.url + "/obtenercapitulosplan" ,
         {   headers,
@@ -94,11 +93,53 @@ export class ConversationService {
     idQuestion: number;
     messages: { role: string; content: string }[];
     user_message?: string;
+    current_answer?: string;
+    // Archivos adjuntos en el asistente, ya leídos
+    attachments?: { name: string; text: string }[];
   }): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + this.authService.token
     });
     return this.http.post(`${this.url}/assistant-chat`, payload, { headers });
+  }
+
+  // Lee un archivo adjunto en el asistente y devuelve su texto
+  readAssistantAttachment(formData: FormData): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/assistant-attachment`, formData, { headers });
+  }
+
+  // Modificar respuesta: preguntas ya respondidas, respuesta guardada, análisis del cambio y guardado
+  modificationQuestions(idConversation: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/modification/questions`, { idConversation }, { headers });
+  }
+
+  modificationAnswer(idConversation: number, idQuestion: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/modification/answer`, { idConversation, idQuestion }, { headers });
+  }
+
+  modificationAnalyze(idConversation: number, idQuestion: number, text: string): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/modification/analyze`, { idConversation, idQuestion, text }, { headers });
+  }
+
+  modificationSave(idConversation: number, idQuestion: number, text: string, type: 'menor' | 'fondo'): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/modification/save`, { idConversation, idQuestion, text, type }, { headers });
+  }
+
+  // Busca fuentes para las referencias oficiales o académicas
+  searchSources(payload: { idConversation: number; query: string; scope: 'official' | 'academic' }): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/sources/search`, payload, { headers });
+  }
+
+  // Valida una fuente ingresada
+  formatSource(payload: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + this.authService.token });
+    return this.http.post(`${this.url}/sources/format`, payload, { headers });
   }
 
     getDocument(idConversation: number ){
@@ -160,9 +201,6 @@ export class ConversationService {
       let headers = new HttpHeaders({'Authorization': 'Bearer ' + this.authService.token});
      const url = `${this.url}/replicate/prediction/${idPrediction}`;
 
-      console.log('this.url:', this.url);
-      console.log('idPrediction:', idPrediction);
-      console.log('URL FINAL:', url);
 
       return this.http.get(url, { headers });
      

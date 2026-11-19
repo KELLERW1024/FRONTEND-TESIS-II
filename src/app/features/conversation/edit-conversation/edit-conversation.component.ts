@@ -31,8 +31,10 @@ import {
   ChatResponse,
   ChatTable,
   IaImageResponse,
-  IaResponse
+  IaResponse,
+  Source
 } from 'src/app/core/models/IAResponse';
+import { SourceModalComponent } from '../source-modal/source-modal.component';
 
 import { ConversationPlanResponse, RestoredAnswer } from 'src/app/core/models/ConversationPlanResponse';
 
@@ -40,8 +42,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ConversationFormService } from '../service/conversation-form.service';
 
 import { AssistantModalComponent } from '../assistant-modal/assistant-modal.component';
+import { ModificationModalComponent, ModificationResult } from '../modification-modal/modification-modal.component';
 import { LoaderComponent } from 'src/app/components/loader/loader.component';
-
 
 @Component({
   selector: 'app-edit-conversation',
@@ -78,7 +80,6 @@ export class EditConversationComponent {
   @ViewChild('goBackDialog')
   goBackDialog!: TemplateRef<any>;
 
-
   // ============================================================
   // VARIABLES - CONVERSACIÓN
   // ============================================================
@@ -104,7 +105,6 @@ export class EditConversationComponent {
 
   isStructureLocked: boolean = false;
 
-
   // ============================================================
   // VARIABLES - FORMULARIO
   // ============================================================
@@ -123,7 +123,6 @@ export class EditConversationComponent {
 
   showModal = false;
 
-
   // ============================================================
   // VARIABLES - ARCHIVOS
   // ============================================================
@@ -138,7 +137,6 @@ export class EditConversationComponent {
 
   imagesAdd: any[] = [];
 
-
   // ============================================================
   // VARIABLES - TABLAS
   // ============================================================
@@ -147,12 +145,13 @@ export class EditConversationComponent {
 
   displayedTableColumns: string[] = [];
 
-
   // ============================================================
   // VARIABLES - IA
   // ============================================================
 
   iaResponse: IaResponse | null = null;
+
+  fuentesAgregadas: Source[] = [];
 
   iaImageResponse: IaImageResponse | null = null;
 
@@ -161,7 +160,6 @@ export class EditConversationComponent {
   mostrarImagenIA = false;
 
   urlImagenIA : string = '';
-
 
   // ============================================================
   // VARIABLES - IMÁGENES
@@ -172,7 +170,6 @@ export class EditConversationComponent {
   imagesSafe: any[] = [];
 
   selectedImage: string | null = null;
-
 
   // ============================================================
   // VARIABLES - VOLVER A LA PREGUNTA ANTERIOR
@@ -185,7 +182,6 @@ export class EditConversationComponent {
 
   // Archivos que tenía la respuesta anterior (hay que volver a adjuntarlos)
   archivosAnteriores: string[] = [];
-
 
   // ============================================================
   // CONSTRUCTOR
@@ -202,7 +198,6 @@ export class EditConversationComponent {
     private http: HttpClient, 
     private conversationFormService: ConversationFormService
   ) {}
-
 
   // ============================================================
   // CICLO DE VIDA
@@ -226,7 +221,6 @@ export class EditConversationComponent {
 
     this.obtenerDataConversation();
   }
-
 
   // ============================================================
   // NAVEGACIÓN
@@ -290,20 +284,17 @@ export class EditConversationComponent {
 
   }
 
-
   // ============================================================
   // DATOS DE LA CONVERSACIÓN
   // ============================================================
 
   obtenerDataConversation(triggerAi: boolean = false) {
-    console.log("Suscription => obtenerDataConversation ");
 
     this.conversationService
       .getDataConversation(this.idSuscriptionConversation, triggerAi)
       .subscribe({
         next: (resp: any) => {
           this.dataCurrentQuestion = resp;
-          console.log('Data Question Ultimate => ', resp);
 
           // Si se volvió a esta pregunta, cargar lo que escribió el usuario y su tabla
           this.aplicarRespuestaRecuperada(resp?.restored);
@@ -319,16 +310,12 @@ export class EditConversationComponent {
         },
         error: (err: any) => {
           console.error(err);
-        },
-        complete: () => {
-          console.log('Completado');
         }
       });
   }
 
   confirmarRespuestaAutomatica() {
     if (!this.autoSuggestedAnswer || !this.dataCurrentQuestion?.question) return;
-
 
     this.loaderTitle = 'Guardando respuesta';
     this.loaderDescription = 'Esto tomará solo unos segundos…';
@@ -379,7 +366,6 @@ export class EditConversationComponent {
     this.showAutoAnswerModal = false;
   }
 
-
   // ============================================================
   // MANEJO DE ARCHIVOS - RESPUESTA
   // ============================================================
@@ -389,7 +375,6 @@ export class EditConversationComponent {
     this.fileInput.nativeElement.click();
 
   }
-
 
   onFileSelected(event: any): void {
 
@@ -498,13 +483,11 @@ export class EditConversationComponent {
 
   }
 
-
   removeFile(index: number): void {
 
     this.selectedFiles.splice(index, 1);
 
   }
-
 
   trackByFile(
     index: number,
@@ -515,7 +498,6 @@ export class EditConversationComponent {
 
   }
 
-
   // ============================================================
   // DRAG & DROP - RESPUESTA
   // ============================================================
@@ -525,7 +507,6 @@ export class EditConversationComponent {
     event.preventDefault();
 
   }
-
 
   onDrop2(event: DragEvent): void {
 
@@ -624,7 +605,6 @@ export class EditConversationComponent {
 
   }
 
-
   private processFiles2(files: FileList): void {
 
     Array.from(files).forEach(file => {
@@ -683,7 +663,6 @@ export class EditConversationComponent {
     });
 
   }
-
 
   // ============================================================
   // ARCHIVOS ADICIONALES
@@ -769,21 +748,15 @@ export class EditConversationComponent {
 
     });
 
-    console.log(
-      this.selectedFilesAddDoc
-    );
-
     event.target.value = '';
 
   }
-
 
   onDragOver(event: DragEvent) {
 
     event.preventDefault();
 
   }
-
 
   onDrop(event: DragEvent) {
 
@@ -831,7 +804,6 @@ export class EditConversationComponent {
     this.processFiles(validFiles);
 
   }
-
 
   private processFiles(files: File[]): void {
 
@@ -892,7 +864,6 @@ export class EditConversationComponent {
 
   }
 
-
   // ============================================================
   // TABLAS
   // ============================================================
@@ -930,22 +901,7 @@ export class EditConversationComponent {
 
   }
 
-
   openModalTable(): void {
-
-    console.log(
-      'Intentando abrir tabla...'
-    );
-
-    console.log(
-      'tablaGenerada:',
-      this.tablaGenerada
-    );
-
-    console.log(
-      'displayedTableColumns:',
-      this.displayedTableColumns
-    );
 
     if (!this.tablaGenerada) {
 
@@ -996,28 +952,19 @@ export class EditConversationComponent {
 
   }
 
-
   // ============================================================
   // VALIDACIÓN DE RESPUESTA
   // ============================================================
 
   conversationPayloadResponse() {
 
-    console.log(
-      'Respuestas enviadas:',
-      this.answers
-    );
-
     const respuesta =
       this.form.value.answer?.trim() || '';
 
-    console.count(
-      '🔥 validarRespuesta'
-    );
-
     if (
       !respuesta &&
-      this.selectedFiles.length == 0
+      this.selectedFiles.length == 0 &&
+      this.fuentesAgregadas.length == 0
     ) {
 
       return this.showDialog(
@@ -1030,11 +977,6 @@ export class EditConversationComponent {
 
     const formDataPayload =
       this.buildFormData('validate');
-
-    console.log(
-      'Payload:',
-      formDataPayload
-    );
 
     this.iaResponse = null;
 
@@ -1054,11 +996,6 @@ export class EditConversationComponent {
 
           this.iaResponse = resp.response;
 
-          console.log( "Respuesta Completa : {}", resp );
-
-          console.log( "Respuesta feedback : {}",  this.iaResponse.is_valid  );
-
-
           if (!resp.is_valid) {
 
             return this.showDialog(  'info', resp.feedback ?? '', 'Info'  );
@@ -1068,7 +1005,6 @@ export class EditConversationComponent {
           this.reply = this.iaResponse.response ?? '';
 
           this.iaImageResponse =  resp.image ?? null;
-          console.log( "IMAGEN RESPONSE IA=> {} ", resp.image ?? null );
 
           const predictionId =  this.iaImageResponse?.id;
 
@@ -1076,19 +1012,11 @@ export class EditConversationComponent {
                                             this.iaImageResponse.status === 'starting'
                                           ) &&  predictionId  ) {
 
-            console.log(  ' INICIANDO POLLING REPLICATE:',  predictionId );
-
             this.consultarImagenReplicate( predictionId  );
 
           }
 
           this.tablaGenerada = resp.table ?? null;
-
-          console.log(  '================ TABLE ================'  );
-
-          console.log(  this.tablaGenerada );
-
-          console.log(  '========================================'  );
 
           this.prepararTabla();
 
@@ -1115,16 +1043,11 @@ export class EditConversationComponent {
 
           this.isLoading = false;
 
-          console.log(
-            'Completado'
-          );
-
         }
 
       });
 
   }
-
 
   // ============================================================
   // FORM DATA
@@ -1166,8 +1089,11 @@ export class EditConversationComponent {
 
         });
 
-        break;
+        if (this.fuentesAgregadas.length) {
+          formData.append( 'sources', JSON.stringify( this.fuentesAgregadas ) );
+        }
 
+        break;
 
       // --------------------------------------------------------
       // SAVE
@@ -1216,18 +1142,10 @@ export class EditConversationComponent {
         this.selectedFilesAddDoc.forEach(
           item => {
 
-            console.log( 'NAME:',  item.file.name  );
-
-            console.log(  'TYPE:',  item.file.type  );
-
-            console.log(  'SIZE:', item.file.size );
-
             formData.append( 'files[]', item.file, item.file.name  );
 
           }
         );
-
-        console.log(  this.iaResponse?.references  );
 
         formData.append(  'references',  JSON.stringify( this.iaResponse?.references ?? [] )  );
 
@@ -1255,24 +1173,9 @@ export class EditConversationComponent {
 
     }
 
-    for (  let pair of formData.entries()  ) {
-
-      if (  pair[1] instanceof File  ) {
-
-        console.log(  pair[0],  'FILE =>',  pair[1].name,  pair[1].size  );
-
-      } else {
-
-        //console.log(  pair[0],  pair[1]  );
-
-      }
-
-    }
-
     return formData;
 
   }
-
 
   // ============================================================
   // GUARDAR RESPUESTA
@@ -1297,8 +1200,6 @@ export class EditConversationComponent {
 
         next: (resp: any) => {
 
-          console.log(  "Estado Guaradar Respuesta {} ",  resp  );
-
           this.obtenerDataConversation(true);
 
           this.reply = '';
@@ -1306,6 +1207,8 @@ export class EditConversationComponent {
           this.answers = [];
 
           this.selectedFiles = [];
+
+          this.fuentesAgregadas = [];
 
           this.form.reset();
 
@@ -1351,7 +1254,6 @@ export class EditConversationComponent {
 
   }
 
-
   // ============================================================
   // POLLING IMAGEN IA
   // ============================================================
@@ -1369,16 +1271,10 @@ export class EditConversationComponent {
 
         intentos++;
 
-        console.log(
-          `Consultando imagen ${intentos}/${maxIntentos}`
-        );
-
         this.conversationService .getReplicatePrediction( predictionId )
           .subscribe({
 
             next: (resp: any) => {
-
-              console.log( 'Estado Replicate:', resp.status );
 
               if (  resp.status === 'starting' ||  resp.status === 'processing' ) {
 
@@ -1417,8 +1313,6 @@ export class EditConversationComponent {
                     true;
 
                 });
-
-                console.log( 'Imagen lista:',  resp.output );
 
                 return;
 
@@ -1465,7 +1359,6 @@ export class EditConversationComponent {
 
   }
 
-
   // ============================================================
   // IMAGEN IA
   // ============================================================
@@ -1477,7 +1370,6 @@ export class EditConversationComponent {
 
   }
 
-
   openImage(img: string) {
 
     this.selectedImage = img;
@@ -1487,7 +1379,6 @@ export class EditConversationComponent {
 
   }
 
-
   closeImage() {
 
     this.selectedImage = null;
@@ -1496,7 +1387,6 @@ export class EditConversationComponent {
       'auto';
 
   }
-
 
   verImagenGrande(
     template: TemplateRef<any>
@@ -1515,7 +1405,6 @@ export class EditConversationComponent {
 
   }
 
-
 descargarImagen(url: string): void {
   const link = document.createElement('a');
 
@@ -1527,8 +1416,6 @@ descargarImagen(url: string): void {
   link.click();
   document.body.removeChild(link);
 }
-
-
 
   eliminarImagenIA(): void {
 
@@ -1543,7 +1430,6 @@ descargarImagen(url: string): void {
       null;
 
   }
-
 
   // ============================================================
   // VALIDACIÓN DE ARCHIVOS
@@ -1591,7 +1477,6 @@ descargarImagen(url: string): void {
 
   }
 
-
   // ============================================================
   // UI / MODALES
   // ============================================================
@@ -1606,14 +1491,12 @@ descargarImagen(url: string): void {
 
   }
 
-
   cerrarModal() {
 
     this.showModal =
       false;
 
   }
-
 
   mostrarSeccion(): void {
 
@@ -1622,8 +1505,36 @@ descargarImagen(url: string): void {
 
   }
 
-
   // Mensaje breve según el error de "Validar información"
+  abrirAgregarFuente(): void {
+    if (!this.dataCurrentQuestion?.question) return;
+
+    this.dialog.open(SourceModalComponent, {
+      width: '620px',
+      maxWidth: '95vw',
+      data: {
+        idConversation: this.idSuscriptionConversation
+      }
+    }).afterClosed().subscribe((fuentes: Source[] | undefined) => {
+      // Sin repetir la misma fuente
+      for (const fuente of fuentes ?? []) {
+        if (!this.fuentesAgregadas.some(f => f.apa_text === fuente.apa_text)) {
+          this.fuentesAgregadas.push(fuente);
+        }
+      }
+    });
+  }
+
+  quitarFuente(index: number): void {
+    this.fuentesAgregadas.splice(index, 1);
+  }
+
+  quitarReferencia(index: number): void {
+    if (!this.iaResponse?.references) return;
+
+    this.iaResponse.references = this.iaResponse.references.filter((_, i) => i !== index);
+  }
+
   private mensajeErrorValidacion(err: any): string {
     // Sin conexión: desde el navegador (0) o desde el servidor hacia el servicio externo (503)
     if (err?.status === 0 || err?.status === 503) {
@@ -1632,6 +1543,11 @@ descargarImagen(url: string): void {
 
     // Archivo rechazado por tipo o tamaño
     if (err?.status === 422) {
+      // Adjunto del que no se pudo obtener texto: el backend envía el mensaje
+      if (err?.error?.file_error && err?.error?.message) {
+        return err.error.message;
+      }
+
       return 'El archivo no es válido. Solo se admiten archivos JPG, PNG, PDF, Word.';
     }
 
@@ -1643,7 +1559,6 @@ descargarImagen(url: string): void {
     this.form.reset();
 
   }
-
 
   showDialog(
     type: 'success' | 'error' | 'info',
@@ -1672,7 +1587,6 @@ descargarImagen(url: string): void {
     );
 
   }
-
 
   // ============================================================
   // GENERAR DOCUMENTO
@@ -1801,6 +1715,7 @@ descargarImagen(url: string): void {
   // Deja la pregunta como nueva (lo mismo que se limpia después de guardar)
   private limpiarFormularioPregunta(): void {
     this.reply = '';
+    this.fuentesAgregadas = [];
     this.answers = [];
     this.selectedFiles = [];
     this.previewFiles = [];
@@ -1827,6 +1742,28 @@ descargarImagen(url: string): void {
   }
 
   // ABRIR MODAL 
+  // "Modificar respuesta": modificar una respuesta ya guardada de cualquier capítulo sin salir de la pregunta actual
+  abrirModificarRespuesta(): void {
+    this.dialog.open(ModificationModalComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: { idConversation: this.idSuscriptionConversation }
+    }).afterClosed().subscribe((result: ModificationResult | undefined) => {
+      if (!result) return;
+
+      if (result.type === 'menor') {
+        this.showDialog('success', 'Tu respuesta se modificó correctamente. Puedes continuar con tu pregunta actual.', 'Respuesta modificada');
+        return;
+      }
+
+      // De fondo: lo posterior se borró; se continúa desde la pregunta siguiente a la corregida
+      this.limpiarFormularioPregunta();
+      this.obtenerDataConversation();
+      this.showDialog('info', 'Tu respuesta se modificó y se eliminó lo desarrollado después de ella. Continúa desde la pregunta siguiente.', 'Respuesta modificada');
+    });
+  }
+
   abrirAsistenteIA(): void {
     if (!this.dataCurrentQuestion?.question) return;
 
@@ -1838,7 +1775,8 @@ descargarImagen(url: string): void {
       data: {
         idConversation: this.idSuscriptionConversation,
         question: this.dataCurrentQuestion.question,
-        parentNode: this.dataCurrentQuestion.parent_node
+        parentNode: this.dataCurrentQuestion.parent_node,
+        currentAnswer: this.form.get('answer')?.value ?? ''
       }
     });
 

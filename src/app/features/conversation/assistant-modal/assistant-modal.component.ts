@@ -22,6 +22,7 @@ export interface AssistantModalData {
   idConversation: number;
   question: any;
   parentNode: any;
+  currentAnswer?: string;
 }
 
 // INTERFACES PARA EL SUPER-MODAL
@@ -74,7 +75,15 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
   variables: VariableNegocio[] = [];
   
   // DATOS YA CONOCIDOS (Memoria Inmutable)
-  datosConocidos: { nombre: string, valor: string }[] = [];
+  datosConocidos: { clave: string, nombre: string, valor: string }[] = [];
+
+  // ARCHIVOS ADJUNTOS: se leen una sola vez y su texto viaja en cada mensaje del chat.
+  // Como en "Agregar archivo como respuesta": una imagen y un documento como máximo
+  adjuntos: { name: string; type: 'image' | 'document'; text: string; truncated: boolean }[] = [];
+  isReadingFile: boolean = false;
+  fileError: string = '';
+  private readonly MAX_ADJUNTO_MB = 5;
+  private readonly EXTENSIONES = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'xls', 'xlsx'];
 
   // Confirmación antes de integrar una propuesta incompleta (< 100 %)
   showIntegrateConfirm: boolean = false;
@@ -111,7 +120,9 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
     this.conversationService.assistantChat({
       idConversation: this.data.idConversation,
       idQuestion: this.data.question.id,
-      messages: []
+      messages: [],
+      current_answer: this.data.currentAnswer ?? '',
+      attachments: this.attachmentsPayload()
     })
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe({
@@ -141,7 +152,9 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
       idConversation: this.data.idConversation,
       idQuestion: this.data.question.id,
       messages: this.messages,
-      user_message: text
+      user_message: text,
+      current_answer: this.data.currentAnswer ?? '',
+      attachments: this.attachmentsPayload()
     })
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe({
@@ -188,14 +201,17 @@ export class AssistantModalComponent implements OnInit, AfterViewChecked {
       mostrarFormula: false // Inicia oculta
     }));
     
-    // MAPEO DE DATOS YA CONOCIDOS (Limpiando nulos y formateando claves)
-    const rawDatos = data.datos_conocidos || {};
-    this.datosConocidos = Object.keys(rawDatos)
-      .filter(key => rawDatos[key] !== null && rawDatos[key] !== '')
-      .map(key => ({
-        nombre: key.replace(/_/g, ' '), // Cambia guiones_bajos a espacios
-        valor: rawDatos[key]
-      }));
+    // DATOS YA CONOCIDOS: el backend envía solo los datos con valor del catálogo del plan,
+    this.setDatosConocidos(data.datos_conocidos);
+  }
+
+  private setDatosConocidos(raw: any): void {
+    const rawDatos: { key: string, label: string, value: string }[] = Array.isArray(raw) ? raw : [];
+    this.datosConocidos = rawDatos.map(d => ({
+      clave: d.key,
+      nombre: d.label,
+      valor: d.value
+    }));
   }
 
   recalculate(): void {
@@ -251,9 +267,82 @@ abrirCalculadora(): void {
     this.sendMessage(); // Lo enviamos a la IA automáticamente
   }
 
+  // "Subir archivo": se lee con el mismo servicio que "Agregar archivo como respuesta"
   subirArchivo(): void {
-    // TODO: Aquí integraremos la lógica para seleccionar y procesar archivos
-    console.log('Abrir selector de archivos...');
+    if (this.isReadingFile || this.isLoading) return;
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = this.EXTENSIONES.map(ext => '.' + ext).join(',');
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (file) this.leerArchivo(file);
+    };
+    input.click();
+  }
+
+  private leerArchivo(file: File): void {
+    this.fileError = '';
+
+    const extension = (file.name.split('.').pop() ?? '').toLowerCase();
+    const type: 'image' | 'document' = ['jpg', 'jpeg', 'png'].includes(extension) ? 'image' : 'document';
+
+    if (!this.EXTENSIONES.includes(extension)) {
+      this.fileError = 'Usa JPG, PNG, PDF, Word o Excel.';
+      return;
+    }
+
+    if (file.size > this.MAX_ADJUNTO_MB * 1024 * 1024) {
+      this.fileError = `El archivo supera ${this.MAX_ADJUNTO_MB} MB.`;
+      return;
+    }
+
+    if (this.adjuntos.some(a => a.type === type)) {
+      this.fileError = type === 'image'
+        ? 'Ya adjuntaste una imagen. Quítala para subir otra.'
+        : 'Ya adjuntaste un documento. Quítalo para subir otro.';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('idConversation', String(this.data.idConversation));
+    formData.append('idQuestion', String(this.data.question.id));
+    formData.append('file', file, file.name);
+
+    this.isReadingFile = true;
+
+    this.conversationService.readAssistantAttachment(formData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resp: any) => {
+          this.isReadingFile = false;
+          const data = resp?.data;
+          if (!data) return;
+
+          this.adjuntos.push({ name: data.name, type: data.type, text: data.text, truncated: !!data.truncated });
+          this.setDatosConocidos(data.datos_conocidos);
+
+          // El asistente revisa el archivo de inmediato
+          this.userInput = `Adjunté el archivo "${data.name}". Revisa su información.`;
+          this.sendMessage();
+        },
+        error: (err) => {
+          this.isReadingFile = false;
+          this.fileError = (err?.status === 422 || err?.status === 503) && err?.error?.message && !err?.error?.errors
+            ? err.error.message
+            : err?.status === 422
+              ? 'El archivo no es válido. Usa JPG, PNG, PDF, Word o Excel de hasta 5 MB.'
+              : 'No se pudo leer el archivo. Inténtalo de nuevo.';
+        }
+      });
+  }
+
+  quitarAdjunto(index: number): void {
+    this.adjuntos.splice(index, 1);
+  }
+
+  private attachmentsPayload(): { name: string; text: string }[] {
+    return this.adjuntos.map(a => ({ name: a.name, text: a.text }));
   }
   
   actionEstimarIA(): void {

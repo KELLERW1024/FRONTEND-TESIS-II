@@ -174,10 +174,12 @@
               class="flex flex-col items-center"
             >
 
-              <!-- Título -->
-              <h4 class="font-semibold mb-3 text-gray-700 text-center w-full">
-                Imagen {{ file.orden }}
-              </h4>
+              <!-- APA 7, igual que el Word: "Figura N" en negrita, título en cursiva, imagen y nota -->
+              <p class="font-bold text-gray-800 w-full">Figura {{ file.orden }}</p>
+
+              @if (file.description) {
+                <p class="italic text-gray-700 mb-2 w-full">{{ file.description }}</p>
+              }
 
               <!-- Imagen -->
               <a
@@ -187,21 +189,14 @@
               >
                 <img
                   [src]="file.file_path"
-                  [alt]="'Imagen ' + file.orden"
+                  [alt]="'Figura ' + file.orden"
                   class="max-w-full max-h-[350px] rounded-sm"
                 />
               </a>
 
-              <!-- Descripción -->
-              <p class="text-sm text-gray-700 mt-3 mb-1 text-center w-full">
-                {{ file.description || 'Sin descripción' }}
-              </p>
-
-              <!-- Fuente -->
-              <p class="text-xs text-gray-500 text-center w-full">
-                <span class="font-medium">Fuente:</span>
-                {{ file.fuente || 'No especificada' }}
-              </p>
+              @if (file.fuente) {
+                <p class="text-xs text-gray-600 mt-1 w-full"><em>Nota.</em> {{ file.fuente }}</p>
+              }
 
             </div>
           </div>
@@ -218,53 +213,43 @@
             *ngFor="let table of question.answer.tables"
             class="mb-8"
           >
-
-            <!-- Título -->
-            <h4 class="font-semibold mb-3 text-gray-700">
-              {{  table.nombre }}
-            </h4>
-            <h4 class="font-semibold mb-3 text-gray-700">
-              Fuente: {{ table.fuente}}
-            </h4>
-
             <div
               *ngIf="table.data?.columns?.length && table.data?.rows?.length"
               class="overflow-x-auto"
             >
+              <!-- APA 7, igual que el Word: "Tabla N" en negrita, título en cursiva, tabla y nota -->
+              <p class="font-bold text-gray-800">Tabla {{ table.orden }}</p>
+              @if (table.nombre) {
+                <p class="italic text-gray-700 mb-2">{{ table.nombre }}</p>
+              }
 
-              <table
-                class="w-full border-collapse border border-gray-300 text-sm"
-              >
-
+              <!-- Solo líneas horizontales: arriba, bajo el encabezado y al final; sin verticales ni sombreado -->
+              <table class="w-full border-collapse text-sm border-t border-b border-gray-800">
                 <thead>
                   <tr>
                     <th
                       *ngFor="let col of table.data.columns"
-                      class="border border-gray-300 px-3 py-2 bg-gray-100 text-left font-semibold"
+                      class="border-b border-gray-800 px-3 py-2 text-left font-semibold"
                     >
                       {{ col || '' }}
                     </th>
                   </tr>
                 </thead>
-
                 <tbody>
                   <tr
                     *ngFor="let row of table.data.rows"
                   >
                     <td
                       *ngFor="let cell of row"
-                      class="border border-gray-300 px-3 py-2"
+                      class="px-3 py-2"
                     >
                       {{ cell ?? '' }}
                     </td>
                   </tr>
                 </tbody>
-
               </table>
-                <h4 class="font-semibold mb-3 text-gray-700">
-              Tabla {{  table.orden }}
-            </h4>
 
+              <p class="text-xs text-gray-600 mt-1"><em>Nota.</em> {{ table.fuente }}</p>
             </div>
 
           </div>

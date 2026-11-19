@@ -131,13 +131,33 @@
             <button (click)="abrirCalculadora()" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded text-[11px] font-semibold text-indigo-600 transition-colors">
               <mat-icon class="text-[14px] w-4 h-4">calculate</mat-icon> Operaciones
             </button>
-            <button (click)="subirArchivo()" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded text-[11px] font-semibold text-emerald-600 transition-colors">
-              <mat-icon class="text-[14px] w-4 h-4">upload_file</mat-icon> Subir archivo
+            <button (click)="subirArchivo()" [disabled]="isReadingFile || isLoading"
+              class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded text-[11px] font-semibold text-emerald-600 transition-colors disabled:opacity-60">
+              <mat-icon class="text-[14px] w-4 h-4">upload_file</mat-icon> {{ isReadingFile ? 'Leyendo archivo…' : 'Subir archivo' }}
             </button>
             <button (click)="actionEstimarIA()" class="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-medium rounded border border-amber-200 transition-colors">
               <mat-icon class="text-[14px] w-4 h-4">auto_awesome</mat-icon> Estimar con IA
             </button>
           </div>
+
+          <!-- ARCHIVOS ADJUNTOS (su texto se envía en cada mensaje del chat) -->
+          @if (adjuntos.length || fileError) {
+            <div class="mb-3 space-y-1">
+              @for (adjunto of adjuntos; track $index) {
+                <p class="text-xs text-slate-600 break-words">
+                  <span aria-hidden="true">📎</span> {{ adjunto.name }}
+                  @if (adjunto.truncated) {
+                    <span class="text-amber-700">(se usará solo la primera parte del texto)</span>
+                  }
+                  <button type="button" class="ml-1 align-baseline text-slate-400 hover:text-red-600 leading-none cursor-pointer"
+                    title="Quitar archivo" (click)="quitarAdjunto($index)">✕</button>
+                </p>
+              }
+              @if (fileError) {
+                <p class="text-xs text-red-600">{{ fileError }}</p>
+              }
+            </div>
+          }
 
           <div class="flex gap-2 items-center">
             <input type="text" autofocus [(ngModel)]="userInput" (keyup.enter)="sendMessage()"
@@ -189,7 +209,9 @@
               <div class="flex items-center gap-2 shrink-0 mt-0.5">
                 <span class="font-bold text-slate-800">{{ v.valor }}</span>
                 <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded"
-                      [ngClass]="v.estado === 'Calculado' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
+                      [ngClass]="v.estado === 'Calculado' ? 'bg-emerald-100 text-emerald-700'
+                        : v.estado === 'Dato del usuario' ? 'bg-sky-100 text-sky-700'
+                        : 'bg-amber-100 text-amber-700'">
                   {{ v.estado }}
                 </span>
               </div>

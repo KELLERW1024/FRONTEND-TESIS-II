@@ -1,0 +1,203 @@
+<div class="flex flex-col max-h-[85vh]">
+
+  <!-- ENCABEZADO -->
+  <div class="flex items-center justify-between px-5 pt-3 pb-1">
+    <h2 class="text-base font-semibold text-slate-800">📚 Agregar fuente</h2>
+    <button type="button" class="text-slate-400 hover:text-slate-700 cursor-pointer" (click)="cerrar()" title="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- PESTAÑAS -->
+  <div class="flex gap-1 px-5 border-b border-slate-200">
+    <button type="button"
+      class="px-3 py-2 text-sm -mb-px border-b-2 cursor-pointer"
+      [ngClass]="tab === 'manual' ? 'border-blue-600 text-blue-700 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'"
+      (click)="tab = 'manual'">
+      Ingresar fuente
+    </button>
+    <button type="button"
+      class="px-3 py-2 text-sm -mb-px border-b-2 cursor-pointer"
+      [ngClass]="tab === 'search' ? 'border-blue-600 text-blue-700 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'"
+      (click)="tab = 'search'">
+      Buscar en fuentes confiables
+    </button>
+  </div>
+
+  <div class="overflow-y-auto px-5 py-3">
+
+    <!-- ===================== INGRESAR A MANO ===================== -->
+    @if (tab === 'manual') {
+      <div class="grid grid-cols-6 gap-x-3 gap-y-2 text-sm">
+
+        <label class="col-span-6 flex flex-col gap-0.5">
+          <span class="font-medium text-slate-700">Tipo de fuente</span>
+          <select class="border rounded px-2 py-1" [(ngModel)]="manual.source_type" name="source_type">
+            @for (t of tipos; track t.value) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="col-span-6 sm:col-span-4 flex flex-col gap-0.5">
+          <span class="font-medium text-slate-700">Autor o institución *</span>
+          <input class="border rounded px-2 py-1" [(ngModel)]="manual.author" name="author"
+            placeholder="Ej.: Instituto Nacional de Estadística e Informática o Pérez, J.">
+        </label>
+
+        <label class="col-span-6 sm:col-span-2 flex flex-col gap-0.5">
+          <span class="font-medium text-slate-700">Año</span>
+          <input class="border rounded px-2 py-1" [(ngModel)]="manual.year" name="year" placeholder="Ej.: 2023" maxlength="10">
+        </label>
+
+        <label class="col-span-6 flex flex-col gap-0.5">
+          <span class="font-medium text-slate-700">Otros autores <small class="text-slate-400">(opcional, separados por ;)</small></span>
+          <input class="border rounded px-2 py-1" [(ngModel)]="manual.otherAuthors" name="otherAuthors" placeholder="Ej.: Gómez, L.; Ríos, M.">
+        </label>
+
+        <label class="col-span-6 flex flex-col gap-0.5">
+          <span class="font-medium text-slate-700">Título *</span>
+          <input class="border rounded px-2 py-1" [(ngModel)]="manual.title" name="title">
+        </label>
+
+        @if (usaSitio) {
+          <label class="col-span-6 flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700">{{ esArticulo ? 'Revista' : 'Sitio web' }}</span>
+            <input class="border rounded px-2 py-1" [(ngModel)]="manual.container_title" name="container_title">
+          </label>
+        }
+
+        @if (esArticulo) {
+          <label class="col-span-2 flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700">Volumen</span>
+            <input class="border rounded px-2 py-1" [(ngModel)]="manual.volume" name="volume">
+          </label>
+          <label class="col-span-2 flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700">Número</span>
+            <input class="border rounded px-2 py-1" [(ngModel)]="manual.issue" name="issue">
+          </label>
+          <label class="col-span-2 flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700">Páginas</span>
+            <input class="border rounded px-2 py-1" [(ngModel)]="manual.pages" name="pages" placeholder="Ej.: 45-60">
+          </label>
+        }
+
+        @if (usaEditorial) {
+          <label class="col-span-6 flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700">{{ etiquetaEditorial }}</span>
+            <input class="border rounded px-2 py-1" [(ngModel)]="manual.publisher" name="publisher">
+          </label>
+        }
+
+        <label class="col-span-6 flex flex-col gap-0.5" [ngClass]="{ 'sm:col-span-4': esArticulo }">
+          <span class="font-medium text-slate-700">Enlace</span>
+          <input class="border rounded px-2 py-1" [(ngModel)]="manual.url" name="url" placeholder="https://…">
+        </label>
+
+        @if (esArticulo) {
+          <label class="col-span-6 sm:col-span-2 flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700">DOI</span>
+            <input class="border rounded px-2 py-1" [(ngModel)]="manual.doi" name="doi" placeholder="10.xxxx/…">
+          </label>
+        }
+
+        <label class="col-span-6 flex flex-col gap-0.5">
+          <span class="font-medium text-slate-700">Dato que tomas de la fuente <small class="text-slate-400">(opcional)</small></span>
+          <textarea class="border rounded px-2 py-1" rows="2" [(ngModel)]="manual.excerpt" name="excerpt"
+            placeholder="Ej.: En 2023, Loreto registró el 90 % de los casos de malaria del país."></textarea>
+        </label>
+      </div>
+
+      @if (manualError) {
+        <p class="mt-3 text-sm text-red-600">{{ manualError }}</p>
+      }
+    }
+
+    <!-- ===================== BUSCAR ===================== -->
+    @if (tab === 'search') {
+      <div class="flex flex-col gap-3 text-sm">
+
+        <div class="flex gap-2">
+          <input class="flex-1 border rounded px-2 py-1" [(ngModel)]="query" name="query"
+            [placeholder]="scope === 'official' ? 'Ej.: inflación en el Perú en 2024' : 'Ej.: diagrama de Ishikawa'"
+            (keyup.enter)="buscar()">
+          <button mat-flat-button color="primary" type="button" (click)="buscar()" [disabled]="isSearching || query.trim().length < 3">
+            Buscar
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-1.5 text-slate-700">
+          <label class="flex items-start gap-1.5 cursor-pointer">
+            <input type="radio" class="mt-1" name="scope" value="official" [(ngModel)]="scope">
+            <span>
+              Fuentes oficiales <small class="text-slate-400">(INEI, BCRP, MINSA, SUNAT, PRODUCE, gob.pe…)</small>
+              <small class="block text-slate-500">Para datos y cifras: población, ventas, inflación, casos.</small>
+            </span>
+          </label>
+          <label class="flex items-start gap-1.5 cursor-pointer">
+            <input type="radio" class="mt-1" name="scope" value="academic" [(ngModel)]="scope">
+            <span>
+              Artículos y tesis <small class="text-slate-400">(revistas y repositorios académicos)</small>
+              <small class="block text-slate-500">Para conceptos y teorías: FODA, Ishikawa, punto de equilibrio. Los libros clásicos agrégalos en "Ingresar fuente".</small>
+            </span>
+          </label>
+        </div>
+
+        @if (isSearching) {
+          <div class="flex items-center gap-3 py-6 justify-center text-slate-500">
+            <mat-spinner diameter="22"></mat-spinner>
+            {{ scope === 'official' ? 'Buscando en fuentes oficiales · puede tardar unos segundos…' : 'Buscando artículos y tesis…' }}
+          </div>
+        }
+
+        @if (searchError) {
+          <p class="text-red-600">{{ searchError }}</p>
+        }
+
+        @if (!isSearching && searched && !searchError && results.length === 0) {
+          <p class="text-slate-500">No se encontraron fuentes. Prueba con otras palabras.</p>
+        }
+
+        @if (results.length > 0) {
+          <p class="text-xs text-amber-800">Revisa el dato en el enlace antes de usarlo.</p>
+
+          <div class="flex flex-col gap-2">
+            @for (r of results; track $index) {
+              <label class="flex gap-3 p-3 border rounded-lg cursor-pointer"
+                [ngClass]="selected.has($index) ? 'border-blue-500 bg-blue-50/40' : 'border-slate-200 hover:bg-slate-50'">
+                <input type="checkbox" class="mt-1" [checked]="selected.has($index)" (change)="toggle($index)">
+                <div class="flex-1 min-w-0">
+                  <p class="text-slate-800 break-words">{{ r.apa_text }}</p>
+                  @if (r.excerpt) {
+                    <p class="mt-1 text-slate-500 italic break-words">{{ r.excerpt }}</p>
+                  }
+                  @if (enlace(r); as link) {
+                    <a [href]="link" target="_blank" rel="noopener noreferrer"
+                      class="mt-1 inline-block text-xs text-blue-600 hover:underline" (click)="$event.stopPropagation()">
+                      Abrir fuente ↗
+                    </a>
+                  }
+                </div>
+              </label>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- PIE -->
+  <div class="flex justify-end gap-2 px-5 py-2.5 border-t border-slate-200">
+    <button mat-stroked-button type="button" (click)="cerrar()">Cancelar</button>
+
+    @if (tab === 'manual') {
+      <button mat-flat-button color="primary" type="button" (click)="agregarManual()" [disabled]="isSaving">
+        Agregar fuente
+      </button>
+    } @else {
+      <button mat-flat-button color="primary" type="button" (click)="agregarSeleccionadas()" [disabled]="selected.size === 0">
+        Agregar seleccionadas{{ selected.size ? ' (' + selected.size + ')' : '' }}
+      </button>
+    }
+  </div>
+</div>
